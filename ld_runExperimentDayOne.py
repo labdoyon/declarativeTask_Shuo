@@ -19,6 +19,12 @@ dayOneExample = CommandItem(text='Example',
                             menu=menu,
                             should_exit=False)
 
+dayOneStimuliPresentation = CommandItem(text='stimulti presentation',
+                            command=python + " src" + os.path.sep + "ld_stimuli_presentation.py",
+                            arguments='stimulti-presentation, ' + sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
+
 soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
                             command=python + " src" + os.path.sep + "ld_calibrateSoundVolumeSubprocess.py",
                             arguments=sys.argv[1],
@@ -67,6 +73,7 @@ dayOneConfig = CommandItem(text='Show config file',
                            should_exit=False)
 
 menu.append_item(dayOneExample)
+menu.append_item(dayOneStimuliPresentation)
 menu.append_item(dayOnePreLearning)
 menu.append_item(soundVolumeAdjustment)
 menu.append_item(dayOneLearning)

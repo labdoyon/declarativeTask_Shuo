@@ -38,7 +38,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 
 textSize = 50
-matrixSize = (7, 7)
+matrixSize = (4, 4)
 cardSize = (80, 80)
 
 ''' Circles '''
@@ -128,7 +128,10 @@ arrow1 = (' XX                                                                  
           '                                                                                ',
           '                                                                                ')
 
-if matrixSize == (5, 5):
+if matrixSize == (4, 4):
+    matrixTemplate = None
+    removeCards = None
+elif matrixSize == (5, 5):
     matrixTemplate = [2,0,2,1,1,1,1,0,2,0,2,2,0,1,2,1,2,2,0,0,0,1,0,1]
     removeCards = [12]
 elif matrixSize == (6, 6):
@@ -159,6 +162,7 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     its number of subUnits * the number of blocks during a subUnit""")
 
 classPictures = ['a', 'b', 'c']
+# one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 
 listPictures = []
