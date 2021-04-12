@@ -3,15 +3,18 @@ from cursesmenu.items import *
 import sys
 import os
 
-# '1': Example
-# '2': Matrix A
-# '3': Rest
-# '4': Show Config
 
 python = 'py'
+language = 'None'
 
 # Create the menu
-menu = CursesMenu("Declarative Task - Day One", 'Subject: ' + sys.argv[1])
+menu = CursesMenu(title="Declarative Task - Day One", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + language)
+
+dayOneChooseLanguage = CommandItem(text='choose language',
+                            command=python + " src" + os.path.sep + "ld_choose_language.py",
+                            arguments='choose-language, ' + sys.argv[1] + ', ' + language,
+                            menu=menu,
+                            should_exit=False)
 
 dayOneExample = CommandItem(text='Example',
                             command=python + " src" + os.path.sep + "ld_example.py",
@@ -72,6 +75,7 @@ dayOneConfig = CommandItem(text='Show config file',
                            menu=menu,
                            should_exit=False)
 
+menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
 menu.append_item(dayOneStimuliPresentation)
 menu.append_item(dayOnePreLearning)

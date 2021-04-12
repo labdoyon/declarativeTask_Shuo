@@ -8,7 +8,7 @@ from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
-    matrixSize, classPicture, shortRest, presentationCard, \
+    classPictures, matrixSize, classPicture, shortRest, presentationCard, \
     picturesFolder
 from ld_stimuli_names import pictureNames, language
 
@@ -28,7 +28,8 @@ subjectName = arguments[1]
 
 # Create experiment
 exp = design.Experiment(experimentName)  # Save experiment name
-exp.add_experiment_info('Subject: ' + subjectName)  # Save Subject Code
+exp.add_experiment_info('Subject: ')
+exp.add_experiment_info(subjectName)  # Save Subject Code
 
 # save image categories used for experiment
 exp.add_experiment_info('Image categories (original order; src/config.py order): ' + str(classPictures))
