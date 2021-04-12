@@ -1,11 +1,16 @@
 import sys
+import os
+import glob
 import numpy as np
 
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
-from config import *
+from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
+    matrixSize, classPicture, shortRest, presentationCard, \
+    picturesFolder
+from ld_stimuli_names import pictureNames, language
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
@@ -87,8 +92,11 @@ for category in classPicturesPresentationOrder:
     instructionRectangle.plot(bs)
     bs.present(False, True)
 
-    for picture in category_pictures:
-        m._cueCard.setPicture(picture)  # Associate Picture to CueCard
+    for picture_fullpath in category_pictures:
+        m._cueCard.setPicture(picture_fullpath)  # Associate Picture to CueCard
+        picture_filename = os.path.basename(picture_fullpath)
+        picture_name = picture_filename.replace('.png', '')
+        picture_title = pictureNames[language][picture_name]
 
         m.plotCueCard(True, bs, True)  # Show Cue
         exp.clock.wait(presentationCard)  # Wait presentationCard
