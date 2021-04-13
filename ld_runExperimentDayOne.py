@@ -36,12 +36,11 @@ def getLanguage(subjectName, daysBefore, experienceName):
                 language = header[indexPositions].split('\n')[0].split('\n')[0]
                 output = language
 
-    # This ensures the latest ld
+    # This ensures the latest language choice is used
     return output
 
 
-# subjectName = sys.argv[1]
-subjectName = 'test'
+subjectName = sys.argv[1]
 
 language = str(getLanguage(subjectName, 0, 'choose-language'))
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
@@ -75,29 +74,35 @@ soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
                             menu=menu,
                             should_exit=False)
 
-dayOnePreLearning = CommandItem(text="PreLearning",
-                                command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-                                arguments="DayOne-PreLearning, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+dayOneEncoding = CommandItem(text='Encoding',
+                            command=python + " src" + os.path.sep + "ld_encoding.py",
+                            arguments='Encoding, ' + sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
 
-dayOneLearning = CommandItem(text="Matrix A",
-                             command=python + " src" + os.path.sep + "ld_declarativeTask_relauncher.py ",
-                             arguments="DayOne-Learning, " + sys.argv[1],
-                             menu=menu,
-                             should_exit=False)
+# dayOnePreLearning = CommandItem(text="PreLearning",
+#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
+#                                 arguments="DayOne-PreLearning, " + sys.argv[1],
+#                                 menu=menu,
+#                                 should_exit=False)
 
-dayOneTestMatrixA = CommandItem(text="Test Matrix A",
-                                command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-                                arguments="Day One - Test Learning, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+# dayOneLearning = CommandItem(text="Matrix A",
+#                              command=python + " src" + os.path.sep + "ld_declarativeTask_relauncher.py ",
+#                              arguments="DayOne-Learning, " + sys.argv[1],
+#                              menu=menu,
+#                              should_exit=False)
 
-dayOneConsolidationMatrixA = CommandItem(text="Consolidation Matrix A",
-                                command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-                                arguments="Day One - Test Consolidation, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+# dayOneTestMatrixA = CommandItem(text="Test Matrix A",
+#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
+#                                 arguments="Day One - Test Learning, " + sys.argv[1],
+#                                 menu=menu,
+#                                 should_exit=False)
+
+# dayOneConsolidationMatrixA = CommandItem(text="Consolidation Matrix A",
+#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
+#                                 arguments="Day One - Test Consolidation, " + sys.argv[1],
+#                                 menu=menu,
+#                                 should_exit=False)
 
 dayOneRecognition = CommandItem(text="Recognition",
                                   command=python + " src" + os.path.sep + "ld_recognition.py ",
@@ -119,11 +124,11 @@ dayOneConfig = CommandItem(text='Show config file',
 menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
 menu.append_item(dayOneStimuliPresentation)
-menu.append_item(dayOnePreLearning)
+# menu.append_item(dayOnePreLearning)
 menu.append_item(soundVolumeAdjustment)
-menu.append_item(dayOneLearning)
-menu.append_item(dayOneTestMatrixA)
-menu.append_item(dayOneConsolidationMatrixA)
+# menu.append_item(dayOneLearning)
+# menu.append_item(dayOneTestMatrixA)
+# menu.append_item(dayOneConsolidationMatrixA)
 menu.append_item(dayOneRecognition)
 menu.append_item(dayOneAssociation)
 menu.append_item(dayOneConfig)

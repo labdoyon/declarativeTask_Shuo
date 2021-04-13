@@ -19,7 +19,7 @@ picturesExamples = ['triangle.png', 'square.png', 'circle.png']
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 tempSounds = ['sound' + str(i) + '.wav' for i in range(len(sounds))]
 
-templatePicture = picturesFolder+'a001.png'
+templatePicture = picturesFolder + 'a001.png'
 
 linesThickness = 0
 colorLine = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
@@ -162,6 +162,7 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     its number of subUnits * the number of blocks during a subUnit""")
 
 classPictures = ['a', 'b', 'c']
+picturesFolderClass = {category: picturesFolder+'class_'+category+os.path.sep for category in classPictures}
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 
