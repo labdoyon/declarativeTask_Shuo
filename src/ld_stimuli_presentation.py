@@ -7,7 +7,7 @@ from expyriment.misc import constants
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, \
-    picturesFolderClass
+    picturesFolderClass, min_max_ISI
 from ld_stimuli_names import pictureNames, language
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
@@ -61,21 +61,33 @@ bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
     0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
 
-instructions = stimuli.TextLine(' PRESENTATION: PRESENTING ALL STIMULIS ',
-                                position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                text_underline=None, text_colour=textColor,
-                                background_colour=bgColor,
-                                max_width=None)
 
-instructionRectangle.plot(bs)
-instructions.plot(bs)
-bs.present(False, True)
+def create_instructions_box(box_text):
+    box = stimuli.TextLine(box_text,
+                           position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
+                           text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                           text_underline=None, text_colour=textColor,
+                           background_colour=bgColor,
+                           max_width=None)
+    return box
 
-exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
 
-instructionRectangle.plot(bs)
-bs.present(False, True)
+def show_and_hide_text_box(background, text_box, onscreen_time, just_show=False, just_hide=False):
+    if not just_hide:
+        instructionRectangle.plot(background)
+        text_box.plot(background)
+        background.present(False, True)
+        exp.clock.wait(onscreen_time)  # Short Rest between presentation and cue-recall
+    if not just_show:
+        instructionRectangle.plot(background)
+        background.present(False, True)
+
+
+instructions = create_instructions_box(' PRESENTATION: PRESENTING ALL STIMULIS ')
+show_and_hide_text_box(bs, instructions, shortRest)
+
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI)
 
 # PRESENTATION
 for category in classPicturesPresentationOrder:
@@ -84,14 +96,11 @@ for category in classPicturesPresentationOrder:
     # randomise pictures' presentation order
     category_pictures = np.random.permutation(category_pictures)
 
-    instructionRectangle.plot(bs)
-    instructions.plot(bs)
-    bs.present(False, True)
+    instructions = create_instructions_box(' PRESENTATION: PRESENTING CATEGORY ' + category.upper() + ' ')
+    show_and_hide_text_box(bs, instructions, shortRest)
 
-    exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
-
-    instructionRectangle.plot(bs)
-    bs.present(False, True)
+    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+    exp.clock.wait(ISI)
 
     for picture in category_pictures:
         m._cueCard.setPicture(picturesFolderClass[category] + picture)  # Associate Picture to CueCard
@@ -100,9 +109,13 @@ for category in classPicturesPresentationOrder:
         picture_title = pictureNames[language][picture_name]
 
         m.plotCueCard(True, bs, True)  # Show Cue
+        instructions = create_instructions_box(picture_title)
+        show_and_hide_text_box(bs, instructions, 0, just_show=True, just_hide=False)
         exp.clock.wait(presentationCard)  # Wait presentationCard
+        show_and_hide_text_box(bs, instructions, 0, just_show=False, just_hide=True)
         m.plotCueCard(False, bs, True)  # Hide Cue
 
-        exp.clock.wait(shortRest)
+        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+        exp.clock.wait(ISI)
 
 control.end()
