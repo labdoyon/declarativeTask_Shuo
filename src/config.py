@@ -19,7 +19,7 @@ picturesExamples = ['triangle.png', 'square.png', 'circle.png']
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 tempSounds = ['sound' + str(i) + '.wav' for i in range(len(sounds))]
 
-templatePicture = picturesFolder + 'a001.png'
+templatePicture = picturesFolder + 'class_a' + os.path.sep + 'a001.png'
 
 linesThickness = 0
 colorLine = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
@@ -129,8 +129,8 @@ arrow1 = (' XX                                                                  
           '                                                                                ')
 
 if matrixSize == (4, 4):
-    matrixTemplate = None
-    removeCards = None
+    matrixTemplate = [0]*16
+    removeCards = []
 elif matrixSize == (5, 5):
     matrixTemplate = [2,0,2,1,1,1,1,0,2,0,2,2,0,1,2,1,2,2,0,0,0,1,0,1]
     removeCards = [12]
@@ -166,11 +166,11 @@ picturesFolderClass = {category: picturesFolder+'class_'+category+os.path.sep fo
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 
-listPictures = []
+listPictures = {}
 for classPicture in classPictures:
-    listPictures.append(glob.glob(picturesFolder + classPicture + '*[0-9][0-9][0-9].png'))
+    listPictures[classPicture] = glob.glob(picturesFolderClass[classPicture] + classPicture + '*[0-9][0-9][0-9].png')
 
-for NClass in range(len(classPictures)):
-    listPictures[NClass] = [p.replace(picturesFolder, '') for p in listPictures[NClass]]
+for category in classPictures:
+    listPictures[category] = [p.replace(picturesFolderClass[category], '') for p in listPictures[category]]
 
 debug = False

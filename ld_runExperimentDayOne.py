@@ -124,6 +124,7 @@ dayOneConfig = CommandItem(text='Show config file',
 menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
 menu.append_item(dayOneStimuliPresentation)
+menu.append_item(dayOneEncoding)
 # menu.append_item(dayOnePreLearning)
 menu.append_item(soundVolumeAdjustment)
 # menu.append_item(dayOneLearning)
