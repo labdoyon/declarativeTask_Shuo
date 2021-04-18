@@ -1,5 +1,8 @@
+import os
 import sys
 import numpy as np
+from datetime import datetime
+from dateutil.parser import parse
 
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
@@ -7,8 +10,8 @@ from expyriment.misc import constants
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, \
-    picturesFolderClass, min_max_ISI
-from ld_stimuli_names import pictureNames, language
+    dataFolder, picturesFolderClass, min_max_ISI
+from ld_stimuli_names import pictureNames
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
@@ -21,6 +24,35 @@ from ld_stimuli_names import pictureNames, language
 # TODO describe the whole process at the beginning of the script, presentation, waiting times
 # TODO exp.add_experiment_info so all necessary informations are saved
 
+
+def getLanguage(subjectName, daysBefore, experienceName):
+    currentDate = datetime.now()
+    dataFiles = [file for file in os.listdir(dataFolder) if file.endswith('.xpd')]
+
+    output = None
+
+    for dataFile in dataFiles:
+        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        previousDate = parse(agg[2]['date'])
+
+        try:
+            agg[3].index(experienceName)
+        except ValueError:
+            continue
+        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
+            header = agg[3].split('\n#e ')
+
+            indexSubjectName = header.index('Subject:') + 1
+            if subjectName in header[indexSubjectName]:
+                print('File found: ' + dataFile)
+                indexPositions = header.index('language:') + 1
+                language = header[indexPositions].split('\n')[0].split('\n')[0]
+                output = language
+
+    # This ensures the latest language choice is used
+    return output
+
+
 # get experiment's name and subject's name from command line arguments
 arguments = str(''.join(sys.argv[1:])).split(',')
 experimentName = arguments[0]
@@ -30,6 +62,9 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)  # Save Subject Code
+language = str(getLanguage(subjectName, 0, 'choose-language'))
+exp.add_experiment_info('language: ')
+exp.add_experiment_info(language)  # Save Subject Code
 
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['show_or_hide', 'Time', 'category', 'Picture', 'picture_name'])
@@ -71,11 +106,11 @@ instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSi
 
 def create_instructions_box(box_text):
     instructions_box = stimuli.TextLine(box_text,
-                           position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                           text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                           text_underline=None, text_colour=textColor,
-                           background_colour=bgColor,
-                           max_width=None)
+                                        position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
+                                        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                        text_underline=None, text_colour=textColor,
+                                        background_colour=bgColor,
+                                        max_width=None)
     return instructions_box
 
 
