@@ -22,6 +22,7 @@ class LdMatrix(object):
         self._listPictures = []
         self._rowGap = 0
         self._columnGap = 0
+        self._category = None
 
         self.populate()  # Populate with cards
         self.isValidMatrix()  # Check Matrix validity
@@ -85,6 +86,9 @@ class LdMatrix(object):
         else:
             print('Matrix is not valid')
 
+    def associateCategory(self, category):
+        self._category = category
+
     def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
             self._cueCard.stimuli[0].plot(bs)
@@ -109,14 +113,16 @@ class LdMatrix(object):
     def returnPicture(self, nCard):
         return self._matrix.item(nCard).picture
 
-    def playSound(self, nCard, volumeAdjusted = False):
+    def playSound(self, soundsAllocation_index, volumeAdjusted = False):
         if volumeAdjusted:
             command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder +\
-                      tempSounds[self._matrix.item(nCard).sound]
+                      tempSounds[soundsAllocation_index[self._category]]
             subprocess.call(command)
         else:
+            print(self._category)
+            print(soundsAllocation_index)
             command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder +\
-                      sounds[self._matrix.item(nCard).sound]
+                      sounds[soundsAllocation_index[self._category]]
             subprocess.call(command)
 
     def playCueSound(self, volumeAdjusted = False):
@@ -150,18 +156,16 @@ class LdMatrix(object):
         else:
             return bs
 
-    def findMatrix(self, previousMatrix=None, keep=False):
+    def findMatrix(self, category, previousMatrix=None, keep=False):
 
         newMatrix = []
-        perm = np.random.permutation(numberClasses)
-        newClassesPictures = np.asarray(listPictures)[perm]
-        newClassesPictures = np.ndarray.tolist(newClassesPictures)
+
         if previousMatrix is None:   # New Matrix
-            for itemMatrix in matrixTemplate:
-                currentClass = newClassesPictures[itemMatrix]
-                randomIndex = np.random.randint(0, len(currentClass))
-                newMatrix.append(currentClass[randomIndex])
-                newClassesPictures[itemMatrix].remove(currentClass[randomIndex])
+            pictures = list(listPictures[category])
+            for itemMatrix in range(self._size[0]*self._size[1]):
+                randomIndex = np.random.randint(0, len(pictures))
+                newMatrix.append(pictures[randomIndex])
+                pictures.remove(pictures[randomIndex])
         elif keep:  # Keep previous Matrix
             previousMatrix = np.asarray(previousMatrix)
             newMatrix = previousMatrix

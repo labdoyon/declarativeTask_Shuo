@@ -13,6 +13,7 @@ from expyriment.misc._timer import get_time
 from expyriment.misc.geometry import coordinates2position
 
 from config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, dataFolder, removeCards
+from config import classPictures, sounds
 
 
 def checkWindowParameters(iWindowSize):
@@ -278,10 +279,17 @@ def readMouse(startTime, button, duration=None):
     #             exp.clock.wait(ISI)
 
 
-def newSoundAllocation(numberClasses):
+def newSoundAllocation():
     # Random permutation to assign sounds to picture classes
-    soundToClasses = np.random.permutation(numberClasses).tolist()
-    return soundToClasses
+    soundToClasses = {}
+    soundToClasses_index = {}
+    sounds_index = list(range(len(classPictures)))
+    for category in classPictures:
+        soundToClasses_index[category] = np.random.choice(sounds_index)
+        soundToClasses[category] = sounds[soundToClasses_index[category]]
+        sounds_index.remove(soundToClasses_index[category])
+
+    return soundToClasses_index, soundToClasses
 
 
 def absoluteTime(firstTime):

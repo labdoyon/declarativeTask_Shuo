@@ -50,6 +50,9 @@ def delete_temp_files():
             pass
 
 
+# TODO rename create_temp_sound_files to get_temp_sound_files wherever appropriate
+
+
 def create_temp_sound_files(subject_name):
     subject_file = 'soundsVolumeAdjustmentIndB_' + subject_name + '.pkl'
     # Getting back the objects:
