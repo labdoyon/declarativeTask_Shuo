@@ -252,7 +252,6 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             matrix_i._cueCard.setPicture(matrix_i._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
             matrix_i.plotCueCard(True, bs, True)  # Show Cue
-            matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
             # LOG and SYNC show cue card
             exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}_sound'.format(
                 nCard, matrix_i.listPictures[nCard], exp.clock.time,
@@ -264,61 +263,74 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             # LOG and SYNC hide cue card
             exp.add_experiment_info(['HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, matrix_i.listPictures[nCard],
                                                                                    exp.clock.time)])  # Add sync info
+            # Mouse Response Block
+            time_left = responseTime
+            valid_response = False
+            while True:
+                mouse.show_cursor(True, True)
 
-            mouse.show_cursor(True, True)
+                start = get_time()
+                rt, position = readMouse(start, mouseButton, time_left)
 
-            start = get_time()
-            rt, position = readMouse(start, mouseButton, responseTime)
+                mouse.hide_cursor(True, True)
+                if rt is not None:
 
-            mouse.hide_cursor(True, True)
-            if rt is not None:
+                    currentCard = matrix_i.checkPosition(position)
 
-                currentCard = matrix_i.checkPosition(position)
+                    # LOG and SYNC Response
+                    try:
+                        exp.add_experiment_info(['Response_pos_{}_card_{}_timing_{}'.format(
+                            currentCard,
+                            matrix_i.listPictures[currentCard],
+                            exp.clock.time)])  # Add sync info
+                        valid_response = True
+                    except:
+                        exp.add_experiment_info(
+                            ['Response_pos_{}_ERROR_timing_{}'.format(currentCard, exp.clock.time)])  # Add sync info
 
-                # LOG and SYNC Response
-                try:
-                    exp.add_experiment_info(['Response_pos_{}_card_{}_timing_{}'.format(currentCard,
-                                                                                        matrix_i.listPictures[currentCard],
-                                                                                        exp.clock.time)])  # Add sync info
-                except:
-                    exp.add_experiment_info(
-                        ['Response_pos_{}_ERROR_timing_{}'.format(currentCard, exp.clock.time)])  # Add sync info
+                    if currentCard is not None and currentCard not in removeCards:
+                        matrix_i._matrix.item(currentCard).color = clickColor
+                        matrix_i.plotCard(currentCard, False, bs, True)
 
-                if currentCard is not None and currentCard not in removeCards:
-                    matrix_i._matrix.item(currentCard).color = clickColor
-                    matrix_i.plotCard(currentCard, False, bs, True)
+                        exp.clock.wait(clicPeriod)  # Wait 200ms
 
-                    exp.clock.wait(clicPeriod)  # Wait 200ms
+                        matrix_i._matrix.item(currentCard).color = cardColor
+                        matrix_i.plotCard(currentCard, False, bs, True)
 
-                    matrix_i._matrix.item(currentCard).color = cardColor
-                    matrix_i.plotCard(currentCard, False, bs, True)
+                    if currentCard == nCard:
+                        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                        correctAnswers[i, nBlock] += 1
+                        exp.data.add([exp.clock.time, nBlock,
+                                      path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
+                                      path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
+                                      rt])
 
-                if currentCard == nCard:
-                    correctAnswers[i, nBlock] += 1
-                    exp.data.add([exp.clock.time, nBlock,
-                                  path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                                  path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
-                                  rt])
+                    elif currentCard is None:
+                        exp.data.add([exp.clock.time, nBlock,
+                                      path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
+                                      None,
+                                      rt])
 
-                elif currentCard is None:
+                    else:
+                        exp.data.add([exp.clock.time, nBlock,
+                                      path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
+                                      path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
+                                      rt])
+                else:
                     exp.data.add([exp.clock.time, nBlock,
                                   path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
                                   None,
                                   rt])
 
+                    # LOG and SYNC Response
+                    exp.add_experiment_info(['NoResponse'])  # Add sync info
+                if valid_response or rt is None:
+                    break
+                elif rt < time_left - clicPeriod:
+                    time_left = time_left - clicPeriod - rt
+                    pass
                 else:
-                    exp.data.add([exp.clock.time, nBlock,
-                                  path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                                  path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
-                                  rt])
-            else:
-                exp.data.add([exp.clock.time, nBlock,
-                              path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                              None,
-                              rt])
-
-                # LOG and SYNC Response
-                exp.add_experiment_info(['NoResponse'])  # Add sync info
+                    break
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
