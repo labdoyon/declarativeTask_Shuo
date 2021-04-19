@@ -44,20 +44,19 @@ if experimentName == 'Encoding':
 exp.add_experiment_info('Image categories (original order; src/config.py order): ')
 exp.add_experiment_info(str(classPictures))
 
-# classPicturesPresentationOrder = list(np.random.permutation(classPictures))
-matrix = []
-newMatrix = []
+matrices = []
+pictures_allocation = []
 for i, category in enumerate(classPictures):
-    matrix.append(LdMatrix(matrixSize, windowSize))  # Create Matrix
-    newMatrix.append(matrix[i].findMatrix(category, previousMatrix, keepMatrix))  # Find newMatrix
-    matrix[i].associateCategory(category)
+    matrices.append(LdMatrix(matrixSize, windowSize))  # Create matrices
+    pictures_allocation.append(matrices[i].findMatrix(category, previousMatrix, keepMatrix))  # Find pictures_allocation
+    matrices[i].associateCategory(category)
 
 control.initialize(exp)
 
 for i, category in enumerate(classPictures):
-    matrix[i].associatePictures(newMatrix[i], picturesFolder=picturesFolderClass[category])  # Associate Pictures to cards
+    matrices[i].associatePictures(pictures_allocation[i], picturesFolder=picturesFolderClass[category])  # Associate Pictures to cards
     exp.add_experiment_info('matrix {}, pictures from class {}:'.format(i, category))
-    exp.add_experiment_info(str(matrix[i].listPictures))  # Add listPictures
+    exp.add_experiment_info(str(matrices[i].listPictures))  # Add listPictures
 
 previousSoundAllocation = getPreviousSoundsAllocation(subjectName, 0, 'DayOne-Learning')
 
@@ -65,6 +64,7 @@ if not previousSoundAllocation or not keepSoundsAllocation:
     soundsAllocation_index, soundsAllocation = newSoundAllocation()
 else:
     soundsAllocation_index = previousSoundAllocation
+    soundsAllocation = {category: sounds[soundsAllocation_index[category]] for category in classPictures}
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -95,19 +95,19 @@ bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
 exp.clock.wait(shortRest)
 
-correctAnswers = np.zeros(nbBlocksMax)
-currentCorrectAnswers = 0
+correctAnswers = np.zeros((len(classPictures), nbBlocksMax))
+currentCorrectAnswers = correctAnswers[0:len(classPictures), 0]
 nBlock = 0
 
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], matrix[0].gap * 2 + cardSize[1]), position=(
-    0, -windowSize[1]/float(2) + (2 * matrix[0].gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
+instructionRectangle = stimuli.Rectangle(size=(windowSize[0], matrices[0].gap * 2 + cardSize[1]), position=(
+    0, -windowSize[1]/float(2) + (2 * matrices[0].gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
 
 ''' Presentation all locations '''
 presentationOrder = newRandomPresentation()
 
 instructions_ttl = stimuli.TextLine(' PLEASE INPUT TTL ',
                                     position=(
-                                    0, -windowSize[1] / float(2) + (2 * matrix[0].gap + cardSize[1]) / float(2)),
+                                        0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
                                     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                     text_underline=None, text_colour=textColor,
                                     background_colour=bgColor,
@@ -122,13 +122,26 @@ exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
 instructionRectangle.plot(bs)
 bs.present(False, True)
 
-while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
+new_matrix_presentation_order = None
+learning_matrix_presentation_order = None
+test_matrix_presentation_order = None
 
+while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
+
+    # TODO change this line <1 != nbBlocksMax> to reflect relevant experiment more accurately
+    # PRESENTATION BLOCK
     if 1 != nbBlocksMax or experimentName == 'DayOne-PreLearning':
-        matrix_presentation_order = list(np.random.permutation(3))
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
+
+        while new_matrix_presentation_order == learning_matrix_presentation_order:
+            new_matrix_presentation_order = list(np.random.permutation(len(classPictures)))
+        learning_matrix_presentation_order = new_matrix_presentation_order
+        exp.add_experiment_info(
+            'Presentation_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock,
+                                                                                learning_matrix_presentation_order,
+                                                                                exp.clock.time))  # Add sync info
         instructions = stimuli.TextLine(' PRESENTATION ',
-                                        position=(0, -windowSize[1]/float(2) + (2*matrix[0].gap + cardSize[1])/float(2)),
+                                        position=(0, -windowSize[1]/float(2) + (2*matrices[0].gap + cardSize[1])/float(2)),
                                         text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                         text_underline=None, text_colour=textColor,
                                         background_colour=bgColor,
@@ -146,22 +159,18 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         # LOG and SYNC: Start Presentation
         exp.add_experiment_info('StartPresentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))  # Add sync info
-        exp.add_experiment_info(
-            'Presentation_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock, matrix_presentation_order,
-                                                                                exp.clock.time))  # Add sync info
 
-        for i in matrix_presentation_order:
+        for i in learning_matrix_presentation_order:
             presentationOrder = newRandomPresentation(presentationOrder)
-            matrix_i = matrix[i]
+            matrix_i = matrices[i]
             matrix_i.plotDefault(bs, True)
 
-            matrix_presentation_order = list(np.random.permutation(3))
             exp.add_experiment_info('Presentation_Block_{}_matrix_{}_category_{}_timing_{}'.format(
                 nBlock, i, matrix_i._category, exp.clock.time))
             exp.add_experiment_info(str(presentationOrder))
-            instructions = stimuli.TextLine(' PRESENTATION ' + matrix_i._category,
-                                            position=(0, -windowSize[1] / float(2) + (
-                                                        2 * matrix[0].gap + cardSize[1]) / float(2)),
+            instructions = stimuli.TextLine(' PRESENTATION ' + matrix_i._category.upper(),
+                                            position=(0, -windowSize[1] / float(2) +
+                                                      (2 * matrices[0].gap + cardSize[1]) / float(2)),
                                             text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                             text_underline=None, text_colour=textColor,
                                             background_colour=bgColor,
@@ -193,10 +202,15 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
                 exp.clock.wait(ISI)
 
-            exp.clock.wait(shortRest)
+            ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+            exp.clock.wait(ISI)
 
+        exp.clok.wait(restPeriod)
+
+    # TEST BLOCK
     instructions = stimuli.TextLine(' TEST ',
-                                    position=(0, -windowSize[1] / float(2) + (2 * matrix[0].gap + cardSize[1]) / float(2)),
+                                    position=(
+                                        0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
                                     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                     text_underline=None, text_colour=textColor,
                                     background_colour=bgColor,
@@ -217,14 +231,17 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.clock.wait(ISI)
 
     ''' Cue Recall '''
+    while new_matrix_presentation_order == learning_matrix_presentation_order or \
+            new_matrix_presentation_order == test_matrix_presentation_order:
+        new_matrix_presentation_order = list(np.random.permutation(3))
+    test_matrix_presentation_order = new_matrix_presentation_order
+
     exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
     exp.add_experiment_info(
-        'Test_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock, matrix_presentation_order,
-                                                                            exp.clock.time))  # Add sync info
-
-    matrix_presentation_order = list(np.random.permutation(3))
-    for i in matrix_presentation_order:
-        matrix_i = matrix[i]
+        'Test_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock, test_matrix_presentation_order,
+                                                                    exp.clock.time))  # Add sync info
+    for i in test_matrix_presentation_order:
+        matrix_i = matrices[i]
         presentationOrder = newRandomPresentation(presentationOrder)
         exp.add_experiment_info('Test_Block_{}_matrix_{}_category_{}_timing_{}'.format(
             nBlock, i, matrix_i._category, exp.clock.time))
@@ -235,9 +252,11 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             matrix_i._cueCard.setPicture(matrix_i._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
             matrix_i.plotCueCard(True, bs, True)  # Show Cue
+            matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
             # LOG and SYNC show cue card
-            exp.add_experiment_info(['ShowCueCard_pos_{}_card_{}_timing_{}'.format(nCard, matrix_i.listPictures[nCard],
-                                                                                   exp.clock.time)])  # Add sync info
+            exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}_sound'.format(
+                nCard, matrix_i.listPictures[nCard], exp.clock.time,
+                sounds[soundsAllocation_index[matrix_i._category]]))  # Add sync info
 
             exp.clock.wait(presentationCard)  # Wait presentationCard
 
@@ -275,7 +294,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                     matrix_i.plotCard(currentCard, False, bs, True)
 
                 if currentCard == nCard:
-                    correctAnswers[nBlock] += 1
+                    correctAnswers[i, nBlock] += 1
                     exp.data.add([exp.clock.time, nBlock,
                                   path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
                                   path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
@@ -301,9 +320,11 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 # LOG and SYNC Response
                 exp.add_experiment_info(['NoResponse'])  # Add sync info
 
-            ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-            exp.clock.wait(ISI)
+        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+        exp.clock.wait(ISI)
 
-    currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
+    exp.clok.wait(restPeriod)
+
+    currentCorrectAnswers = correctAnswers[:, nBlock]
 
 control.end()

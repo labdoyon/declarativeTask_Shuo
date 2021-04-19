@@ -53,7 +53,7 @@ responseTime = 5000
 AssociationResponseTime = 10000
 
 shortRest = 2500
-restPeriod = 25000
+restPeriod = 15000
 clicPeriod = 200
 
 min_max_ISI = [500, 1500]  # [min, max] inter_stimulus interval
@@ -153,7 +153,7 @@ elif matrixSize == (7, 7):
                       0, 1, 0, 1, 2, 2, 0]
 
 # correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
-correctAnswersMax = 38
+correctAnswersMax = 12
 numberBlocksLearning = 10
 numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
