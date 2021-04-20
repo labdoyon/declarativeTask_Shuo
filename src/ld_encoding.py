@@ -41,7 +41,7 @@ if experimentName == 'Encoding':
     keepMatrix = True
     keepSoundsAllocation = True
 elif experimentName == 'Test-Encoding':
-    previousMatrix = True
+    keepPreviousMatrix = True
     keepMatrix = True
     keepSoundsAllocation = True
     nbBlocksMax = 1
@@ -51,10 +51,8 @@ exp.add_experiment_info(str(classPictures))
 
 matrices = []
 pictures_allocation = []
-if previousMatrix == True:
-    previousMatrix = []
 for i, category in enumerate(classPictures):
-    if previousMatrix == True:
+    if keepPreviousMatrix == True:
         previousMatrix = getPreviousMatrix(subjectName, 0, 'Encoding', i, category)
     matrices.append(LdMatrix(matrixSize, windowSize))  # Create matrices
     pictures_allocation.append(matrices[i].findMatrix(category, previousMatrix, keepMatrix))  # Find pictures_allocation
