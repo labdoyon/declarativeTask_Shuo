@@ -80,6 +80,12 @@ dayOneEncoding = CommandItem(text='Encoding',
                             menu=menu,
                             should_exit=False)
 
+dayOneTestEncoding = CommandItem(text='Test Encoding',
+                            command=python + " src" + os.path.sep + "ld_encoding.py",
+                            arguments='Test-Encoding, ' + sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
+
 # dayOnePreLearning = CommandItem(text="PreLearning",
 #                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
 #                                 arguments="DayOne-PreLearning, " + sys.argv[1],
@@ -125,6 +131,7 @@ menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
 menu.append_item(dayOneStimuliPresentation)
 menu.append_item(dayOneEncoding)
+menu.append_item(dayOneTestEncoding)
 # menu.append_item(dayOnePreLearning)
 menu.append_item(soundVolumeAdjustment)
 # menu.append_item(dayOneLearning)

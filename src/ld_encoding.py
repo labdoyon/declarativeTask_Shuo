@@ -22,7 +22,7 @@ else:
     control.defaults.window_size = windowSize
 
 if debug:
-    control.set_develop_mode(True)
+    control.set_develop_mode(on=True, intensive_logging=False, skip_wait_methods=True)
 
 arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment name and subject
 # arguments = ['Encoding', 'test']
@@ -40,13 +40,22 @@ if experimentName == 'Encoding':
     previousMatrix = None
     keepMatrix = True
     keepSoundsAllocation = True
+elif experimentName == 'Test-Encoding':
+    previousMatrix = True
+    keepMatrix = True
+    keepSoundsAllocation = True
+    nbBlocksMax = 1
 
 exp.add_experiment_info('Image categories (original order; src/config.py order): ')
 exp.add_experiment_info(str(classPictures))
 
 matrices = []
 pictures_allocation = []
+if previousMatrix == True:
+    previousMatrix = []
 for i, category in enumerate(classPictures):
+    if previousMatrix == True:
+        previousMatrix = getPreviousMatrix(subjectName, 0, 'Encoding', i, category)
     matrices.append(LdMatrix(matrixSize, windowSize))  # Create matrices
     pictures_allocation.append(matrices[i].findMatrix(category, previousMatrix, keepMatrix))  # Find pictures_allocation
     matrices[i].associateCategory(category)
@@ -130,7 +139,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
     # TODO change this line <1 != nbBlocksMax> to reflect relevant experiment more accurately
     # PRESENTATION BLOCK
-    if 1 != nbBlocksMax or experimentName == 'DayOne-PreLearning':
+    if 1 != nbBlocksMax or experimentName == 'Encoding':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
 
         while new_matrix_presentation_order == learning_matrix_presentation_order:
@@ -205,7 +214,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
             exp.clock.wait(ISI)
 
-        exp.clok.wait(restPeriod)
+        exp.clock.wait(restPeriod)
 
     # TEST BLOCK
     instructions = stimuli.TextLine(' TEST ',
@@ -331,12 +340,27 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                     pass
                 else:
                     break
+        if nbBlocksMax != 1:
+            instructions = stimuli.TextLine(
+                'You got ' + str(int(correctAnswers[i, nBlock])) + ' out of ' + str(matrix_i._matrix.size - len(removeCards)),
+                position=(0, -windowSize[1] / float(2) + (2 * matrix_i.gap + cardSize[1]) / float(2)),
+                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                text_underline=None, text_colour=textColor, background_colour=bgColor,
+                max_width=None)
+            instructions.plot(bs)
+            bs.present(False, True)
+
+            exp.clock.wait(shortRest)
+
+            instructionRectangle.plot(bs)
+            bs.present(False, True)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
+        exp.clock.wait(shortRest)
 
-    exp.clok.wait(restPeriod)
-
+    exp.clock.wait(restPeriod)
     currentCorrectAnswers = correctAnswers[:, nBlock]
+    nBlock += 1
 
 control.end()

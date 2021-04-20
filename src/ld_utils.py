@@ -95,7 +95,7 @@ def longestSubstringFinder(string1, string2):
     return answer
 
 
-def getPreviousMatrix(subjectName, daysBefore, experienceName):
+def getPreviousMatrix(subjectName, daysBefore, experienceName, matrix_index, matrix_category):
 
     currentDate = datetime.now()
 
@@ -117,7 +117,8 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
                 print('File found: ' + dataFile)
-                indexPositions = header.index('Positions pictures:') + 1
+                indexPositions = header.index('matrix {}, pictures from class {}:'.format(matrix_index,
+                                                                                          matrix_category)) + 1
                 previousMatrix = ast.literal_eval(header[indexPositions].split('\n')[0].split('\n')[0])
                 return previousMatrix
 
