@@ -362,4 +362,19 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     currentCorrectAnswers = correctAnswers[:, nBlock]
     nBlock += 1
 
+instructions = stimuli.TextLine(
+    ' REST ',
+    position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+    text_underline=None, text_colour=textColor, background_colour=bgColor,
+    max_width=None)
+
+instructions.plot(bs)
+bs.present(False, True)
+
+exp.clock.wait(restPeriod)
+
+instructionRectangle.plot(bs)
+bs.present(False, True)
+
 control.end()
