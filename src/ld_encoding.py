@@ -249,6 +249,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                                                                     exp.clock.time))  # Add sync info
     for i in test_matrix_presentation_order:
         matrix_i = matrices[i]
+        matrix_i.plotDefault(bs, True)
         presentationOrder = newRandomPresentation(presentationOrder)
         exp.add_experiment_info('Test_Block_{}_matrix_{}_category_{}_timing_{}'.format(
             nBlock, i, matrix_i._category, exp.clock.time))
