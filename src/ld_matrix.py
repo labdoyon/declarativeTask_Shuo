@@ -89,6 +89,10 @@ class LdMatrix(object):
     def associateCategory(self, category):
         self._category = category
 
+    def changeCueCardPosition(self, position):
+        sizeRows = self._matrix.item(0).size[0]  # Size of a card
+        self._cueCard.position = position
+
     def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
             self._cueCard.stimuli[0].plot(bs)

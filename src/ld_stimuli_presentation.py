@@ -10,7 +10,7 @@ from expyriment.misc import constants
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, \
-    dataFolder, picturesFolderClass, min_max_ISI
+    dataFolder, picturesFolderClass, min_max_ISI, restPeriod
 from ld_stimuli_names import pictureNames
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
@@ -87,6 +87,7 @@ else:
 
 # TODO # this line (below) does too much, but it's okay for now.
 m = LdMatrix(matrixSize, windowSize)
+m.changeCueCardPosition((0, 0))
 
 # start experiment
 control.initialize(exp)
@@ -100,13 +101,13 @@ exp.add_experiment_info(str(classPicturesPresentationOrder))
 # Graphical instructions
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
-    0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
+instructionRectangle = stimuli.Rectangle(size=(windowSize[0], cardSize[1]), position=(
+    0, -(cardSize[1])), colour=constants.C_DARKGREY)
 
 
 def create_instructions_box(box_text):
     instructions_box = stimuli.TextLine(box_text,
-                                        position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
+                                        position=(0, -(cardSize[1])),  # -windowSize[1]/float(2) +
                                         text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                         text_underline=None, text_colour=textColor,
                                         background_colour=bgColor,
@@ -167,5 +168,20 @@ for category in classPicturesPresentationOrder:
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
+
+instructions = stimuli.TextLine(
+    ' REST ',
+    position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
+    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+    text_underline=None, text_colour=textColor, background_colour=bgColor,
+    max_width=None)
+
+instructions.plot(bs)
+bs.present(False, True)
+
+exp.clock.wait(restPeriod)
+
+instructionRectangle.plot(bs)
+bs.present(False, True)
 
 control.end()
