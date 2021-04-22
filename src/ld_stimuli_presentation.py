@@ -10,8 +10,8 @@ from expyriment.misc import constants
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, \
-    dataFolder, picturesFolderClass, min_max_ISI, restPeriod
-from ld_stimuli_names import pictureNames
+    dataFolder, picturesFolderClass, min_max_ISI, restPeriod, debug
+from ld_stimuli_names import pictureNames, classNames
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
@@ -23,6 +23,9 @@ from ld_stimuli_names import pictureNames
 # TODO check all resting times
 # TODO describe the whole process at the beginning of the script, presentation, waiting times
 # TODO exp.add_experiment_info so all necessary informations are saved
+
+if debug:
+    control.set_develop_mode(on=True, intensive_logging=False, skip_wait_methods=True)
 
 
 def getLanguage(subjectName, daysBefore, experienceName):
@@ -101,17 +104,18 @@ exp.add_experiment_info(str(classPicturesPresentationOrder))
 # Graphical instructions
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], cardSize[1]), position=(
-    0, -(cardSize[1])), colour=constants.C_DARKGREY)
+instructionRectangle = stimuli.Rectangle(size=(windowSize[0], 2*cardSize[1]), position=(
+    0, -(2*cardSize[1])), colour=constants.C_DARKGREY)
 
 
-def create_instructions_box(box_text):
-    instructions_box = stimuli.TextLine(box_text,
-                                        position=(0, -(cardSize[1])),  # -windowSize[1]/float(2) +
+def create_instructions_box(box_text, position):
+    instructions_box = stimuli.TextBox(box_text,
+                                       size=(windowSize[0], 2*cardSize[1]),
+                                        position=position,  # -windowSize[1]/float(2) +
                                         text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                         text_underline=None, text_colour=textColor,
-                                        background_colour=bgColor,
-                                        max_width=None)
+                                        background_colour=bgColor)  # ,
+                                        # max_width=None)
     return instructions_box
 
 
@@ -126,9 +130,22 @@ def show_and_hide_text_box(background, instructions_box, onscreen_time, just_sho
         background.present(False, True)
 
 
+if language == 'french':
+    instructions_rest_text = ' REPOS '
+    instructions_presentation_text = """ PRÉSENTATION: 
+     PRÉSENTATION DE TOUS LES STIMULIS """
+    instructions_present1category_text = """ PRÉSENTATION:
+    PRÉSENTATION DE LA CATÉGORIE: """
+elif language == 'english':
+    instructions_rest_text = ' REST '
+    instructions_presentation_text = """ PRESENTATION:
+     PRESENTING ALL STIMULIS """
+    instructions_present1category_text = """ PRESENTATION: 
+     PRESENTING CATEGORY """
+
 exp.add_experiment_info('Presentation start')
-instructions = create_instructions_box(' PRESENTATION: PRESENTING ALL STIMULIS ')
-show_and_hide_text_box(bs, instructions, shortRest)
+instructions_presentation = create_instructions_box(instructions_presentation_text, (0, -(2*cardSize[1])))
+show_and_hide_text_box(bs, instructions_presentation, shortRest)
 
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
 exp.clock.wait(ISI)
@@ -140,9 +157,11 @@ for category in classPicturesPresentationOrder:
     # randomise pictures' presentation order
     category_pictures = np.random.permutation(category_pictures)
 
-    exp.add_experiment_info(' PRESENTATION: PRESENTING CATEGORY ' + category)
-    instructions = create_instructions_box(' PRESENTATION: PRESENTING CATEGORY ' + category.upper() + ' ')
-    show_and_hide_text_box(bs, instructions, shortRest)
+    exp.add_experiment_info(' PRESENTATION: PRESENTING CATEGORY ' + classNames[language][category])
+    instructions_present1category = create_instructions_box(
+        instructions_present1category_text + classNames[language][category] + ' ',
+        (0, -(2*cardSize[1])))
+    show_and_hide_text_box(bs, instructions_present1category, shortRest)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     exp.clock.wait(ISI)
@@ -154,13 +173,14 @@ for category in classPicturesPresentationOrder:
         picture_title = pictureNames[language][picture_name]
 
         m.plotCueCard(True, bs, True)  # Show Cue
-        instructions = create_instructions_box(picture_title)
-        show_and_hide_text_box(bs, instructions, 0, just_show=True, just_hide=False)
+        title = create_instructions_box(picture_title,
+                                        (0, -(2*cardSize[1])))
+        show_and_hide_text_box(bs, title, 0, just_show=True, just_hide=False)
         exp.add_experiment_info(
             'ShowCard_pos_{}_card_{}_name_{}_timing_{}'.format('None', picture, picture_title, exp.clock.time))
         exp.data.add(['show', exp.clock.time, category, picture, picture_title])
         exp.clock.wait(presentationCard)  # Wait presentationCard
-        show_and_hide_text_box(bs, instructions, 0, just_show=False, just_hide=True)
+        show_and_hide_text_box(bs, title, 0, just_show=False, just_hide=True)
         m.plotCueCard(False, bs, True)  # Hide Cue
         exp.add_experiment_info(
             'HideCard_pos_{}_card_{}_name_{}__timing_{}'.format('None', picture, picture_title, exp.clock.time))
@@ -169,19 +189,8 @@ for category in classPicturesPresentationOrder:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
-instructions = stimuli.TextLine(
-    ' REST ',
-    position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-    text_underline=None, text_colour=textColor, background_colour=bgColor,
-    max_width=None)
-
-instructions.plot(bs)
-bs.present(False, True)
-
-exp.clock.wait(restPeriod)
-
-instructionRectangle.plot(bs)
-bs.present(False, True)
+instructions_rest = create_instructions_box(instructions_rest_text,
+                                            (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))
+show_and_hide_text_box(bs, instructions_rest, restPeriod)
 
 control.end()

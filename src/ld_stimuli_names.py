@@ -108,3 +108,5 @@ picturesNamesFrench = {
 }
 
 pictureNames = {'english': picturesNamesEnglish, 'french': picturesNamesFrench}
+classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
+              'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'}}

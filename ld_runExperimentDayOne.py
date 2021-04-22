@@ -64,7 +64,7 @@ dayOneExample = CommandItem(text='Example',
 
 dayOneStimuliPresentation = CommandItem(text='stimulti presentation',
                             command=python + " src" + os.path.sep + "ld_stimuli_presentation.py",
-                            arguments='stimulti-presentation, ' + sys.argv[1],
+                            arguments='stimuli-presentation, ' + sys.argv[1],
                             menu=menu,
                             should_exit=False)
 

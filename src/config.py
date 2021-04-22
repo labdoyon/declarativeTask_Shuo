@@ -37,7 +37,7 @@ bgColor = (150, 150, 150)
 textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 
-textSize = 50
+textSize = 40
 matrixSize = (4, 4)
 cardSize = (80, 80)
 
