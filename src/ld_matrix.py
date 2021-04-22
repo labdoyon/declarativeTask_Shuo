@@ -123,8 +123,6 @@ class LdMatrix(object):
                       tempSounds[soundsAllocation_index[self._category]]
             subprocess.call(command)
         else:
-            print(self._category)
-            print(soundsAllocation_index)
             command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder +\
                       sounds[soundsAllocation_index[self._category]]
             subprocess.call(command)

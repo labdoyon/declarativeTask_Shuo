@@ -146,7 +146,7 @@ def getPreviousSoundsAllocation(subjectName, daysBefore, experienceName):
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
                 print('File found: ' + dataFile)
-                indexPositions = header.index('Image classes to sounds:') + 1
+                indexPositions = header.index('Image classes to sounds (index):') + 1
                 previousMatrix = ast.literal_eval(header[indexPositions].split('\n')[0].split('\n')[0])
                 return previousMatrix
 

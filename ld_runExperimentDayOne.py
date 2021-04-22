@@ -2,24 +2,28 @@ from cursesmenu import *
 from cursesmenu.items import *
 import sys
 import os
+import numpy as np
+from ast import literal_eval
 
 from datetime import datetime
-from expyriment import misc
+import expyriment
 from dateutil.parser import parse
 
 
 rawFolder = os.getcwd() + os.path.sep
 dataFolder = rawFolder + 'data' + os.path.sep
+sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
+classPictures = ['a', 'b', 'c']
 
 
-def getLanguage(subjectName, daysBefore, experienceName):
+def getPrevious(subjectName, daysBefore, experienceName, target):
     currentDate = datetime.now()
     dataFiles = [file for file in os.listdir(dataFolder) if file.endswith('.xpd')]
 
     output = None
 
     for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        agg = expyriment.misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
         previousDate = parse(agg[2]['date'])
 
         try:
@@ -32,23 +36,60 @@ def getLanguage(subjectName, daysBefore, experienceName):
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
                 print('File found: ' + dataFile)
-                indexPositions = header.index('language:') + 1
-                language = header[indexPositions].split('\n')[0].split('\n')[0]
-                output = language
+                indexPositions = header.index(target) + 1
+                previousTarget = header[indexPositions].split('\n')[0].split('\n')[0]
+                try:  # dictionary or list
+                    output = literal_eval(previousTarget)
+                except SyntaxError or ValueError:  # string
+                    output = previousTarget
 
     # This ensures the latest language choice is used
     return output
 
 
+def newSoundAllocation():
+    # Random permutation to assign sounds to picture classes
+    soundToClasses = {}
+    soundToClasses_index = {}
+    sounds_index = list(range(len(classPictures)))
+    for category in classPictures:
+        soundToClasses_index[category] = np.random.choice(sounds_index)
+        soundToClasses[category] = sounds[soundToClasses_index[category]]
+        sounds_index.remove(soundToClasses_index[category])
+
+    return soundToClasses_index, soundToClasses
+
+
 subjectName = sys.argv[1]
 
-language = str(getLanguage(subjectName, 0, 'choose-language'))
+soundsAllocation_index = getPrevious(subjectName, 0, 'choose-sound-association', 'Image classes to sounds (index):')
+if soundsAllocation_index is None:
+    soundsAllocation_index, soundsAllocation = newSoundAllocation()
+    expyriment.control.set_develop_mode(on=True, intensive_logging=False, skip_wait_methods=True)
+    exp = expyriment.design.Experiment('choose-sound-association')  # Save experiment name
+    exp.add_experiment_info('Subject: ')  # Save Subject Code
+    exp.add_experiment_info(subjectName)
+    exp.add_experiment_info('Image classes order:')
+    exp.add_experiment_info(str(classPictures))
+    exp.add_experiment_info('Sounds order:')
+    exp.add_experiment_info(str(sounds))
+    exp.add_experiment_info('Image classes to sounds:')
+    exp.add_experiment_info(str(soundsAllocation))
+    exp.add_experiment_info('Image classes to sounds (index):')
+    exp.add_experiment_info(str(soundsAllocation_index))
+    expyriment.control.initialize(exp)
+    expyriment.control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
+    expyriment.control.end()
+
+menu_soundsAllocation_index = {key: 'S'+str(soundsAllocation_index[key]+1) for key in soundsAllocation_index.keys()}
+language = str(getPrevious(subjectName, 0, 'choose-language', 'language:'))
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
 
 python = 'py'
 
 # Create the menu
-menu = CursesMenu(title="Declarative Task - Day One", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + language)
+menu = CursesMenu(title="Declarative Task - Day One", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + language +\
+                  ' ; sounds to categories: ' + str(menu_soundsAllocation_index))
 
 dayOneChooseLanguage = CommandItem(text='choose language',
                             command=python + " src" + os.path.sep + "ld_choose_language.py",
@@ -86,30 +127,6 @@ dayOneTestEncoding = CommandItem(text='Test Encoding',
                             menu=menu,
                             should_exit=False)
 
-# dayOnePreLearning = CommandItem(text="PreLearning",
-#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-#                                 arguments="DayOne-PreLearning, " + sys.argv[1],
-#                                 menu=menu,
-#                                 should_exit=False)
-
-# dayOneLearning = CommandItem(text="Matrix A",
-#                              command=python + " src" + os.path.sep + "ld_declarativeTask_relauncher.py ",
-#                              arguments="DayOne-Learning, " + sys.argv[1],
-#                              menu=menu,
-#                              should_exit=False)
-
-# dayOneTestMatrixA = CommandItem(text="Test Matrix A",
-#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-#                                 arguments="Day One - Test Learning, " + sys.argv[1],
-#                                 menu=menu,
-#                                 should_exit=False)
-
-# dayOneConsolidationMatrixA = CommandItem(text="Consolidation Matrix A",
-#                                 command=python + " src" + os.path.sep + "ld_declarativeTask.py ",
-#                                 arguments="Day One - Test Consolidation, " + sys.argv[1],
-#                                 menu=menu,
-#                                 should_exit=False)
-
 dayOneRecognition = CommandItem(text="Recognition",
                                   command=python + " src" + os.path.sep + "ld_recognition.py ",
                                   arguments="Day One - Recognition, " + sys.argv[1],
@@ -132,11 +149,7 @@ menu.append_item(dayOneExample)
 menu.append_item(dayOneStimuliPresentation)
 menu.append_item(dayOneEncoding)
 menu.append_item(dayOneTestEncoding)
-# menu.append_item(dayOnePreLearning)
 menu.append_item(soundVolumeAdjustment)
-# menu.append_item(dayOneLearning)
-# menu.append_item(dayOneTestMatrixA)
-# menu.append_item(dayOneConsolidationMatrixA)
 menu.append_item(dayOneRecognition)
 menu.append_item(dayOneAssociation)
 menu.append_item(dayOneConfig)

@@ -36,14 +36,11 @@ exp.add_experiment_info(subjectName)
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
+keepMatrix = True
 if experimentName == 'Encoding':
-    previousMatrix = None
-    keepMatrix = True
-    keepSoundsAllocation = True
+    keepPreviousMatrix = False
 elif experimentName == 'Test-Encoding':
     keepPreviousMatrix = True
-    keepMatrix = True
-    keepSoundsAllocation = True
     nbBlocksMax = 1
 
 exp.add_experiment_info('Image categories (original order; src/config.py order): ')
@@ -54,6 +51,8 @@ pictures_allocation = []
 for i, category in enumerate(classPictures):
     if keepPreviousMatrix == True:
         previousMatrix = getPreviousMatrix(subjectName, 0, 'Encoding', i, category)
+    else:
+        previousMatrix = None
     matrices.append(LdMatrix(matrixSize, windowSize))  # Create matrices
     pictures_allocation.append(matrices[i].findMatrix(category, previousMatrix, keepMatrix))  # Find pictures_allocation
     matrices[i].associateCategory(category)
@@ -65,13 +64,8 @@ for i, category in enumerate(classPictures):
     exp.add_experiment_info('matrix {}, pictures from class {}:'.format(i, category))
     exp.add_experiment_info(str(matrices[i].listPictures))  # Add listPictures
 
-previousSoundAllocation = getPreviousSoundsAllocation(subjectName, 0, 'DayOne-Learning')
-
-if not previousSoundAllocation or not keepSoundsAllocation:
-    soundsAllocation_index, soundsAllocation = newSoundAllocation()
-else:
-    soundsAllocation_index = previousSoundAllocation
-    soundsAllocation = {category: sounds[soundsAllocation_index[category]] for category in classPictures}
+soundsAllocation_index = getPreviousSoundsAllocation(subjectName, 0, 'choose-sound-association')
+soundsAllocation = {key: sounds[soundsAllocation_index[key]] for key in soundsAllocation_index.keys()}
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -79,6 +73,7 @@ exp.add_experiment_info('Sounds order:')
 exp.add_experiment_info(str(sounds))
 exp.add_experiment_info('Image classes to sounds:')
 exp.add_experiment_info(str(soundsAllocation))
+exp.add_experiment_info('Image classes to sounds (index):')
 exp.add_experiment_info(str(soundsAllocation_index))
 
 soundsVolumeAdjustmentIndB = create_temp_sound_files(subjectName)
