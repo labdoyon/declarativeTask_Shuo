@@ -115,7 +115,7 @@ soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
                             menu=menu,
                             should_exit=False)
 
-dayOneAssociationLearning = CommandItem(text='Association Learning',
+dayOneAssociationLearning = CommandItem(text='Sound Category Association Learning',
                             command=python + " src" + os.path.sep + "ld_association_learning.py",
                             arguments='Association-Learning, ' + sys.argv[1],
                             menu=menu,
@@ -133,11 +133,23 @@ dayOneTestEncoding = CommandItem(text='Test Encoding',
                             menu=menu,
                             should_exit=False)
 
+dayOneReTestEncoding = CommandItem(text='ReTest Encoding',
+                            command=python + " src" + os.path.sep + "ld_encoding.py",
+                            arguments='ReTest-Encoding, ' + sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
+
 dayOneRecognition = CommandItem(text="Recognition",
                                   command=python + " src" + os.path.sep + "ld_recognition.py ",
                                   arguments="Day One - Recognition, " + sys.argv[1],
                                   menu=menu,
                                   should_exit=False)
+
+dayOneTestAssociationLearning = CommandItem(text='Test Sound Category Association Learning',
+                            command=python + " src" + os.path.sep + "ld_association_learning.py",
+                            arguments='Test-Association-Learning, ' + sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
 
 dayOneConfig = CommandItem(text='Show config file',
                            command=python + " src" + os.path.sep + "ld_showConfigFile.py",
@@ -151,6 +163,7 @@ menu.append_item(dayOneStimuliPresentation)
 menu.append_item(dayOneAssociationLearning)
 menu.append_item(dayOneEncoding)
 menu.append_item(dayOneTestEncoding)
+menu.append_item(dayOneReTestEncoding)
 menu.append_item(dayOneRecognition)
 menu.append_item(dayOneConfig)
 
