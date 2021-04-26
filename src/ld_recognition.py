@@ -43,7 +43,7 @@ for i, category in enumerate(classPictures):
     exp.add_experiment_info('LearningMatrix_{}_category_{}: '.format(i, category))  # Save Subject Code
     exp.add_experiment_info(str(learning_matrices[i]))  # Add listPictures
     exp.add_experiment_info('RandomMatrix_{}_category_{}: '.format(i, category))  # Save Subject Code
-    random_matrices.append(matrices[i].newRecognitionMatrix(learning_matrices[i]))
+    random_matrices.append(matrices[i].newRecognitionMatrix(learning_matrices[i], category))
     exp.add_experiment_info(str(random_matrices[i]))  # Add listPictures
 
 soundsAllocation_index = getPreviousSoundsAllocation(subjectName, 0, 'choose-sound-association')
@@ -73,8 +73,9 @@ old_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'ReTest-E
 matrix_presentation_order = list(np.random.permutation(len(classPictures)))
 while matrix_presentation_order == old_matrix_presentation_order:
     matrix_presentation_order = list(np.random.permutation(matrices_to_present))
+
 exp.add_experiment_info(
-            'MatrixPresentationOrder_{}_timing_{}'.format(matrix_presentation_order, exp.clock.time))  # Add sync info
+            'MatrixPresentationOrder_{}'.format(matrix_presentation_order))  # Add sync info
 
 control.initialize(exp)
 control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
@@ -185,13 +186,9 @@ for i in matrix_presentation_order:
         else:
             showMatrix = 'MatrixRandom'
 
-        matrix_i._matrix.item(locationCard).setPicture(picturesFolder + listCards[nCard])
+        matrix_i._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
         picture = listCards[nCard].rstrip(".png")
-        for i in range(numberClasses):
-            if classPictures[i] in picture:  # if card belongs to the the i-th class of pictures
-                # associate this class' sound to the card
-                matrix_i._matrix.item(locationCard).setSound(soundsAllocation[i])
-                break
+
         matrix_i.plotCard(locationCard, True, bs, True)
 
         matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)

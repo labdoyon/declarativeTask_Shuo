@@ -200,7 +200,7 @@ class LdMatrix(object):
                 self._listPictures.append(newMatrix[nPict])
                 nPict += 1
 
-    def newRecognitionMatrix(self, previousMatrix):
+    def newRecognitionMatrix(self, previousMatrix, category):
         # dummyMatrix is a matrix the size of previousMatrix that stores only the pictures category under 0,1,2 int format
         # 0 = first category (often a images), 1 = second category (often b), etc.
         dummyMatrix = [None] * len(previousMatrix)
@@ -216,7 +216,7 @@ class LdMatrix(object):
         dummyMatrix = [perm[i] for i in dummyMatrix]
 
         # copying class Pictures to a different object
-        tempListPictures = list(listPictures)
+        tempListPictures = list(listPictures[category])
 
         currentCategoryIndex = [0] * len(tempListPictures)
 
@@ -224,7 +224,7 @@ class LdMatrix(object):
         newMatrix = [0] * len(previousMatrix)
         for i in range(len(previousMatrix)):
             category = dummyMatrix[i]
-            newMatrix[i] = tempListPictures[category][currentCategoryIndex[dummyMatrix[i]]]
+            newMatrix[i] = tempListPictures[currentCategoryIndex[dummyMatrix[i]]]
             currentCategoryIndex[category] += 1
 
         return newMatrix

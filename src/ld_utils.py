@@ -162,32 +162,35 @@ def getPreviousMatrixOrder(subjectName, daysBefore, experienceName):
     dataFiles = [each for each in os.listdir(dataFolder) if each.endswith('.xpd')]
 
     for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-        previousDate = parse(agg[2]['date'])
-
         try:
-            agg[3].index(experienceName)
-        except (ValueError):
-            continue
+            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+            previousDate = parse(agg[2]['date'])
 
-        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
-            header = agg[3].split('\n#e ')
+            try:
+                agg[3].index(experienceName)
+            except (ValueError):
+                continue
 
-            indexSubjectName = header.index('Subject:') + 1
-            if subjectName in header[indexSubjectName]:
-                print('File found: ' + dataFile)
-                elements = [element for element in header if 'MatrixPresentationOrder_' in element]
-                target = elements[-1]
-                target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
-                target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
-                target = ast.literal_eval(target)
-                if not ignore_learned_matrices:
-                    output = target
-                else:
-                    if len(target) == len(classPictures):
+            if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
+                header = agg[3].split('\n#e ')
+
+                indexSubjectName = header.index('Subject:') + 1
+                if subjectName in header[indexSubjectName]:
+                    print('File found: ' + dataFile)
+                    elements = [element for element in header if 'MatrixPresentationOrder_' in element]
+                    target = elements[-1]
+                    target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
+                    target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
+                    target = ast.literal_eval(target)
+                    if not ignore_learned_matrices:
                         output = target
-                    elif not output:
-                        output = target
+                    else:
+                        if len(target) == len(classPictures):
+                            output = target
+                        elif not output:
+                            output = target
+        except:
+            pass
 
     return output
 

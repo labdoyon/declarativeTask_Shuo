@@ -63,7 +63,7 @@ for i, category in enumerate(classPictures):
 control.initialize(exp)
 
 for i, category in enumerate(classPictures):
-    matrices[i].associatePictures(pictures_allocation[i], picturesFolder=picturesFolderClass[category])  # Associate Pictures to cards
+    matrices[i].associatePictures(pictures_allocation[i])  # Associate Pictures to cards
     exp.add_experiment_info('matrix {}, pictures from class {}:'.format(i, category))
     exp.add_experiment_info(str(matrices[i].listPictures))  # Add listPictures
 
