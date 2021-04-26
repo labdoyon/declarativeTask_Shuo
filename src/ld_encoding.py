@@ -8,7 +8,7 @@ from expyriment.misc._timer import get_time
 from ld_matrix import LdMatrix
 from ld_utils import newSoundAllocation, getPreviousSoundsAllocation
 from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, path_leaf, readMouse
-from ld_sound import create_temp_sound_files
+from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 
@@ -358,7 +358,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     nBlock += 1
 
 instructions = stimuli.TextLine(
-    ' REST ',
+    ' THANK YOU ',
     position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
     text_underline=None, text_colour=textColor, background_colour=bgColor,
@@ -373,3 +373,5 @@ instructionRectangle.plot(bs)
 bs.present(False, True)
 
 control.end()
+
+delete_temp_files()

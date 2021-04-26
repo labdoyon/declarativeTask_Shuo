@@ -6,7 +6,7 @@ from playsound import playsound
 
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
-from config import numberClasses, picturesFolder, classPictures
+from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
 from config import sounds, soundsFolder, tempSounds
 
 class LdMatrix(object):
@@ -186,11 +186,16 @@ class LdMatrix(object):
 
         return newMatrix
 
-    def associatePictures(self, newMatrix, picturesFolder):
+    def associatePictures(self, newMatrix, pictureFolder=picturesFolder):
         nPict = 0
         for nCard in range(self._matrix.size):
             if nCard not in removeCards:
-                self._matrix.item(nCard).setPicture(picturesFolder + newMatrix[nPict], False, picture=newMatrix[nPict])
+                if newMatrix[nPict][0] in classPictures:
+                    self._matrix.item(nCard).setPicture(
+                        picturesFolderClass[newMatrix[nPict][0]] + newMatrix[nPict], False, picture=newMatrix[nPict])
+                else:
+                    self._matrix.item(nCard).setPicture(
+                        pictureFolder + newMatrix[nPict], False, picture=newMatrix[nPict])
                 self._matrix.item(nCard).stimuli[0].scale(self._matrix.item(nCard).size[0]/float(300))
                 self._listPictures.append(newMatrix[nPict])
                 nPict += 1

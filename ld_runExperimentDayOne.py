@@ -40,7 +40,7 @@ def getPrevious(subjectName, daysBefore, experienceName, target):
                 previousTarget = header[indexPositions].split('\n')[0].split('\n')[0]
                 try:  # dictionary or list
                     output = literal_eval(previousTarget)
-                except SyntaxError or ValueError:  # string
+                except:  # string
                     output = previousTarget
 
     # This ensures the latest language choice is used
@@ -103,7 +103,7 @@ dayOneExample = CommandItem(text='Example',
                             menu=menu,
                             should_exit=False)
 
-dayOneStimuliPresentation = CommandItem(text='stimulti presentation',
+dayOneStimuliPresentation = CommandItem(text='stimuli presentation',
                             command=python + " src" + os.path.sep + "ld_stimuli_presentation.py",
                             arguments='stimuli-presentation, ' + sys.argv[1],
                             menu=menu,
@@ -112,6 +112,12 @@ dayOneStimuliPresentation = CommandItem(text='stimulti presentation',
 soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
                             command=python + " src" + os.path.sep + "ld_calibrateSoundVolumeSubprocess.py",
                             arguments=sys.argv[1],
+                            menu=menu,
+                            should_exit=False)
+
+dayOneAssociationLearning = CommandItem(text='Association Learning',
+                            command=python + " src" + os.path.sep + "ld_association_learning.py",
+                            arguments='Association-Learning, ' + sys.argv[1],
                             menu=menu,
                             should_exit=False)
 
@@ -133,12 +139,6 @@ dayOneRecognition = CommandItem(text="Recognition",
                                   menu=menu,
                                   should_exit=False)
 
-dayOneAssociation = CommandItem(text="Association",
-                                  command=python + " src" + os.path.sep + "ld_association.py ",
-                                  arguments="DayOne-Association, " + sys.argv[1],
-                                  menu=menu,
-                                  should_exit=False)
-
 dayOneConfig = CommandItem(text='Show config file',
                            command=python + " src" + os.path.sep + "ld_showConfigFile.py",
                            menu=menu,
@@ -146,12 +146,12 @@ dayOneConfig = CommandItem(text='Show config file',
 
 menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
+menu.append_item(soundVolumeAdjustment)
 menu.append_item(dayOneStimuliPresentation)
+menu.append_item(dayOneAssociationLearning)
 menu.append_item(dayOneEncoding)
 menu.append_item(dayOneTestEncoding)
-menu.append_item(soundVolumeAdjustment)
 menu.append_item(dayOneRecognition)
-menu.append_item(dayOneAssociation)
 menu.append_item(dayOneConfig)
 
 menu.show()
