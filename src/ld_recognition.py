@@ -7,6 +7,7 @@ from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
 from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse, getPreviousSoundsAllocation
+from ld_utils import getPreviousMatrixOrder
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
 
@@ -67,7 +68,11 @@ else:
     volumeAdjusted = False
 
 # TODO: needs to differ from last matrix presentation order
+matrices_to_present = np.array(range(len(classPictures)))
+old_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'ReTest-Encoding')
 matrix_presentation_order = list(np.random.permutation(len(classPictures)))
+while matrix_presentation_order == old_matrix_presentation_order:
+    matrix_presentation_order = list(np.random.permutation(matrices_to_present))
 exp.add_experiment_info(
             'MatrixPresentationOrder_{}_timing_{}'.format(matrix_presentation_order, exp.clock.time))  # Add sync info
 

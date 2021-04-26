@@ -4,6 +4,7 @@ import os
 import pygame
 from datetime import datetime
 from time import time
+import re
 
 import numpy as np
 from dateutil.parser import parse
@@ -13,7 +14,7 @@ from expyriment.misc._timer import get_time
 from expyriment.misc.geometry import coordinates2position
 
 from config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, dataFolder, removeCards
-from config import classPictures, sounds
+from config import classPictures, sounds, ignore_learned_matrices
 
 
 def checkWindowParameters(iWindowSize):
@@ -153,14 +154,15 @@ def getPreviousSoundsAllocation(subjectName, daysBefore, experienceName):
     return False
 
 
-def getPreviousState(subjectName, daysBefore, experienceName):
+def getPreviousMatrixOrder(subjectName, daysBefore, experienceName):
+    # Duplicate of get previous matrix but for matrix order
+    output = False
     currentDate = datetime.now()
 
     dataFiles = [each for each in os.listdir(dataFolder) if each.endswith('.xpd')]
 
     for dataFile in dataFiles:
         agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-
         previousDate = parse(agg[2]['date'])
 
         try:
@@ -168,19 +170,26 @@ def getPreviousState(subjectName, daysBefore, experienceName):
         except (ValueError):
             continue
 
-        if daysBefore == 0 or ((currentDate - previousDate).total_seconds() > 72000 * daysBefore and (
-                currentDate - previousDate).total_seconds() < 100800 * daysBefore):
+        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
             header = agg[3].split('\n#e ')
 
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
-                if 'Experiment ended with success' in agg[3]:
-                    print("experiment was a success")
-                    return True  # we can stop the experiment here
-                if 'Experiment completed without interruption' not in agg[3]:
-                    print("experiment was manually interrupted. Ending the experiment")
-                    return True
-    return False
+                print('File found: ' + dataFile)
+                elements = [element for element in header if 'MatrixPresentationOrder_' in element]
+                target = elements[-1]
+                target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
+                target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
+                target = ast.literal_eval(target)
+                if not ignore_learned_matrices:
+                    output = target
+                else:
+                    if len(target) == len(classPictures):
+                        output = target
+                    elif not output:
+                        output = target
+
+    return output
 
 
 def subfinder(mylist, pattern):

@@ -6,7 +6,7 @@ from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from ld_matrix import LdMatrix
-from ld_utils import newSoundAllocation, getPreviousSoundsAllocation
+from ld_utils import newSoundAllocation, getPreviousSoundsAllocation, getPreviousMatrixOrder
 from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, path_leaf, readMouse
 from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
@@ -40,6 +40,9 @@ keepMatrix = True
 if experimentName == 'Encoding':
     keepPreviousMatrix = False
 elif experimentName == 'Test-Encoding':
+    keepPreviousMatrix = True
+    nbBlocksMax = 1
+elif experimentName == 'ReTest-Encoding':
     keepPreviousMatrix = True
     nbBlocksMax = 1
 
@@ -126,8 +129,14 @@ bs.present(False, True)
 
 new_matrix_presentation_order = None
 learning_matrix_presentation_order = None
-test_matrix_presentation_order = None
 matrices_to_present = np.array(range(len(classPictures)))
+if experimentName == 'Encoding':
+    test_matrix_presentation_order = None
+elif experimentName == 'Test-Encoding':
+    test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Encoding')
+elif experimentName == 'ReTest-Encoding':
+    test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Test-Encoding')
+
 
 while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
