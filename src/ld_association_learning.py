@@ -92,16 +92,16 @@ instructions = stimuli.TextLine(' PRESENTATION ',
                                         text_underline=None, text_colour=textColor,
                                         background_colour=bgColor,
                                         max_width=None)
-        instructionRectangle.plot(bs)
-        instructions.plot(bs)
-        bs.present(False, True)
+instructionRectangle.plot(bs)
+instructions.plot(bs)
+bs.present(False, True)
 
-        exp.clock.wait(shortRest)
-        instructionRectangle.plot(bs)
-        bs.present(False, True)
+exp.clock.wait(shortRest)
+instructionRectangle.plot(bs)
+bs.present(False, True)
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI)
 
 for j, sound_index in enumerate(sounds_order):
     sound = sounds[sound_index]
