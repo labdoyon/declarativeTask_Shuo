@@ -165,6 +165,11 @@ classPictures = ['a', 'b', 'c']
 picturesFolderClass = {category: picturesFolder+'class_'+category+os.path.sep for category in classPictures}
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
+# The setting below allows the experimenter to prevent a learned matrix (currentCorrectAnswers > correctAnswersMax)
+# from appearing again during the Encoding Phase. In other words, as soon as this matrix is learned, during the encoding
+# phase, it won't appear again, during the encoding phase, again. The Encoding phase will continue, using only unlearned
+# matrices during the Encoding phase
+ignore_learned_matrices = False
 
 listPictures = {}
 for classPicture in classPictures:

@@ -127,6 +127,7 @@ bs.present(False, True)
 new_matrix_presentation_order = None
 learning_matrix_presentation_order = None
 test_matrix_presentation_order = None
+matrices_to_present = np.array(range(len(classPictures)))
 
 while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
@@ -135,8 +136,12 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     if 1 != nbBlocksMax or experimentName == 'Encoding':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
 
-        while new_matrix_presentation_order == learning_matrix_presentation_order:
-            new_matrix_presentation_order = list(np.random.permutation(len(classPictures)))
+        if len(matrices_to_present) > 2:
+            while (new_matrix_presentation_order == learning_matrix_presentation_order or
+                    new_matrix_presentation_order == test_matrix_presentation_order):
+                new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
+        else:
+            new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
         learning_matrix_presentation_order = new_matrix_presentation_order
         exp.add_experiment_info(
             'Presentation_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock,
@@ -233,9 +238,12 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     exp.clock.wait(ISI)
 
     ''' Cue Recall '''
-    while new_matrix_presentation_order == learning_matrix_presentation_order or \
-            new_matrix_presentation_order == test_matrix_presentation_order:
-        new_matrix_presentation_order = list(np.random.permutation(3))
+    if len(matrices_to_present) > 2:
+        while (new_matrix_presentation_order == learning_matrix_presentation_order or
+               new_matrix_presentation_order == test_matrix_presentation_order):
+            new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
+    else:
+        new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
     test_matrix_presentation_order = new_matrix_presentation_order
 
     exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
@@ -348,6 +356,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
             instructionRectangle.plot(bs)
             bs.present(False, True)
+        if ignore_learned_matrices and correctAnswers[i, nBlock] > correctAnswersMax:
+            matrices_to_present = np.delete(matrices_to_present, i)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
