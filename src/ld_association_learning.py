@@ -39,6 +39,13 @@ arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment 
 experimentName = arguments[0]
 subjectName = arguments[1]
 
+if experimentName == 'Test-Association-Learning':
+    validate_color = constants.C_BLACK
+    wrong_color = constants.C_BLACK
+else:
+    validate_color = constants.C_GREEN
+    wrong_color = constants.C_RED
+
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)
@@ -161,14 +168,13 @@ for j, sound_index in enumerate(sounds_order):
         m.plotCard(currentCard, True, bs, True)
 
         card = m._matrix.item(currentCard)
-        if currentCard == correctCard:
+        if currentCard == correctCard or experimentName == 'Test-Association-Learning':
             noValidResponse = False
-            m.plotCard(correctCard, True, bs, True)
 
             correct_response_stimuli = stimuli.Shape(position=card.position,
                                                      vertex_list=vertices_frame(size=(110, 110),
                                                                                 frame_thickness=10),
-                                                     colour=misc.constants.C_GREEN)
+                                                     colour=validate_color)
             correct_response_stimuli.plot(bs)
             bs.present(False, True)
             exp.clock.wait(shortRest)
@@ -185,14 +191,14 @@ for j, sound_index in enumerate(sounds_order):
                 exp.clock.time))  # Add sync info
         else:
             wrong_response_stimuli = stimuli.Shape(position=card.position,
-                                                     vertex_list=vertices_frame(size=(110, 110),
-                                                                                frame_thickness=10),
-                                                     colour=misc.constants.C_RED)
+                                                   vertex_list=vertices_frame(size=(100, 100),
+                                                                              frame_thickness=10),
+                                                     colour=wrong_color)
             wrong_response_stimuli.plot(bs)
             bs.present(False, True)
             exp.clock.wait(shortRest)
             wrong_response_stimuli = stimuli.Shape(position=card.position,
-                                                     vertex_list=vertices_frame(size=(110, 110),
+                                                     vertex_list=vertices_frame(size=(100, 100),
                                                                                 frame_thickness=10),
                                                      colour=bgColor)
             wrong_response_stimuli.plot(bs)
