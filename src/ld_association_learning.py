@@ -129,26 +129,31 @@ for j, sound_index in enumerate(sounds_order):
 
     m.associatePictures(pictures_allocation)
     exp.add_experiment_info(str(m.listPictures))
+    m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+    exp.clock.wait(200)
     for i in range(len(classPictures)):
         m.plotCard(i, True, bs, True)
         exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
             i, m.listPictures[i], exp.clock.time))
 
-    exp.clock.wait(2000)
-
     noValidResponse = True
     time_to_respond = 2000
+    first_time_sound_played = True
     while noValidResponse:  # The subject
         rt = None
         currentCard = None
         while rt is None or currentCard is None:
             currentCard = None
             position = None
-            if rt is None:
-                m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-                time_to_respond = 2000
+            if not first_time_sound_played:
+                if rt is None:
+                    first_time_sound_played = False
+                    m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                    time_to_respond = 2000
+                else:
+                    time_to_respond = time_to_respond - rt - clicPeriod
             else:
-                time_to_respond = time_to_respond - rt - clicPeriod
+                first_time_sound_played = False
             mouse.show_cursor(True, True)
             start = get_time()
             rt, position = readMouse(start, mouseButton, time_to_respond)
@@ -173,14 +178,14 @@ for j, sound_index in enumerate(sounds_order):
             noValidResponse = False
 
             correct_response_stimuli = stimuli.Shape(position=card.position,
-                                                     vertex_list=vertices_frame(size=(110, 110),
+                                                     vertex_list=vertices_frame(size=(100, 100),
                                                                                 frame_thickness=10),
                                                      colour=validate_color)
             correct_response_stimuli.plot(bs)
             bs.present(False, True)
             exp.clock.wait(shortRest)
             correct_response_stimuli = stimuli.Shape(position=card.position,
-                                                     vertex_list=vertices_frame(size=(110, 110),
+                                                     vertex_list=vertices_frame(size=(100, 100),
                                                                                 frame_thickness=10),
                                                      colour=bgColor)
             correct_response_stimuli.plot(bs)
@@ -194,22 +199,27 @@ for j, sound_index in enumerate(sounds_order):
             wrong_response_stimuli = stimuli.Shape(position=card.position,
                                                    vertex_list=vertices_frame(size=(100, 100),
                                                                               frame_thickness=10),
-                                                     colour=wrong_color)
+                                                   colour=wrong_color)
             wrong_response_stimuli.plot(bs)
             bs.present(False, True)
             exp.clock.wait(shortRest)
             wrong_response_stimuli = stimuli.Shape(position=card.position,
-                                                     vertex_list=vertices_frame(size=(100, 100),
-                                                                                frame_thickness=10),
-                                                     colour=bgColor)
+                                                   vertex_list=vertices_frame(size=(100, 100),
+                                                                              frame_thickness=10),
+                                                   colour=bgColor)
             wrong_response_stimuli.plot(bs)
             bs.present(False, True)
+
+    for i in range(len(classPictures)):
+        m.plotCard(i, False, bs, True)
+        exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
+            i, m.listPictures[i], exp.clock.time))
 
     exp.clock.wait(shortRest)
 
 instructions = stimuli.TextLine(
     ' THANK YOU ',
-    position=(0, -windowSize[1] / float(2) + (2 * m[0].gap + cardSize[1]) / float(2)),
+    position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
     text_underline=None, text_colour=textColor, background_colour=bgColor,
     max_width=None)
