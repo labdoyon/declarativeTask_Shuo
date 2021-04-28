@@ -1,8 +1,5 @@
-import os
 import sys
 import numpy as np
-from datetime import datetime
-from dateutil.parser import parse
 
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
@@ -11,12 +8,11 @@ from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, \
     dataFolder, picturesFolderClass, min_max_ISI, restPeriod, debug
-from ld_stimuli_names import pictureNames, classNames
+from ld_stimuli_names import pictureNames, classNames, ending_screen_text
+from ld_utils import getLanguage
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
-# TODO bug: if participant name is contained within other participant's name (e.g. test and test2), test2 may get test's
-# previous values
 # TODO use config.py wherever possible
 # TODO define functions in ld_utils.py, especially graphical functions
 # TODO write all graphical interface
@@ -26,34 +22,6 @@ from ld_stimuli_names import pictureNames, classNames
 
 if debug:
     control.set_develop_mode(on=True, intensive_logging=False, skip_wait_methods=True)
-
-
-def getLanguage(subjectName, daysBefore, experienceName):
-    currentDate = datetime.now()
-    dataFiles = [file for file in os.listdir(dataFolder) if file.endswith('.xpd')]
-
-    output = None
-
-    for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-        previousDate = parse(agg[2]['date'])
-
-        try:
-            agg[3].index(experienceName)
-        except ValueError:
-            continue
-        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
-            header = agg[3].split('\n#e ')
-
-            indexSubjectName = header.index('Subject:') + 1
-            if subjectName in header[indexSubjectName]:
-                print('File found: ' + dataFile)
-                indexPositions = header.index('language:') + 1
-                language = header[indexPositions].split('\n')[0].split('\n')[0]
-                output = language
-
-    # This ensures the latest language choice is used
-    return output
 
 
 # get experiment's name and subject's name from command line arguments
@@ -131,13 +99,11 @@ def show_and_hide_text_box(background, instructions_box, onscreen_time, just_sho
 
 
 if language == 'french':
-    instructions_rest_text = ' REPOS '
     instructions_presentation_text = """ PRÉSENTATION: 
      PRÉSENTATION DE TOUS LES STIMULIS """
     instructions_present1category_text = """ PRÉSENTATION:
     PRÉSENTATION DE LA CATÉGORIE: """
 elif language == 'english':
-    instructions_rest_text = ' REST '
     instructions_presentation_text = """ PRESENTATION:
      PRESENTING ALL STIMULIS """
     instructions_present1category_text = """ PRESENTATION: 
@@ -189,7 +155,7 @@ for category in classPicturesPresentationOrder:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
-instructions_rest = create_instructions_box(instructions_rest_text,
+instructions_rest = create_instructions_box(ending_screen_text[language],
                                             (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))
 show_and_hide_text_box(bs, instructions_rest, restPeriod)
 

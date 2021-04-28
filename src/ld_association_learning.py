@@ -6,8 +6,9 @@ from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from ld_sound import create_temp_sound_files, delete_temp_files
-from ld_utils import getPreviousSoundsAllocation, readMouse
+from ld_utils import getPreviousSoundsAllocation, readMouse, getLanguage
 from ld_matrix import LdMatrix
+from ld_stimuli_names import ending_screen_text, presentation_screen_text
 from config import *
 
 if not windowMode:  # Check WindowMode and Resolution
@@ -49,6 +50,9 @@ else:
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)
+language = str(getLanguage(subjectName, 0, 'choose-language'))
+exp.add_experiment_info('language: ')
+exp.add_experiment_info(language)  # Save Subject Code
 
 # Save time, nblocks, position, correctAnswer, RT
 data_variables_names = ['sound_played', 'Time', 'category']
@@ -94,7 +98,7 @@ random.shuffle(sounds_order)  # this randomized sounds presentation order
 
 instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
     0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
-instructions = stimuli.TextLine(' PRESENTATION ',
+instructions = stimuli.TextLine(presentation_screen_text[language],
                                         position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                                         text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                         text_underline=None, text_colour=textColor,
@@ -218,7 +222,7 @@ for j, sound_index in enumerate(sounds_order):
     exp.clock.wait(shortRest)
 
 instructions = stimuli.TextLine(
-    ' THANK YOU ',
+    ending_screen_text[language],
     position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
     text_underline=None, text_colour=textColor, background_colour=bgColor,
@@ -230,3 +234,4 @@ bs.present(False, True)
 exp.clock.wait(restPeriod)
 
 control.end()
+delete_temp_files()

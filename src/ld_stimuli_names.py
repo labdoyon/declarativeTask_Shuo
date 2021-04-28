@@ -110,3 +110,7 @@ picturesNamesFrench = {
 pictureNames = {'english': picturesNamesEnglish, 'french': picturesNamesFrench}
 classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
               'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'}}
+
+rest_screen_text = {'english': ' REST ', 'french': ' REPOS '}
+ending_screen_text = {'english': ' THANK YOU ', 'french': ' MERCI '}
+presentation_screen_text = {'english': ' PRESENTATION ', 'french': ' PRÉSENTATION '}
