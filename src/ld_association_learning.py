@@ -84,6 +84,7 @@ mouse.set_logging(True)  # Log mouse
 mouse.hide_cursor(True, True)  # Hide cursor
 
 m = LdMatrix((len(classPictures), 1), windowSize)
+m._cueCard.color = bgColor
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 m.plotDefault(bs, True)
 
