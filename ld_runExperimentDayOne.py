@@ -14,6 +14,9 @@ rawFolder = os.getcwd() + os.path.sep
 dataFolder = rawFolder + 'data' + os.path.sep
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 classPictures = ['a', 'b', 'c']
+classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
+              'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'},
+              None: {'a': 'a', 'b': 'b', 'c': 'c'}}
 
 
 def getPrevious(subjectName, daysBefore, experienceName, target):
@@ -61,6 +64,7 @@ def newSoundAllocation():
 
 
 subjectName = sys.argv[1]
+language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 
 soundsAllocation_index = getPrevious(subjectName, 0, 'choose-sound-association', 'Image classes to sounds (index):')
 if soundsAllocation_index is None:
@@ -81,15 +85,17 @@ if soundsAllocation_index is None:
     expyriment.control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
     expyriment.control.end()
 
-menu_soundsAllocation_index = {key: 'S'+str(soundsAllocation_index[key]+1) for key in soundsAllocation_index.keys()}
-language = str(getPrevious(subjectName, 0, 'choose-language', 'language:'))
+menu_soundsAllocation_index = {classNames[language][key]: 'S'+str(soundsAllocation_index[key]+1) for key in soundsAllocation_index.keys()}
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
 
 python = 'py'
 
 # Create the menu
-menu = CursesMenu(title="Declarative Task - Day One", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + language +\
-                  ' ; sounds to categories: ' + str(menu_soundsAllocation_index))
+menu = CursesMenu(
+    title="Declarative Task - Day One", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' +
+                                                 str(language) +
+                                                 ' ; Son-Cat: ' + str(menu_soundsAllocation_index).
+                                                     replace('{', '').replace('}', ''))
 
 dayOneChooseLanguage = CommandItem(text='choose language',
                             command=python + " src" + os.path.sep + "ld_choose_language.py",
@@ -165,6 +171,7 @@ menu.append_item(dayOneEncoding)
 menu.append_item(dayOneTestEncoding)
 menu.append_item(dayOneReTestEncoding)
 menu.append_item(dayOneRecognition)
+menu.append_item(dayOneTestAssociationLearning)
 menu.append_item(dayOneConfig)
 
 menu.show()
