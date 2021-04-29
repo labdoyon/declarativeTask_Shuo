@@ -6,8 +6,8 @@ from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
-    classPictures, matrixSize, listPictures, shortRest, presentationCard, \
-    dataFolder, picturesFolderClass, min_max_ISI, restPeriod, debug
+    classPictures, matrixSize, listPictures, shortRest, presentationCard, picturesFolderClass,\
+    min_max_ISI, debug, thankYouRest
 from ld_stimuli_names import pictureNames, classNames, ending_screen_text
 from ld_utils import getLanguage
 
@@ -157,6 +157,6 @@ for category in classPicturesPresentationOrder:
 
 instructions_rest = create_instructions_box(ending_screen_text[language],
                                             (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))
-show_and_hide_text_box(bs, instructions_rest, restPeriod)
+show_and_hide_text_box(bs, instructions_rest, thankYouRest)
 
 control.end()

@@ -7,11 +7,11 @@ from expyriment.misc._timer import get_time
 
 from ld_matrix import LdMatrix
 from ld_utils import newSoundAllocation, getPreviousSoundsAllocation, getPreviousMatrixOrder
-from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, path_leaf, readMouse
+from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
 from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
 from ttl_catch_keyboard import wait_for_ttl_keyboard
-
+from ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, ending_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -32,6 +32,9 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)
+language = str(getLanguage(subjectName, 0, 'choose-language'))
+exp.add_experiment_info('language: ')
+exp.add_experiment_info(language)  # Save Subject Code
 
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
@@ -52,7 +55,7 @@ exp.add_experiment_info(str(classPictures))
 matrices = []
 pictures_allocation = []
 for i, category in enumerate(classPictures):
-    if keepPreviousMatrix == True:
+    if keepPreviousMatrix:
         previousMatrix = getPreviousMatrix(subjectName, 0, 'Encoding', i, category)
     else:
         previousMatrix = None
@@ -110,7 +113,7 @@ instructionRectangle = stimuli.Rectangle(size=(windowSize[0], matrices[0].gap * 
 ''' Presentation all locations '''
 presentationOrder = newRandomPresentation()
 
-instructions_ttl = stimuli.TextLine(' PLEASE INPUT TTL ',
+instructions_ttl = stimuli.TextLine(ttl_instructions_text[language],
                                     position=(
                                         0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
                                     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
@@ -156,7 +159,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             'Presentation_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock,
                                                                                 learning_matrix_presentation_order,
                                                                                 exp.clock.time))  # Add sync info
-        instructions = stimuli.TextLine(' PRESENTATION ',
+        instructions = stimuli.TextLine(presentation_screen_text[language],
                                         position=(0, -windowSize[1]/float(2) + (2*matrices[0].gap + cardSize[1])/float(2)),
                                         text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                         text_underline=None, text_colour=textColor,
@@ -184,13 +187,13 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             exp.add_experiment_info('Presentation_Block_{}_matrix_{}_category_{}_timing_{}'.format(
                 nBlock, i, matrix_i._category, exp.clock.time))
             exp.add_experiment_info(str(presentationOrder))
-            instructions = stimuli.TextLine(' PRESENTATION ' + matrix_i._category.upper(),
-                                            position=(0, -windowSize[1] / float(2) +
-                                                      (2 * matrices[0].gap + cardSize[1]) / float(2)),
-                                            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                            text_underline=None, text_colour=textColor,
-                                            background_colour=bgColor,
-                                            max_width=None)
+            instructions = stimuli.TextLine(
+                presentation_screen_text[language] + classNames[language][matrix_i._category] + ' ',
+                position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                text_underline=None, text_colour=textColor,
+                background_colour=bgColor,
+                max_width=None)
             instructionRectangle.plot(bs)
             instructions.plot(bs)
             bs.present(False, True)
@@ -204,8 +207,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
             for nCard in presentationOrder:
                 mouse.hide_cursor(True, True)
-                matrix_i.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
                 matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                exp.clock.wait(SoundBeforeImageTime)
+                matrix_i.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
                 exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}_sound_{}'.format(
                     nCard, matrix_i.listPictures[nCard], exp.clock.time,
                     sounds[soundsAllocation_index[matrix_i._category]]))
@@ -222,6 +226,24 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             exp.clock.wait(ISI)
 
         exp.clock.wait(restPeriod)
+
+    # REST BLOCK
+    instructions = stimuli.TextLine(
+        rest_screen_text[language],
+        position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+        text_underline=None, text_colour=textColor, background_colour=bgColor,
+        max_width=None)
+
+    instructions.plot(bs)
+    bs.present(False, True)
+    exp.add_experiment_info(
+        ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
+    exp.clock.wait(restPeriod)
+    exp.add_experiment_info(
+        ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
+    instructionRectangle.plot(bs)
+    bs.present(False, True)
 
     # TEST BLOCK
     instructions = stimuli.TextLine(' TEST ',
@@ -266,6 +288,21 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info('Test_Block_{}_matrix_{}_category_{}_timing_{}'.format(
             nBlock, i, matrix_i._category, exp.clock.time))
         exp.add_experiment_info(str(presentationOrder))
+
+        instructions = stimuli.TextLine(
+            ' TEST ' + classNames[language][matrix_i._category] + ' ',
+            position=(0, -windowSize[1] / float(2) + (2 * matrix_i.gap + cardSize[1]) / float(2)),
+            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+            text_underline=None, text_colour=textColor,
+            background_colour=bgColor,
+            max_width=None)
+        instructionRectangle.plot(bs)
+        instructions.plot(bs)
+        bs.present(False, True)
+
+        exp.clock.wait(shortRest)
+        instructionRectangle.plot(bs)
+        bs.present(False, True)
 
         for nCard in presentationOrder:
 
@@ -351,6 +388,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                     pass
                 else:
                     break
+            ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+            exp.clock.wait(ISI)
+
         if nbBlocksMax != 1:
             instructions = stimuli.TextLine(
                 'You got ' + str(int(correctAnswers[i, nBlock])) + ' out of ' + str(matrix_i._matrix.size - len(removeCards)),
@@ -372,12 +412,28 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         exp.clock.wait(ISI)
         exp.clock.wait(shortRest)
 
+    instructions = stimuli.TextLine(
+        rest_screen_text[language],
+        position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+        text_underline=None, text_colour=textColor, background_colour=bgColor,
+        max_width=None)
+
+    instructions.plot(bs)
+    bs.present(False, True)
+    exp.add_experiment_info(
+        ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
     exp.clock.wait(restPeriod)
+    exp.add_experiment_info(
+        ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
+    instructionRectangle.plot(bs)
+    bs.present(False, True)
+
     currentCorrectAnswers = correctAnswers[:, nBlock]
     nBlock += 1
 
 instructions = stimuli.TextLine(
-    ' THANK YOU ',
+    ending_screen_text[language],
     position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
     text_underline=None, text_colour=textColor, background_colour=bgColor,
@@ -385,9 +441,7 @@ instructions = stimuli.TextLine(
 
 instructions.plot(bs)
 bs.present(False, True)
-
-exp.clock.wait(restPeriod)
-
+exp.clock.wait(thankYouRest)
 instructionRectangle.plot(bs)
 bs.present(False, True)
 

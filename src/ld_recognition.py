@@ -7,9 +7,10 @@ from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
 from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse, getPreviousSoundsAllocation
-from ld_utils import getPreviousMatrixOrder
+from ld_utils import getPreviousMatrixOrder, getLanguage
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
+from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
 
 from ld_sound import create_temp_sound_files, delete_temp_files
 
@@ -28,6 +29,9 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info('Subject: ')  # Save Subject Code
 exp.add_experiment_info(subjectName)  # Save Subject Code
+exp.add_experiment_info(subjectName)
+language = str(getLanguage(subjectName, 0, 'choose-language'))
+exp.add_experiment_info('language: ')
 
 # Save time, Response, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'Category', 'Matrix', 'CorrectAnswer', 'RT'])
@@ -86,6 +90,16 @@ setCursor(arrow)
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 instructionRectangle = stimuli.Rectangle(size=(windowSize[0], matrices[0].gap * 2 + cardSize[1]), position=(
     0, -windowSize[1]/float(2) + (2 * matrices[0].gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
+instructions_ttl = stimuli.TextLine(ttl_instructions_text[language],
+                                    position=(
+                                        0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+                                    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                    text_underline=None, text_colour=textColor,
+                                    background_colour=bgColor,
+                                    max_width=None)
+instructionRectangle.plot(bs)
+instructions_ttl.plot(bs)
+bs.present(False, True)
 
 wait_for_ttl_keyboard()
 exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
@@ -126,7 +140,7 @@ for i in matrix_presentation_order:
         else:
             listCards.append(random_matrices[i][int(position)])
 
-    instructions = stimuli.TextLine(' RECOGNITION ' + category.upper(),
+    instructions = stimuli.TextLine(' RECOGNITION ' + classNames[language][category] + ' ',
                                     position=(0, -windowSize[1] / float(2) +
                                               (2 * matrices[0].gap + cardSize[1]) / float(2)),
                                     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
@@ -189,9 +203,10 @@ for i in matrix_presentation_order:
         matrix_i._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
         picture = listCards[nCard].rstrip(".png")
 
+        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+        exp.clock.wait(SoundBeforeImageTime)
         matrix_i.plotCard(locationCard, True, bs, True)
 
-        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
         exp.add_experiment_info(
             'ShowCard_pos_{}_card_{}_timing_{}_sound_{}'.format(locationCard,
                                                                 listCards[nCard],exp.clock.time,
@@ -266,6 +281,17 @@ for i in matrix_presentation_order:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
-delete_temp_files()
+instructions = stimuli.TextLine(
+    ending_screen_text[language],
+    position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+    text_underline=None, text_colour=textColor, background_colour=bgColor,
+    max_width=None)
 
-exp.clock.wait(5000)
+instructions.plot(bs)
+bs.present(False, True)
+exp.clock.wait(thankYouRest)
+instructionRectangle.plot(bs)
+bs.present(False, True)
+
+delete_temp_files()

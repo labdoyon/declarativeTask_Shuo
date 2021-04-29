@@ -114,3 +114,4 @@ classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
 rest_screen_text = {'english': ' REST ', 'french': ' REPOS '}
 ending_screen_text = {'english': ' THANK YOU ', 'french': ' MERCI '}
 presentation_screen_text = {'english': ' PRESENTATION ', 'french': ' PRÉSENTATION '}
+ttl_instructions_text = {'english': ' PLEASE INPUT TTL ', 'french': ' EN ATTENTE DU TTL '}
