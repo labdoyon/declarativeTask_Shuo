@@ -25,7 +25,6 @@ if debug:
     control.set_develop_mode(on=True, intensive_logging=False, skip_wait_methods=True)
 
 arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment name and subject
-# arguments = ['Encoding', 'test']
 experimentName = arguments[0]
 subjectName = arguments[1]
 
@@ -225,25 +224,23 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
             exp.clock.wait(ISI)
 
+        # REST BLOCK
+        instructions = stimuli.TextLine(
+            rest_screen_text[language],
+            position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+            text_underline=None, text_colour=textColor, background_colour=bgColor,
+            max_width=None)
+
+        instructions.plot(bs)
+        bs.present(False, True)
+        exp.add_experiment_info(
+            ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
         exp.clock.wait(restPeriod)
-
-    # REST BLOCK
-    instructions = stimuli.TextLine(
-        rest_screen_text[language],
-        position=(0, -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
-        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-        text_underline=None, text_colour=textColor, background_colour=bgColor,
-        max_width=None)
-
-    instructions.plot(bs)
-    bs.present(False, True)
-    exp.add_experiment_info(
-        ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    exp.clock.wait(restPeriod)
-    exp.add_experiment_info(
-        ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    instructionRectangle.plot(bs)
-    bs.present(False, True)
+        exp.add_experiment_info(
+            ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
+        instructionRectangle.plot(bs)
+        bs.present(False, True)
 
     # TEST BLOCK
     instructions = stimuli.TextLine(' TEST ',
@@ -355,7 +352,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         matrix_i.plotCard(currentCard, False, bs, True)
 
                     if currentCard == nCard:
-                        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                        if experimentName == 'Encoding' and nbBlocksMax != 1:
+                            matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
                         correctAnswers[i, nBlock] += 1
                         exp.data.add([exp.clock.time, nBlock,
                                       path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
