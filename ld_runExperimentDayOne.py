@@ -17,6 +17,10 @@ classPictures = ['a', 'b', 'c']
 classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
               'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'},
               None: {'a': 'a', 'b': 'b', 'c': 'c'}}
+soundNames = {
+    None: {0: 'S1', 1: 'S2', 2: 'S3'},
+    'english': {0: 'standard', 1: 'noise', 2: 'high pitch'},
+    'french': {0: 'standard', 1: 'bruit', 2: 'aigu'}}
 
 
 def getPrevious(subjectName, daysBefore, experienceName, target):
@@ -85,7 +89,7 @@ if soundsAllocation_index is None:
     expyriment.control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
     expyriment.control.end()
 
-menu_soundsAllocation_index = {classNames[language][key]: 'S'+str(soundsAllocation_index[key]+1) for key in soundsAllocation_index.keys()}
+menu_soundsAllocation_index = {classNames[language][key]: soundNames[language][soundsAllocation_index[key]] for key in soundsAllocation_index.keys()}
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
 
 python = 'py'
