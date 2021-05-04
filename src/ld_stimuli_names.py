@@ -109,7 +109,12 @@ picturesNamesFrench = {
 
 pictureNames = {'english': picturesNamesEnglish, 'french': picturesNamesFrench}
 classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
-              'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'}}
+              'french': {'a': 'animaux', 'b': 'maison', 'c': 'vêtements'},
+              None: {'a': 'a', 'b': 'b', 'c': 'c'}}
+soundNames = {
+    None: {0: 'S1', 1: 'S2', 2: 'S3'},
+    'english': {0: 'standard', 1: 'noise', 2: 'high pitch'},
+    'french': {0: 'standard', 1: 'bruit', 2: 'aigu'}}
 
 rest_screen_text = {'english': ' REST ', 'french': ' REPOS '}
 ending_screen_text = {'english': ' THANK YOU ', 'french': ' MERCI '}

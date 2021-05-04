@@ -7,9 +7,10 @@ from expyriment.misc import constants
 from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, picturesFolderClass,\
-    min_max_ISI, debug, thankYouRest
-from ld_stimuli_names import pictureNames, classNames, ending_screen_text
-from ld_utils import getLanguage
+    min_max_ISI, debug, thankYouRest, sounds
+from ld_stimuli_names import pictureNames, classNames, ending_screen_text, soundNames
+from ld_utils import getLanguage, getPreviousSoundsAllocation
+from ld_sound import create_temp_sound_files, delete_temp_files
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
@@ -37,12 +38,29 @@ language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language: ')
 exp.add_experiment_info(language)  # Save Subject Code
 
+soundsAllocation_index = getPreviousSoundsAllocation(subjectName, 0, 'choose-sound-association')
+soundsAllocation = {key: sounds[soundsAllocation_index[key]] for key in soundsAllocation_index.keys()}
+
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['show_or_hide', 'Time', 'category', 'Picture', 'picture_name'])
 
 # save image categories used for experiment
-exp.add_experiment_info('Image categories (original order; src/config.py order): ')
+exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
+exp.add_experiment_info('Sounds order:')
+exp.add_experiment_info(str(sounds))
+exp.add_experiment_info('Image classes to sounds:')
+exp.add_experiment_info(str(soundsAllocation))
+exp.add_experiment_info('Image classes to sounds (index):')
+exp.add_experiment_info(str(soundsAllocation_index))
+
+soundsVolumeAdjustmentIndB = create_temp_sound_files(subjectName)
+exp.add_experiment_info('Sounds Volume adjustment (in dB):')
+exp.add_experiment_info(str(soundsVolumeAdjustmentIndB))
+if soundsVolumeAdjustmentIndB != [0, 0, 0]:
+    volumeAdjusted = True
+else:
+    volumeAdjusted = False
 
 exp.add_experiment_info('pictures\'s list: ')
 exp.add_experiment_info(str(listPictures))
@@ -123,16 +141,29 @@ for category in classPicturesPresentationOrder:
     # randomise pictures' presentation order
     category_pictures = np.random.permutation(category_pictures)
 
+    soundIndex = soundsAllocation_index[category]
+    sound = soundsAllocation[category]
+    m.associateCategory(category)
     exp.add_experiment_info(' PRESENTATION: PRESENTING CATEGORY ' + classNames[language][category])
     instructions_present1category = create_instructions_box(
-        instructions_present1category_text + classNames[language][category] + ' ',
+        instructions_present1category_text + classNames[language][soundIndex] + ' ',
         (0, -(2*cardSize[1])))
     show_and_hide_text_box(bs, instructions_present1category, shortRest)
+
+    instructions_listen_sound = create_instructions_box(
+        ' Hear Sound: S' + soundNames[language][category],
+        (0, -(2*cardSize[1])))
+    show_and_hide_text_box(bs, instructions_listen_sound, 1000)
+    m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+    exp.add_experiment_info(
+        'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
+            category, exp.clock.wait, soundIndex, sound))
+    show_and_hide_text_box(bs, instructions_listen_sound, 1000)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     exp.clock.wait(ISI)
 
-    for picture in category_pictures:
+    for i, picture in enumerate(category_pictures):
         m._cueCard.setPicture(picturesFolderClass[category] + picture)  # Associate Picture to CueCard
 
         picture_name = picture.replace('.png', '')
@@ -155,8 +186,17 @@ for category in classPicturesPresentationOrder:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
+        if i == int(len(category_pictures)/2):
+            show_and_hide_text_box(bs, instructions_listen_sound, shortRest)
+            m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+            exp.add_experiment_info(
+                'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
+                    category, exp.clock.wait, soundIndex, sound))
+            show_and_hide_text_box(bs, instructions_listen_sound, shortRest)
+
 instructions_rest = create_instructions_box(ending_screen_text[language],
                                             (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))
 show_and_hide_text_box(bs, instructions_rest, thankYouRest)
 
 control.end()
+delete_temp_files()
