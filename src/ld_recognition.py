@@ -203,8 +203,6 @@ for i in matrix_presentation_order:
         matrix_i._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
         picture = listCards[nCard].rstrip(".png")
 
-        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-        exp.clock.wait(SoundBeforeImageTime)
         matrix_i.plotCard(locationCard, True, bs, True)
 
         exp.add_experiment_info(
@@ -218,65 +216,76 @@ for i in matrix_presentation_order:
                                                                             listCards[nCard],
                                                                             exp.clock.time)])  # Add sync info
 
-        mouse.show_cursor(True, True)
+        time_left = responseTime
+        valid_response = False
+        rt = 0
+        while not valid_response and rt is not None:
+            mouse.show_cursor(True, True)
 
-        start = get_time()
-        rt, position = readMouse(start, mouseButton, responseTime)
+            start = get_time()
+            rt, position = readMouse(start, mouseButton, time_left)  # time_left instead of response tine
 
-        mouse.hide_cursor(True, True)
+            mouse.hide_cursor(True, True)
 
-        if rt is not None:
-            if matrixARectangle.overlapping_with_position(position):
-                exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
-                matrixA = stimuli.TextLine('  Correct location  ',
-                                           position=(-windowSize[0]/float(4),
-                                                     -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
-                                           text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                           text_underline=None, text_colour=textColor,
-                                           background_colour=clickColor,
-                                           max_width=None)
-                matrixA.plot(bs)
-                bs.present(False, True)
-                exp.clock.wait(clicPeriod)
-                matrixA = stimuli.TextLine('  Correct location  ',
-                                          position=(-windowSize[0]/float(4),
-                                                    -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
-                                          text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                          text_underline=None, text_colour=textColor,
-                                          background_colour=cardColor,
-                                          max_width=None)
-                matrixA.plot(bs)
-                bs.present(False, True)
-                exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
-
-            elif matrixNoneRectangle.overlapping_with_position(position):
-                exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
-                matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(windowSize[0]/float(4),
-                                                        -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
-                                              text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                              text_underline=None, text_colour=textColor,
-                                              background_colour=clickColor,
-                                              max_width=None)
-                matrixNone.plot(bs)
-                bs.present(False, True)
-                exp.clock.wait(clicPeriod)
-                matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(windowSize[0]/float(4),
+            if rt is not None:
+                if matrixARectangle.overlapping_with_position(position):
+                    valid_response = True
+                    exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
+                    matrixA = stimuli.TextLine('  Correct location  ',
+                                               position=(-windowSize[0]/float(4),
+                                                         -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
+                                               text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                               text_underline=None, text_colour=textColor,
+                                               background_colour=clickColor,
+                                               max_width=None)
+                    matrixA.plot(bs)
+                    bs.present(False, True)
+                    exp.clock.wait(clicPeriod)
+                    matrixA = stimuli.TextLine('  Correct location  ',
+                                              position=(-windowSize[0]/float(4),
                                                         -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
                                               text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                               text_underline=None, text_colour=textColor,
                                               background_colour=cardColor,
                                               max_width=None)
-                matrixNone.plot(bs)
-                bs.present(False, True)
-                exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
+                    matrixA.plot(bs)
+                    bs.present(False, True)
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
+                elif matrixNoneRectangle.overlapping_with_position(position):
+                    valid_response = True
+                    exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
+                    matrixNone = stimuli.TextLine('  Wrong location  ',
+                                                  position=(windowSize[0]/float(4),
+                                                            -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
+                                                  text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                                  text_underline=None, text_colour=textColor,
+                                                  background_colour=clickColor,
+                                                  max_width=None)
+                    matrixNone.plot(bs)
+                    bs.present(False, True)
+                    exp.clock.wait(clicPeriod)
+                    matrixNone = stimuli.TextLine('  Wrong location  ',
+                                                  position=(windowSize[0]/float(4),
+                                                            -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
+                                                  text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                                  text_underline=None, text_colour=textColor,
+                                                  background_colour=cardColor,
+                                                  max_width=None)
+                    matrixNone.plot(bs)
+                    bs.present(False, True)
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
+
+                else:
+                    exp.data.add([exp.clock.time, category, showMatrix, False, rt])
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
             else:
                 exp.data.add([exp.clock.time, category, showMatrix, False, rt])
-                exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
-        else:
-            exp.data.add([exp.clock.time, category, showMatrix, False, rt])
+            if rt is not None:
+                if rt < time_left - clicPeriod:
+                    time_left = time_left - clicPeriod - rt
+                else:
+                    break
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
