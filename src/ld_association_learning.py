@@ -93,7 +93,7 @@ bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 m.plotDefault(bs, True)
 
 sounds_order = []
-[sounds_order.extend([i]*3) for i in range(len(sounds))]
+[sounds_order.extend([i]*5) for i in range(len(sounds))]
 random.shuffle(sounds_order)  # this randomized sounds presentation order
 
 instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
@@ -216,7 +216,7 @@ for j, sound_index in enumerate(sounds_order):
 
     for i in range(len(classPictures)):
         m.plotCard(i, False, bs, True)
-        exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
+        exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
             i, m.listPictures[i], exp.clock.time))
 
     exp.clock.wait(shortRest)
