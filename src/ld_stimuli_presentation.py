@@ -146,12 +146,12 @@ for category in classPicturesPresentationOrder:
     m.associateCategory(category)
     exp.add_experiment_info(' PRESENTATION: PRESENTING CATEGORY ' + classNames[language][category])
     instructions_present1category = create_instructions_box(
-        instructions_present1category_text + classNames[language][soundIndex] + ' ',
+        instructions_present1category_text + classNames[language][category] + ' ',
         (0, -(2*cardSize[1])))
     show_and_hide_text_box(bs, instructions_present1category, shortRest)
 
     instructions_listen_sound = create_instructions_box(
-        ' Hear Sound: S' + soundNames[language][category],
+        ' Sound: ' + soundNames[language][soundIndex],
         (0, -(2*cardSize[1])))
     show_and_hide_text_box(bs, instructions_listen_sound, 1000)
     m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
