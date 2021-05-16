@@ -318,7 +318,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         cueCards.append({'correct_card': True, 'category': category, 'card': card, 'pos': pos,
                          'matrix_index': matrix_index})
         exp.add_experiment_info(
-            f"Trial_trialIndex_{str(trial_index)}_matrix_{cueCards[i]['category']}"
+            f"Trial_trialIndex_{str(trial_index)}_matrix_{category}"
             f"_pos_{pos}_card_{card}_timing_{exp.clock.time}")
 
         other_indexes = list(range(len(classPictures)))
@@ -346,23 +346,60 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 f"ShowCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
         exp.clock.wait(presentationCard)
+        for i in range(len(classPictures)):
+            matrix_i.plotCueCard(i, False, bs, True)
+            exp.add_experiment_info(
+                f"HideCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
+                f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
+
+        # Mouse Response Block
+        time_left = responseTime
+        valid_response = False
+        while not valid_response:
+            mouse.show_cursor(True, True)
+            start = get_time()
+            rt, position = readMouse(start, mouseButton, time_left)
+            mouse.hide_cursor(True, True)
+
+            if rt is not None:
+                chosenCueCard_index = matrix_i.checkPosition(position, cue_card=True)
+                if chosenCueCard_index is not None:
+                    chosenCueCard = cueCards[chosenCueCard_index]
+                    if chosenCueCard['correct_card']:
+                        exp.add_experiment_info(
+                            f"CorrectCueCardResponse_trialIndex_{str(trial_index)}"
+                            f"_cueCardIndex_{chosenCueCard_index}"
+                            f"_matrix_{chosenCueCard['category']}"
+                            f"_pos_{chosenCueCard['pos']}"
+                            f"_card_{chosenCueCard['card']}"
+                            f"_timing_{exp.clock.time}"
+                        )
+                        # ADD GREEN FEEDBACK
+                        time_left = responseTime - rt - clicPeriod
+                        valid_response = True # TEST CODE
+                        # ADD RESPONSE LOOP
+                    else:
+                        exp.add_experiment_info(
+                            f"WrongCueCardResponse_trialIndex_{str(trial_index)}"
+                            f"_cueCardIndex_{chosenCueCard_index}"
+                            f"_matrix_{chosenCueCard['category']}"
+                            f"_pos_{chosenCueCard['pos']}"
+                            f"_card_{chosenCueCard['card']}"
+                            f"_timing_{exp.clock.time}"
+                        )
+                        valid_response = True
+                        # ADD RED FEEDBACK
+                else:
+                    if rt < time_left - clicPeriod:
+                        time_left = time_left - rt - clicPeriod
+                    else:
+                        exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+                        valid_response = True
+            else:
+                exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+                valid_response = True
 
         continue
-        # Show 3 matrices
-        matrix_i._cueCard.setPicture(matrix_i._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
-
-        # matrix_i.plotCueCard(True, bs, True)  # Show Cue
-        # LOG and SYNC show cue card
-        exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}_sound'.format(
-            nCard, matrix_i.listPictures[nCard], exp.clock.time,
-            sounds[soundsAllocation_index[matrix_i._category]]))  # Add sync info
-
-        exp.clock.wait(presentationCard)  # Wait presentationCard
-
-        matrix_i.plotCueCard(False, bs, True)  # Hide Cue
-        # LOG and SYNC hide cue card
-        exp.add_experiment_info(['HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, matrix_i.listPictures[nCard],
-                                                                               exp.clock.time)])  # Add sync info
         # Mouse Response Block
         time_left = responseTime
         valid_response = False

@@ -244,11 +244,18 @@ class LdMatrix(object):
                         self._matrix.item(nCard).setSound(soundsAllocation[i])
                 nPict += 1
 
-    def checkPosition(self, position):
-        for nCard in range(self._matrix.size):
-            if nCard not in removeCards:
-                if self._matrix.item(nCard).stimuli[1].overlapping_with_position(position):
-                    return nCard
+    def checkPosition(self, position, cue_card=False):
+        if not cue_card:
+            for nCard in range(self._matrix.size):
+                if nCard not in removeCards:
+                    if self._matrix.item(nCard).stimuli[1].overlapping_with_position(position):
+                        return nCard
+            return None
+        else:
+            for cuecard_index in range(len(classPictures)):
+                if (self._cueCard[cuecard_index]).stimuli[1].overlapping_with_position(position):
+                    return cuecard_index
+            return None
 
     @property
     def size(self):
