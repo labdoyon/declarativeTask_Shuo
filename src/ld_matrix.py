@@ -17,7 +17,7 @@ class LdMatrix(object):
         self._isFill = False
         self._isValid = False
         self._gap = None
-        self._cueCard = None
+        self._cueCard = []
         self._matrix = np.ndarray(shape=self._size, dtype=object)
         self._listPictures = []
         self._rowGap = 0
@@ -33,7 +33,8 @@ class LdMatrix(object):
         for nCard in range(self._matrix.size):
                 self._matrix.itemset(nCard, LdCard(cardSize))
 
-        self._cueCard = LdCard(cardSize, cueCardColor)
+        for i in range(len(classPictures)):
+            self._cueCard.append(LdCard(cardSize, cueCardColor))
 
     def isValidMatrix(self):
         spaceRowLeft = self.windowSize[0] - (self.size[0] * self._matrix.item(0).size[0])
@@ -80,9 +81,11 @@ class LdMatrix(object):
                     self._matrix.item(iCard).stimuli[1].reposition(self._matrix.item(iCard).position)
                     iCard += 1
 
-            self._cueCard.position = (0, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
-            self._cueCard.stimuli[0].reposition(self._cueCard.position)
-            self._cueCard.stimuli[1].reposition(self._cueCard.position)
+            for i in range(len(classPictures)):
+                rowPosition = 0 + (self.gap + sizeRows) * (i-1)
+                (self._cueCard[i]).position = (rowPosition, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
+                (self._cueCard[i]).stimuli[0].reposition(self._cueCard[i].position)
+                (self._cueCard[i]).stimuli[1].reposition(self._cueCard[i].position)
         else:
             print('Matrix is not valid')
 
@@ -93,11 +96,11 @@ class LdMatrix(object):
         sizeRows = self._matrix.item(0).size[0]  # Size of a card
         self._cueCard.position = position
 
-    def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
+    def plotCueCard(self, cue_index, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
-            self._cueCard.stimuli[0].plot(bs)
+            self._cueCard[cue_index].stimuli[0].plot(bs)
         else:
-            self._cueCard.stimuli[1].plot(bs)
+            self._cueCard[cue_index].stimuli[1].plot(bs)
         if draw:
             bs.present(False, True)
         else:
@@ -144,7 +147,8 @@ class LdMatrix(object):
 
             bs = self.plotCard(nCard, False, bs)
 
-        bs = self.plotCueCard(False, bs)
+        for i in range(len(classPictures)):
+            bs = self.plotCueCard(i, False, bs)
 
         if (self.size[0] % 2 == 0) and (self.size[1] % 2 == 0):
             centerDot = Circle(self.gap/2, colour=dotColor, position=(0, 0))

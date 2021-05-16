@@ -302,13 +302,52 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         # bs.present(False, True)
 
     trials_order = []
+    pictures_allocation = [list(picture_matrix) for picture_matrix in pictures_allocation]
+    pictures_allocation = [[card.rstrip('.png') for card in picture_matrix] for picture_matrix in pictures_allocation]
     trials_order = sum(pictures_allocation, [])
+    trials_order = [card.rstrip('.png') for card in trials_order]
     random.shuffle(trials_order)
-    for trial_index, nCard in enumerate(trials_order):
+    matrix_i = matrices[0]
+    matrix_i.plotDefault(bs, True)
+    for trial_index, card in enumerate(trials_order):
+        cueCards = []
+        category = card[0]
+        matrix_index = classPictures.index(category)
+        matrix_i = matrices[matrix_index]
+        pos = pictures_allocation[matrix_index].index(card)
+        cueCards.append({'correct_card': True, 'category': category, 'card': card, 'pos': pos,
+                         'matrix_index': matrix_index})
         exp.add_experiment_info(
-            f'Trial_trialIndex_{trial_index}_pos_{None}_card_{matrix_i.listPictures[nCard]}_timing_{exp.clock.time}')
-        # matrix_i._cueCard.setPicture(matrix_i._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
+            f"Trial_trialIndex_{str(trial_index)}_matrix_{cueCards[i]['category']}"
+            f"_pos_{pos}_card_{card}_timing_{exp.clock.time}")
 
+        other_indexes = list(range(len(classPictures)))
+        other_indexes.pop(matrix_index)
+        for i, other_matrix_index in enumerate(other_indexes):
+            cueCards.append({})
+            cueCards[i + 1]['correct_card'] = False
+            cueCards[i + 1]['card'] = random.choice(pictures_allocation[other_matrix_index])
+            cueCards[i + 1]['category'] = cueCards[i + 1]['card'][0]
+            cueCards[i + 1]['matrix_index'] = classPictures.index(cueCards[i + 1]['category'])
+            cueCards[i + 1]['pos'] = pictures_allocation[other_matrix_index].index(cueCards[i + 1]['card'])
+
+        random.shuffle(cueCards)
+
+        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+        exp.clock.wait(SoundBeforeImageTime)
+
+        for i in range(len(classPictures)):
+            cuecard_matrix = matrices[cueCards[i]['matrix_index']]
+            cuecard_pos = cueCards[i]['pos']
+            cuecard_card = cueCards[i]['card']
+            matrix_i._cueCard[i].setPicture(cuecard_matrix._matrix.item(cuecard_pos).stimuli[0].filename)
+            matrix_i.plotCueCard(i, True, bs, True)
+            exp.add_experiment_info(
+                f"ShowCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
+                f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
+        exp.clock.wait(presentationCard)
+
+        continue
         # Show 3 matrices
         matrix_i._cueCard.setPicture(matrix_i._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
