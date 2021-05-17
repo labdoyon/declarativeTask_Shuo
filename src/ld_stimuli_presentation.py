@@ -8,9 +8,10 @@ from ld_matrix import LdMatrix
 from config import windowMode, windowSize, bgColor, textColor, cardSize, textSize, \
     classPictures, matrixSize, listPictures, shortRest, presentationCard, picturesFolderClass,\
     min_max_ISI, debug, thankYouRest, sounds
-from ld_stimuli_names import pictureNames, classNames, ending_screen_text, soundNames
+from ld_stimuli_names import pictureNames, classNames, ending_screen_text, soundNames, ttl_instructions_text
 from ld_utils import getLanguage, getPreviousSoundsAllocation
 from ld_sound import create_temp_sound_files, delete_temp_files
+from ttl_catch_keyboard import wait_for_ttl_keyboard
 
 # This script is part of declarative Task 3 and is meant to present and name all the stimulis used in the experiment
 # in order to prepare the participant for all subsequent phases
@@ -76,7 +77,8 @@ else:
 
 # TODO # this line (below) does too much, but it's okay for now.
 m = LdMatrix(matrixSize, windowSize)
-m.changeCueCardPosition((0, 0))
+cuecard_index = int(len(classPictures)/2)
+m.changeCueCardPosition((0, 0), cuecard_index)
 
 # start experiment
 control.initialize(exp)
@@ -127,6 +129,15 @@ elif language == 'english':
     instructions_present1category_text = """ PRESENTATION: 
      PRESENTING CATEGORY """
 
+instructions_ttl = create_instructions_box(ttl_instructions_text[language], (0, -(2*cardSize[1])))
+show_and_hide_text_box(bs, instructions_ttl, 0, just_show=True)
+wait_for_ttl_keyboard()
+show_and_hide_text_box(bs, instructions_ttl, 0, just_hide=True)
+exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
+
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI)
+
 exp.add_experiment_info('Presentation start')
 instructions_presentation = create_instructions_box(instructions_presentation_text, (0, -(2*cardSize[1])))
 show_and_hide_text_box(bs, instructions_presentation, shortRest)
@@ -164,12 +175,12 @@ for category in classPicturesPresentationOrder:
     exp.clock.wait(ISI)
 
     for i, picture in enumerate(category_pictures):
-        m._cueCard.setPicture(picturesFolderClass[category] + picture)  # Associate Picture to CueCard
+        m._cueCard[cuecard_index].setPicture(picturesFolderClass[category] + picture)  # Associate Picture to CueCard
 
         picture_name = picture.replace('.png', '')
         picture_title = pictureNames[language][picture_name]
 
-        m.plotCueCard(True, bs, True)  # Show Cue
+        m.plotCueCard(cuecard_index, True, bs, True)  # Show Cue
         title = create_instructions_box(picture_title,
                                         (0, -(2*cardSize[1])))
         show_and_hide_text_box(bs, title, 0, just_show=True, just_hide=False)
@@ -178,7 +189,7 @@ for category in classPicturesPresentationOrder:
         exp.data.add(['show', exp.clock.time, category, picture, picture_title])
         exp.clock.wait(presentationCard)  # Wait presentationCard
         show_and_hide_text_box(bs, title, 0, just_show=False, just_hide=True)
-        m.plotCueCard(False, bs, True)  # Hide Cue
+        m.plotCueCard(cuecard_index, False, bs, True)  # Hide Cue
         exp.add_experiment_info(
             'HideCard_pos_{}_card_{}_name_{}__timing_{}'.format('None', picture, picture_title, exp.clock.time))
         exp.data.add(['hide', exp.clock.time, category, picture, picture_title])

@@ -113,15 +113,17 @@ correctAnswers = 0
 exp.add_experiment_info(['Block {} - Test'.format(0)])  # Add listPictures
 exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
 
+cuecard_index = int(len(classPictures)/2)
+
 for nCard in presentationOrder:
 
-    m._cueCard.setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
+    m._cueCard[cuecard_index].setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
-    m.plotCueCard(True, bs, True)  # Show Cue
+    m.plotCueCard(cuecard_index, True, bs, True)  # Show Cue
 
     exp.clock.wait(presentationCard)  # Wait presentationCard
 
-    m.plotCueCard(False, bs, True)  # Hide Cue
+    m.plotCueCard(cuecard_index, False, bs, True)  # Hide Cue
 
     mouse.show_cursor(True, True)
 
