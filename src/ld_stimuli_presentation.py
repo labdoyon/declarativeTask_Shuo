@@ -9,6 +9,7 @@ from config import windowMode, windowSize, bgColor, textColor, cardSize, textSiz
     classPictures, matrixSize, listPictures, shortRest, presentationCard, picturesFolderClass,\
     min_max_ISI, debug, thankYouRest, sounds
 from ld_stimuli_names import pictureNames, classNames, ending_screen_text, soundNames, ttl_instructions_text
+from ld_stimuli_names import sound_textbox
 from ld_utils import getLanguage, getPreviousSoundsAllocation
 from ld_sound import create_temp_sound_files, delete_temp_files
 from ttl_catch_keyboard import wait_for_ttl_keyboard
@@ -162,7 +163,7 @@ for category in classPicturesPresentationOrder:
     show_and_hide_text_box(bs, instructions_present1category, shortRest)
 
     instructions_listen_sound = create_instructions_box(
-        ' Sound: ' + soundNames[language][soundIndex],
+        sound_textbox[language] + soundNames[language][soundIndex],
         (0, -(2*cardSize[1])))
     show_and_hide_text_box(bs, instructions_listen_sound, 0, just_show=True)
     m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)

@@ -140,6 +140,7 @@ soundNames = {
     'english': {0: 'standard', 1: 'noise', 2: 'high pitch'},
     'french': {0: 'standard', 1: 'bruit', 2: 'aigu'}}
 
+sound_textbox = {'english': ' Sound: ', 'french': ' Son: '}
 rest_screen_text = {'english': ' REST ', 'french': ' REPOS '}
 ending_screen_text = {'english': ' THANK YOU ', 'french': ' MERCI '}
 presentation_screen_text = {'english': ' PRESENTATION ', 'french': ' PRÉSENTATION '}
