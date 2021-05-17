@@ -39,7 +39,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 
 textSize = 50
-matrixSize = (4, 4)
+matrixSize = (5, 4)
 cardSize = (90, 90)
 
 ''' Circles '''
@@ -153,6 +153,9 @@ elif matrixSize == (7, 7):
                       0, 2, 1, 2, 0, 1, 2,
                       1, 2, 1, 0, 2, 0, 1,
                       0, 1, 0, 1, 2, 2, 0]
+elif matrixSize == (5, 4):
+    matrixTemplate = [0] * 20
+    removeCards = []
 
 # correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
 correctAnswersMax = 12
