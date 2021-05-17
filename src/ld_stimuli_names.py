@@ -17,7 +17,11 @@ picturesNamesEnglish = {
     'a013': 'rabbit',
     'a014': 'rhinoceros',
     'a015': 'sheep',
-    'a016': 'chicken',
+    'a016': 'rooster',
+    'a017': 'bird',
+    'a018': 'cat',
+    'a019': 'duck',
+    'a020': 'racoon',
 
     'b001': 'pliers',
     'b002': 'power outlet',
@@ -35,6 +39,10 @@ picturesNamesEnglish = {
     'b014': 'pan',
     'b015': 'screwdriver',
     'b016': 'spoon',
+    'b017': 'axe',
+    'b018': 'broom',
+    'b019': 'table',
+    'b020': 'toaster',
     
     'c001': 'pants',
     'c002': 'shoe',
@@ -43,7 +51,7 @@ picturesNamesEnglish = {
     'c005': 'pullover',
     'c006': 'tie',
     'c007': 'jacket',
-    'c008': 'boot',
+    'c008': 'belt',
     'c009': 'dress',
     'c010': 'hat',
     'c011': 'coat',
@@ -51,7 +59,11 @@ picturesNamesEnglish = {
     'c013': 'necklace',
     'c014': 'glove',
     'c015': 'button',
-    'c016': 'purse'
+    'c016': 'purse',
+    'c017': 'ribbon',
+    'c018': 'watch',
+    'c019': 'shirt',
+    'c020': 'cap'
 }
 
 picturesNamesFrench = {
@@ -71,6 +83,10 @@ picturesNamesFrench = {
     'a014': 'rhinocéros',
     'a015': 'mouton',
     'a016': 'coq',
+    'a017': 'oiseau',
+    'a018': 'chat',
+    'a019': 'canard',
+    'a020': 'raton laveur',
 
     'b001': 'pinces',
     'b002': 'prise',
@@ -88,6 +104,10 @@ picturesNamesFrench = {
     'b014': 'casserole',
     'b015': 'tournevis',
     'b016': 'cuillère',
+    'b017': 'hache',
+    'b018': 'balai',
+    'b019': 'table',
+    'b020': 'grille-pain',
 
     'c001': 'pantalon',
     'c002': 'chaussure',
@@ -96,15 +116,19 @@ picturesNamesFrench = {
     'c005': 'pull',
     'c006': 'cravate',
     'c007': 'veste',
-    'c008': 'botte',
+    'c008': 'ceinture',
     'c009': 'robe',
     'c010': 'chapeau',
     'c011': 'manteau',
-    'c012': 'moufle',  # mitaine?
+    'c012': 'moufle',
     'c013': 'collier',
     'c014': 'gant',
     'c015': 'bouton',
-    'c016': 'sac à main'
+    'c016': 'sac à main',
+    'c017': 'ruban',
+    'c018': 'montre',
+    'c019': 'chemise',
+    'c020': 'casquette'
 }
 
 pictureNames = {'english': picturesNamesEnglish, 'french': picturesNamesFrench}
