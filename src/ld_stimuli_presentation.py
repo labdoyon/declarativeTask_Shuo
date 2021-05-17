@@ -164,12 +164,13 @@ for category in classPicturesPresentationOrder:
     instructions_listen_sound = create_instructions_box(
         ' Sound: ' + soundNames[language][soundIndex],
         (0, -(2*cardSize[1])))
-    show_and_hide_text_box(bs, instructions_listen_sound, 1000)
+    show_and_hide_text_box(bs, instructions_listen_sound, 0, just_show=True)
     m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+    exp.clock.wait(presentationCard)
     exp.add_experiment_info(
         'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
             category, exp.clock.wait, soundIndex, sound))
-    show_and_hide_text_box(bs, instructions_listen_sound, 1000)
+    show_and_hide_text_box(bs, instructions_listen_sound, 0, just_hide=True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     exp.clock.wait(ISI)
@@ -196,14 +197,6 @@ for category in classPicturesPresentationOrder:
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
-
-        if i == int(len(category_pictures)/2):
-            show_and_hide_text_box(bs, instructions_listen_sound, shortRest)
-            m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-            exp.add_experiment_info(
-                'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
-                    category, exp.clock.wait, soundIndex, sound))
-            show_and_hide_text_box(bs, instructions_listen_sound, shortRest)
 
 instructions_rest = create_instructions_box(ending_screen_text[language],
                                             (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))
