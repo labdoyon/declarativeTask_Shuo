@@ -452,19 +452,36 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         exp.clock.wait(ISI)
 
     if nbBlocksMax != 1:
-        instructions = stimuli.TextLine(
-            'You got ' + str(int(correctAnswers[i, nBlock])) + ' out of ' + str(matrix_i._matrix.size - len(removeCards)),
-            position=(0, -windowSize[1] / float(2) + (2 * matrix_i.gap + cardSize[1]) / float(2)),
-            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-            text_underline=None, text_colour=textColor, background_colour=bgColor,
-            max_width=None)
+        matrix_i.plotDefault(bs, draw=True, show_matrix=False)
+        results_feedback = f"""You got:
+        {classNames[language][classPictures[0]]}: {str(int(correctAnswers[0, nBlock]))} out of {str(matrices[0]._matrix.size - len(removeCards))}
+        {classNames[language][classPictures[1]]}: {str(int(correctAnswers[1, nBlock]))} out of {str(matrices[1]._matrix.size - len(removeCards))}
+        {classNames[language][classPictures[2]]}: {str(int(correctAnswers[2, nBlock]))} out of {str(matrices[2]._matrix.size - len(removeCards))}"""
+        instructions = stimuli.TextBox(results_feedback,
+                                       size=(windowSize[0], 4 * cardSize[1]),
+                                       position=(0, 0),
+                                       text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                       text_underline=None, text_colour=textColor,
+                                       background_colour=bgColor,
+                                       text_justification=0)
+        instructionRectangle_results = stimuli.Rectangle(size=(windowSize[0], 4 * cardSize[1]), position=(0, 0),
+                                                         colour=constants.C_DARKGREY)
+
         instructions.plot(bs)
         bs.present(False, True)
-
         exp.clock.wait(shortRest)
-
-        instructionRectangle.plot(bs)
+        instructionRectangle_results.plot(bs)
         bs.present(False, True)
+
+        pictures_allocation = [np.asarray([card + '.png' for card in picture_matrix])
+                               for picture_matrix in pictures_allocation]
+        for i, category in enumerate(classPictures):
+            matrices[i].associatePictures(pictures_allocation[i])
+        matrix_i = matrices[0]
+        matrix_i.plotDefault(bs, True)
+        for i in range(len(classPictures)):
+            matrix_i.plotCueCard(i, False, bs, draw=True)
+
     if ignore_learned_matrices and correctAnswers[i, nBlock] > correctAnswersMax:
         matrices_to_present = np.delete(matrices_to_present, i)
 

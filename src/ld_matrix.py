@@ -141,21 +141,31 @@ class LdMatrix(object):
                       sounds[self._cueCard.sound]
             subprocess.call(command)
 
-    def plotDefault(self, bs, draw=False):
+    def plotDefault(self, bs, draw=False, show_matrix=True):
         for nCard in range(self._matrix.size):
-            if nCard in removeCards:
+            if nCard in removeCards or not show_matrix:
                  self._matrix.item(nCard).color = bgColor
 
             bs = self.plotCard(nCard, False, bs)
 
         for i in range(len(classPictures)):
+            if not show_matrix:
+                self._cueCard[i].color = bgColor
             bs = self.plotCueCard(i, False, bs)
 
         if (self.size[0] % 2 == 0) and (self.size[1] % 2 == 0):
-            centerDot = Circle(self.gap/2, colour=dotColor, position=(0, 0))
+            if show_matrix:
+                local_color = dotColor
+            else:
+                local_color = bgColor
+            centerDot = Circle(self.gap/2, colour=local_color, position=(0, 0))
             centerDot.plot(bs)
         elif (self.size[0] % 2 == 1) and (self.size[1] % 2 == 1):
-            centerSquare = Rectangle(cardSize, colour=constants.C_WHITE, position=(0, 0))
+            if show_matrix:
+                local_color = constants.C_WHITE
+            else:
+                local_color = bgColor
+            centerSquare = Rectangle(cardSize, colour=local_color, position=(0, 0))
             centerSquare.plot(bs)
 
         if draw:
