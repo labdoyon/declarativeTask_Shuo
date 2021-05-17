@@ -1,13 +1,14 @@
 import numpy as np
 import subprocess
-from expyriment.stimuli import Circle, Rectangle
-from expyriment.misc import constants
+from expyriment.stimuli import Circle, Rectangle, Shape
+from expyriment.misc import constants, geometry
 from playsound import playsound
 
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
 from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
 from config import sounds, soundsFolder, tempSounds
+from config import feedback_frame_correct_color, feedback_frame_wrong_color
 
 class LdMatrix(object):
     def __init__(self, size, windowSize):
@@ -256,6 +257,26 @@ class LdMatrix(object):
                 if (self._cueCard[cuecard_index]).stimuli[1].overlapping_with_position(position):
                     return cuecard_index
             return None
+
+    def response_feedback_stimuli_frame(self, bs, position, subject_correct, show_or_hide=True, draw=False):
+        if show_or_hide:
+            if subject_correct:
+                color = feedback_frame_correct_color
+            else:
+                color = feedback_frame_wrong_color
+        else:
+            color = bgColor
+
+        geometry.vertices_frame(size=(100, 100), frame_thickness=10)
+        response_stimuli = Shape(position=position,
+                                 vertex_list=geometry.vertices_frame(size=(100, 100), frame_thickness=10),
+                                 colour=color)
+
+        response_stimuli.plot(bs)
+        if draw:
+            bs.present(False, True)
+        else:
+            return bs
 
     @property
     def size(self):

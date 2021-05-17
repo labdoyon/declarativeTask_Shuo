@@ -346,11 +346,6 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 f"ShowCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
         exp.clock.wait(presentationCard)
-        for i in range(len(classPictures)):
-            matrix_i.plotCueCard(i, False, bs, True)
-            exp.add_experiment_info(
-                f"HideCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
-                f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
 
         # Mouse Response Block
         time_left = responseTime
@@ -365,6 +360,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 chosenCueCard_index = matrix_i.checkPosition(position, cue_card=True)
                 if chosenCueCard_index is not None:
                     chosenCueCard = cueCards[chosenCueCard_index]
+                    matrix_cueCard = matrix_i._cueCard[chosenCueCard_index]
+
                     if chosenCueCard['correct_card']:
                         exp.add_experiment_info(
                             f"CorrectCueCardResponse_trialIndex_{str(trial_index)}"
@@ -375,9 +372,30 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_timing_{exp.clock.time}"
                         )
                         # ADD GREEN FEEDBACK
+                        matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
+                                                                 show_or_hide=True, draw=True)
+                        exp.clock.wait(shortRest)
+                        matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
+                                                                 show_or_hide=False, draw=True)
                         time_left = responseTime - rt - clicPeriod
-                        valid_response = True # TEST CODE
-                        # ADD RESPONSE LOOP
+                        valid_response = True
+                        matrix_valid_response = False
+                        while not matrix_valid_response:
+                            mouse.show_cursor(True, True)
+                            start = get_time()
+                            rt, position = readMouse(start, mouseButton, time_left)
+                            mouse.hide_cursor(True, True)
+                            if rt is not None:
+                                currentCard = matrix_i.checkPosition(position)
+
+                            else:
+                                if rt < time_left - clicPeriod:
+                                    time_left = time_left - rt - clicPeriod
+                                else:
+                                    exp.add_experiment_info(
+                                        f"NoMatrixCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+                                    matrix_valid_response = True
+
                     else:
                         exp.add_experiment_info(
                             f"WrongCueCardResponse_trialIndex_{str(trial_index)}"
@@ -388,7 +406,11 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_timing_{exp.clock.time}"
                         )
                         valid_response = True
-                        # ADD RED FEEDBACK
+                        matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
+                                                                 show_or_hide=True, draw=True)
+                        exp.clock.wait(shortRest)
+                        matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
+                                                                 show_or_hide=False, draw=True)
                 else:
                     if rt < time_left - clicPeriod:
                         time_left = time_left - rt - clicPeriod
@@ -399,9 +421,15 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
                 valid_response = True
 
+        for i in range(len(classPictures)):
+            matrix_i.plotCueCard(i, False, bs, True)
+            exp.add_experiment_info(
+                f"HideCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
+                f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
+
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
-        
+
         continue
         # Mouse Response Block
         time_left = responseTime

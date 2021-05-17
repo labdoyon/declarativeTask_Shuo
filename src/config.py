@@ -1,6 +1,7 @@
 import glob
 import os
 # from math import ceil
+from expyriment.misc import constants
 
 rawFolder = os.getcwd() + os.path.sep
 
@@ -178,5 +179,8 @@ for classPicture in classPictures:
 
 for category in classPictures:
     listPictures[category] = [p.replace(picturesFolderClass[category], '') for p in listPictures[category]]
+
+feedback_frame_correct_color = constants.C_GREEN
+feedback_frame_wrong_color = constants.C_RED
 
 debug = False
