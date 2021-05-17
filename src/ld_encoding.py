@@ -133,12 +133,12 @@ bs.present(False, True)
 new_matrix_presentation_order = None
 learning_matrix_presentation_order = None
 matrices_to_present = np.array(range(len(classPictures)))
-if experimentName == 'Encoding':
-    test_matrix_presentation_order = None
-elif experimentName == 'Test-Encoding':
-    test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Encoding')
-elif experimentName == 'ReTest-Encoding':
-    test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Test-Encoding')
+# if experimentName == 'Encoding':
+#     test_matrix_presentation_order = None
+# elif experimentName == 'Test-Encoding':
+#     test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Encoding')
+# elif experimentName == 'ReTest-Encoding':
+#     test_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'Test-Encoding')
 
 while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
@@ -148,8 +148,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
 
         if len(matrices_to_present) > 2:
-            while (new_matrix_presentation_order == learning_matrix_presentation_order or
-                    new_matrix_presentation_order == test_matrix_presentation_order):
+            while new_matrix_presentation_order == learning_matrix_presentation_order:
                 new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
         else:
             new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
@@ -266,40 +265,6 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     exp.clock.wait(ISI)
 
     ''' Cue Recall '''
-    # if len(matrices_to_present) > 2:
-    #     while (new_matrix_presentation_order == learning_matrix_presentation_order or
-    #            new_matrix_presentation_order == test_matrix_presentation_order):
-    #         new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
-    # else:
-    #     new_matrix_presentation_order = list(np.random.permutation(matrices_to_present))
-    # test_matrix_presentation_order = new_matrix_presentation_order
-
-    exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
-    exp.add_experiment_info(
-        'Test_Block_{}_MatrixPresentationOrder_{}_timing_{}'.format(nBlock, test_matrix_presentation_order,
-                                                                    exp.clock.time))  # Add sync info
-    # for i in test_matrix_presentation_order:
-    #     matrix_i = matrices[i]
-    #     matrix_i.plotDefault(bs, True)
-    #     presentationOrder = newRandomPresentation(presentationOrder)
-    #     exp.add_experiment_info('Test_Block_{}_matrix_{}_category_{}_timing_{}'.format(
-    #         nBlock, i, matrix_i._category, exp.clock.time))
-    #     exp.add_experiment_info(str(presentationOrder))
-
-        # instructions = stimuli.TextLine(
-        #     ' TEST ' + classNames[language][matrix_i._category] + ' ',
-        #     position=(0, -windowSize[1] / float(2) + (2 * matrix_i.gap + cardSize[1]) / float(2)),
-        #     text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-        #     text_underline=None, text_colour=textColor,
-        #     background_colour=bgColor,
-        #     max_width=None)
-        # instructionRectangle.plot(bs)
-        # instructions.plot(bs)
-        # bs.present(False, True)
-        #
-        # exp.clock.wait(shortRest)
-        # instructionRectangle.plot(bs)
-        # bs.present(False, True)
 
     trials_order = []
     pictures_allocation = [list(picture_matrix) for picture_matrix in pictures_allocation]
@@ -307,6 +272,11 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     trials_order = sum(pictures_allocation, [])
     trials_order = [card.rstrip('.png') for card in trials_order]
     random.shuffle(trials_order)
+
+    exp.add_experiment_info(
+        f'Test_Block_{nBlock}_timing_{exp.clock.time}')  # Add sync info
+    exp.add_experiment_info(f'Test_Block_{nBlock}_Presentation_Order')
+    exp.add_experiment_info(trials_order)
     matrix_i = matrices[0]
     matrix_i.plotDefault(bs, True)
     for trial_index, card in enumerate(trials_order):
@@ -371,10 +341,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_card_{chosenCueCard['card']}"
                             f"_timing_{exp.clock.time}"
                         )
-                        # ADD GREEN FEEDBACK
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=True, draw=True)
-                        exp.clock.wait(shortRest)
+                        exp.clock.wait(feedback_time)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=False, draw=True)
                         time_left = responseTime - rt - clicPeriod
@@ -387,14 +356,50 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             mouse.hide_cursor(True, True)
                             if rt is not None:
                                 currentCard = matrix_i.checkPosition(position)
-
-                            else:
-                                if rt < time_left - clicPeriod:
-                                    time_left = time_left - rt - clicPeriod
-                                else:
-                                    exp.add_experiment_info(
-                                        f"NoMatrixCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+                                if currentCard is not None:
+                                    # Click effect feedback block
+                                    if currentCard not in removeCards:
+                                        matrix_i._matrix.item(currentCard).color = clickColor
+                                        matrix_i.plotCard(currentCard, False, bs, True)
+                                        exp.clock.wait(clicPeriod)  # Wait 200ms
+                                        matrix_i._matrix.item(currentCard).color = cardColor
+                                        matrix_i.plotCard(currentCard, False, bs, True)
                                     matrix_valid_response = True
+                                    try:
+                                        exp.add_experiment_info(
+                                            f"MatrixResponse_trialIndex_{str(trial_index)}"
+                                            f"_matrix_{chosenCueCard['category']}"
+                                            f"_pos_{currentCard}"
+                                            f"_card_{(matrices[chosenCueCard['matrix_index']]).listPictures[currentCard]}"
+                                            f"_timing_{exp.clock.time}"
+                                        )
+                                    except:
+                                        exp.add_experiment_info(
+                                            'MatrixResponse_pos_{}_ERROR_timing_{}'.format(currentCard, exp.clock.time))
+                                    if currentCard == chosenCueCard['pos']:
+                                        if experimentName == 'Encoding' and nbBlocksMax != 1:
+                                            matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                                        correctAnswers[matrix_index, nBlock] += 1
+                                    exp.data.add([exp.clock.time, nBlock,
+                                                  path_leaf(matrix_i._matrix.item(chosenCueCard['pos']).stimuli[0].filename),
+                                                  path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
+                                                  rt])
+                                else:
+                                    if rt < time_left - clicPeriod:
+                                        time_left = time_left - rt - clicPeriod
+                                    else:
+                                        exp.add_experiment_info(
+                                            f"NoMatrixCardResponse_trialIndex_{str(trial_index)}"
+                                            f"_timing_{exp.clock.time}")
+                                        exp.data.add([exp.clock.time, nBlock,
+                                                      path_leaf(matrix_i._matrix.item(chosenCueCard['pos']).stimuli[0].filename),
+                                                      None,
+                                                      rt])
+                                        matrix_valid_response = True
+                            else:
+                                exp.add_experiment_info(
+                                    f"NoMatrixCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+                                matrix_valid_response = True
 
                     else:
                         exp.add_experiment_info(
@@ -408,8 +413,22 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         valid_response = True
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
                                                                  show_or_hide=True, draw=True)
-                        exp.clock.wait(shortRest)
+                        exp.clock.wait(feedback_time)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
+                                                                 show_or_hide=False, draw=True)
+
+                        exp.clock.wait(inter_feedback_delay_time)
+                        for k in range(len(classPictures)):
+                            if cueCards[k]['correct_card']:
+                                break
+
+                        # We use subject_correct parameter set to True in order to have green feedback on the correct
+                        # image/card
+                        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
+                        matrix_i.response_feedback_stimuli_frame(bs, (matrix_i._cueCard[k]).position, True,
+                                                                 show_or_hide=True, draw=True)
+                        exp.clock.wait(feedback_time)
+                        matrix_i.response_feedback_stimuli_frame(bs, (matrix_i._cueCard[k]).position, True,
                                                                  show_or_hide=False, draw=True)
                 else:
                     if rt < time_left - clicPeriod:
@@ -427,79 +446,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 f"HideCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
-
-        continue
-        # Mouse Response Block
-        time_left = responseTime
-        valid_response = False
-        while True:
-            mouse.show_cursor(True, True)
-
-            start = get_time()
-            rt, position = readMouse(start, mouseButton, time_left)
-
-            mouse.hide_cursor(True, True)
-            if rt is not None:
-
-                currentCard = matrix_i.checkPosition(position)
-
-                # LOG and SYNC Response
-                try:
-                    exp.add_experiment_info(['Response_pos_{}_card_{}_timing_{}'.format(
-                        currentCard,
-                        matrix_i.listPictures[currentCard],
-                        exp.clock.time)])  # Add sync info
-                    valid_response = True
-                except:
-                    exp.add_experiment_info(
-                        ['Response_pos_{}_ERROR_timing_{}'.format(currentCard, exp.clock.time)])  # Add sync info
-
-                if currentCard is not None and currentCard not in removeCards:
-                    matrix_i._matrix.item(currentCard).color = clickColor
-                    matrix_i.plotCard(currentCard, False, bs, True)
-
-                    exp.clock.wait(clicPeriod)  # Wait 200ms
-
-                    matrix_i._matrix.item(currentCard).color = cardColor
-                    matrix_i.plotCard(currentCard, False, bs, True)
-
-                if currentCard == nCard:
-                    if experimentName == 'Encoding' and nbBlocksMax != 1:
-                        matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-                    correctAnswers[i, nBlock] += 1
-                    exp.data.add([exp.clock.time, nBlock,
-                                  path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                                  path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
-                                  rt])
-
-                elif currentCard is None:
-                    exp.data.add([exp.clock.time, nBlock,
-                                  path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                                  None,
-                                  rt])
-
-                else:
-                    exp.data.add([exp.clock.time, nBlock,
-                                  path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                                  path_leaf(matrix_i._matrix.item(currentCard).stimuli[0].filename),
-                                  rt])
-            else:
-                exp.data.add([exp.clock.time, nBlock,
-                              path_leaf(matrix_i._matrix.item(nCard).stimuli[0].filename),
-                              None,
-                              rt])
-
-                # LOG and SYNC Response
-                exp.add_experiment_info(['NoResponse'])  # Add sync info
-            if valid_response or rt is None:
-                break
-            elif rt < time_left - clicPeriod:
-                time_left = time_left - clicPeriod - rt
-                pass
-            else:
-                break
+        # Longer than usual time between two trials, in order to ensure sounds aren't mixed up by participants
+        exp.clock.wait(presentationCard)
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 

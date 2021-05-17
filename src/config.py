@@ -182,5 +182,7 @@ for category in classPictures:
 
 feedback_frame_correct_color = constants.C_GREEN
 feedback_frame_wrong_color = constants.C_RED
+feedback_time = 1000
+inter_feedback_delay_time = 1000
 
 debug = False
