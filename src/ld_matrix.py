@@ -268,12 +268,16 @@ class LdMatrix(object):
                     return cuecard_index
             return None
 
-    def response_feedback_stimuli_frame(self, bs, position, subject_correct, show_or_hide=True, draw=False):
+    def response_feedback_stimuli_frame(self, bs, position, subject_correct, show_or_hide=True, draw=False,
+                                        no_feedback=False):
         if show_or_hide:
-            if subject_correct:
-                color = feedback_frame_correct_color
+            if not no_feedback:
+                if subject_correct:
+                    color = feedback_frame_correct_color
+                else:
+                    color = feedback_frame_wrong_color
             else:
-                color = feedback_frame_wrong_color
+                color = constants.C_BLACK
         else:
             color = bgColor
 

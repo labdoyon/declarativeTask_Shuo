@@ -42,12 +42,18 @@ exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 keepMatrix = True
 if experimentName == 'Encoding':
     keepPreviousMatrix = False
+    no_feedback = False
+    cuecard_response_logging_text = 'CorrectCueCardResponse'
 elif experimentName == 'Test-Encoding':
     keepPreviousMatrix = True
     nbBlocksMax = 1
+    no_feedback = True
+    cuecard_response_logging_text = 'CueCardResponse'
 elif experimentName == 'ReTest-Encoding':
     keepPreviousMatrix = True
     nbBlocksMax = 1
+    no_feedback = True
+    cuecard_response_logging_text = 'CueCardResponse'
 
 exp.add_experiment_info('Image categories (original order; src/config.py order): ')
 exp.add_experiment_info(str(classPictures))
@@ -320,7 +326,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         # Mouse Response Block
         time_left = responseTime
         valid_response = False
-        while not valid_response:
+        rt = True  # Response time; equals None if participant haven't clicked within window time frame they were
+        # given to answer
+        while not valid_response and rt is not None:
             mouse.show_cursor(True, True)
             start = get_time()
             rt, position = readMouse(start, mouseButton, time_left)
@@ -332,9 +340,10 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                     chosenCueCard = cueCards[chosenCueCard_index]
                     matrix_cueCard = matrix_i._cueCard[chosenCueCard_index]
 
-                    if chosenCueCard['correct_card']:
+                    if chosenCueCard['correct_card'] or \
+                            (experimentName == 'Test-Encoding' or experimentName == 'ReTest-Encoding'):
                         exp.add_experiment_info(
-                            f"CorrectCueCardResponse_trialIndex_{str(trial_index)}"
+                            f"{cuecard_response_logging_text}_trialIndex_{str(trial_index)}"
                             f"_cueCardIndex_{chosenCueCard_index}"
                             f"_matrix_{chosenCueCard['category']}"
                             f"_pos_{chosenCueCard['pos']}"
@@ -342,11 +351,14 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_timing_{exp.clock.time}"
                         )
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
-                                                                 show_or_hide=True, draw=True)
+                                                                 show_or_hide=True, draw=True, no_feedback=no_feedback)
                         exp.clock.wait(feedback_time)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
-                                                                 show_or_hide=False, draw=True)
+                                                                 show_or_hide=False, draw=True, no_feedback=no_feedback)
                         time_left = responseTime - rt - clicPeriod
+                        # Ensuring participants have AT LEAST 3s (of value written in config file) to answer
+                        if time_left < choose_location_minimum_response_time:
+                            time_left = choose_location_minimum_response_time
                         valid_response = True
                         matrix_valid_response = False
                         while not matrix_valid_response:
@@ -435,10 +447,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         time_left = time_left - rt - clicPeriod
                     else:
                         exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
-                        valid_response = True
+                        valid_response, rt = True, None
             else:
                 exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
-                valid_response = True
 
         for i in range(len(classPictures)):
             matrix_i.plotCueCard(i, False, bs, True)
@@ -451,7 +462,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
-    if nbBlocksMax != 1:
+    if nbBlocksMax != 1 and experimentName != 'Encoding':
         matrix_i.plotDefault(bs, draw=True, show_matrix=False)
         results_feedback = f"""You got:
         {classNames[language][classPictures[0]]}: {str(int(correctAnswers[0, nBlock]))} out of {str(matrices[0]._matrix.size - len(removeCards))}

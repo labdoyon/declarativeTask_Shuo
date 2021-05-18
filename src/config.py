@@ -187,5 +187,6 @@ feedback_frame_correct_color = constants.C_GREEN
 feedback_frame_wrong_color = constants.C_RED
 feedback_time = 1000
 inter_feedback_delay_time = 1000
+choose_location_minimum_response_time = 3000
 
 debug = False
