@@ -12,7 +12,8 @@ from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLan
 from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
 from ttl_catch_keyboard import wait_for_ttl_keyboard
-from ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, ending_screen_text
+from ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \
+    ending_screen_text, choose_image_text, choose_position_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -323,6 +324,17 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
         exp.clock.wait(presentationCard)
 
+        instructions = stimuli.TextLine(choose_image_text[language],
+                                        position=(
+                                            0,
+                                            -windowSize[1] / float(2) + (2 * matrices[0].gap + cardSize[1]) / float(2)),
+                                        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                        text_underline=None, text_colour=textColor,
+                                        background_colour=bgColor,
+                                        max_width=None)
+        instructions.plot(bs)
+        bs.present(False, True)
+
         # Mouse Response Block
         time_left = responseTime
         valid_response = False
@@ -350,11 +362,25 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_card_{chosenCueCard['card']}"
                             f"_timing_{exp.clock.time}"
                         )
+                        instructionRectangle.plot(bs)
+                        bs.present(False, True)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=True, draw=True, no_feedback=no_feedback)
                         exp.clock.wait(feedback_time)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=False, draw=True, no_feedback=no_feedback)
+                        instructions = stimuli.TextLine(choose_position_text[language],
+                                                        position=(
+                                                            0,
+                                                            -windowSize[1] / float(2) + (
+                                                                        2 * matrices[0].gap + cardSize[1]) / float(2)),
+                                                        text_font=None, text_size=textSize, text_bold=None,
+                                                        text_italic=None,
+                                                        text_underline=None, text_colour=textColor,
+                                                        background_colour=bgColor,
+                                                        max_width=None)
+                        instructions.plot(bs)
+                        bs.present(False, True)
                         time_left = responseTime - rt - clicPeriod
                         # Ensuring participants have AT LEAST 3s (of value written in config file) to answer
                         if time_left < choose_location_minimum_response_time:
@@ -376,6 +402,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                                         exp.clock.wait(clicPeriod)  # Wait 200ms
                                         matrix_i._matrix.item(currentCard).color = cardColor
                                         matrix_i.plotCard(currentCard, False, bs, True)
+                                    instructionRectangle.plot(bs)
+                                    bs.present(False, True)
                                     matrix_valid_response = True
                                     try:
                                         exp.add_experiment_info(
@@ -422,6 +450,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                             f"_card_{chosenCueCard['card']}"
                             f"_timing_{exp.clock.time}"
                         )
+                        instructionRectangle.plot(bs)
+                        bs.present(False, True)
                         valid_response = True
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
                                                                  show_or_hide=True, draw=True)
@@ -450,6 +480,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         valid_response, rt = True, None
             else:
                 exp.add_experiment_info(f"NoCueCardResponse_trialIndex_{str(trial_index)}_timing_{exp.clock.time}")
+        instructionRectangle.plot(bs)
+        bs.present(False, True)
 
         for i in range(len(classPictures)):
             matrix_i.plotCueCard(i, False, bs, True)
