@@ -287,6 +287,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     exp.add_experiment_info(str(trials_order))
     matrix_i = matrices[0]
     matrix_i.plotDefault(bs, True)
+    dont_reuse_previous_trial_pictures = [None] * len(classPictures)
     for trial_index, card in enumerate(trials_order):
         cueCards = []
         category = card[0]
@@ -298,13 +299,32 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info(
             f"Trial_trialIndex_{str(trial_index)}_matrix_{category}"
             f"_pos_{pos}_card_{card}_timing_{exp.clock.time}")
+        dont_reuse_previous_trial_pictures[matrix_index] = card
 
         other_indexes = list(range(len(classPictures)))
         other_indexes.pop(matrix_index)
         for i, other_matrix_index in enumerate(other_indexes):
             cueCards.append({})
             cueCards[i + 1]['correct_card'] = False
-            cueCards[i + 1]['card'] = random.choice(pictures_allocation[other_matrix_index])
+
+            # Removing any image that would have used during the previous trial
+            # Ensuring wrong (wrong response) images of this trial aren't the right (to be guessed) image of the next
+            # trial
+            pictures_to_choose_from = list(pictures_allocation[other_matrix_index])
+            try:
+                next_trial_card = trials_order[trial_index + 1]
+                try:
+                    pictures_to_choose_from.remove(next_trial_card)
+                except ValueError:
+                    pass
+            except IndexError: # we're at the last trial
+                pass
+            try:
+                pictures_to_choose_from.remove(dont_reuse_previous_trial_pictures[other_matrix_index])
+            except ValueError:
+                pass
+            cueCards[i + 1]['card'] = random.choice(pictures_to_choose_from)
+            dont_reuse_previous_trial_pictures[other_matrix_index] = cueCards[i + 1]['card']
             cueCards[i + 1]['category'] = cueCards[i + 1]['card'][0]
             cueCards[i + 1]['matrix_index'] = classPictures.index(cueCards[i + 1]['category'])
             cueCards[i + 1]['pos'] = pictures_allocation[other_matrix_index].index(cueCards[i + 1]['card'])
