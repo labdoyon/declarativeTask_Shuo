@@ -515,7 +515,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI, process_control_events=True)
 
-    if nbBlocksMax != 1 and experimentName != 'Encoding':
+    if nbBlocksMax != 1 and experimentName == 'Encoding':
         matrix_i.plotDefault(bs, draw=True, show_matrix=False)
         results_feedback = f"""You got:
         {classNames[language][classPictures[0]]}: {str(int(correctAnswers[0, nBlock]))} out of {str(matrices[0]._matrix.size - len(removeCards))}
