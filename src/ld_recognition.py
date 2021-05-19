@@ -44,11 +44,11 @@ for i, category in enumerate(classPictures):
     matrices.append(LdMatrix(matrixSize, windowSize))  # Create Matrix
     matrices[i].associateCategory(category)
 
-    exp.add_experiment_info('LearningMatrix_{}_category_{}: '.format(i, category))  # Save Subject Code
-    exp.add_experiment_info(str(learning_matrices[i]))  # Add listPictures
-    exp.add_experiment_info('RandomMatrix_{}_category_{}: '.format(i, category))  # Save Subject Code
+    exp.add_experiment_info('LearningMatrix_{}_category_{}: '.format(i, category))
+    exp.add_experiment_info(str(learning_matrices[i]))
+    exp.add_experiment_info('RandomMatrix_{}_category_{}: '.format(i, category))
     random_matrices.append(matrices[i].newRecognitionMatrix(learning_matrices[i], category))
-    exp.add_experiment_info(str(random_matrices[i]))  # Add listPictures
+    exp.add_experiment_info(str(random_matrices[i]))
 
 soundsAllocation_index = getPreviousSoundsAllocation(subjectName, 0, 'choose-sound-association')
 soundsAllocation = {key: sounds[soundsAllocation_index[key]] for key in soundsAllocation_index.keys()}
