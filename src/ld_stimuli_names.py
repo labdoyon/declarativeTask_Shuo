@@ -137,8 +137,8 @@ classNames = {'english': {'a': 'animals', 'b': 'household', 'c': 'clothes'},
               None: {'a': 'a', 'b': 'b', 'c': 'c'}}
 soundNames = {
     None: {0: 'S1', 1: 'S2', 2: 'S3'},
-    'english': {0: 'standard', 1: 'noise', 2: 'high pitch'},
-    'french': {0: 'standard', 1: 'bruit', 2: 'aigu'}}
+    'english': {0: 'standard', 1: 'noise', 2: 'A'},
+    'french': {0: 'standard', 1: 'bruit', 2: 'A'}}
 
 sound_textbox = {'english': ' Sound: ', 'french': ' Son: '}
 rest_screen_text = {'english': ' REST ', 'french': ' REPOS '}
@@ -147,3 +147,5 @@ presentation_screen_text = {'english': ' PRESENTATION ', 'french': ' PRÉSENTATI
 ttl_instructions_text = {'english': ' PLEASE INPUT TTL ', 'french': ' EN ATTENTE DU TTL '}
 choose_image_text = {'english': ' Choose an image ', 'french': ' Choisissez une image '}
 choose_position_text = {'english': ' Choose a location ', 'french': ' Choisissez une position '}
+next_sound_text = {'english': ' Next Sound ', 'french': ' Suivant '}
+ld_GUI_end_text = {'english': ' End ', 'french': ' Fin '}

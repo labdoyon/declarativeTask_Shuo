@@ -120,8 +120,8 @@ dayOneStimuliPresentation = CommandItem(text='stimuli presentation',
                             should_exit=False)
 
 soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
-                            command=python + " src" + os.path.sep + "ld_calibrateSoundVolumeSubprocess.py",
-                            arguments=sys.argv[1],
+                            command=python + " src" + os.path.sep + "ld_GUI_adjust_sound_volumes.py",
+                            arguments='soundVolumeAdjustment, ' + sys.argv[1],
                             menu=menu,
                             should_exit=False)
 
