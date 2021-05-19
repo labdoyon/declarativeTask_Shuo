@@ -124,6 +124,8 @@ for sound_index in range(len(sounds)):
     next_sound_or_end_box.plot(bs)
     bs.present(False, True)
 
+    play_sound(sound_index)
+
     move_on = False
     while not move_on:
         mouse.show_cursor(True, True)
