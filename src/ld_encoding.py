@@ -7,7 +7,7 @@ from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from ld_matrix import LdMatrix
-from ld_utils import newSoundAllocation, getPreviousSoundsAllocation, getPreviousMatrixOrder
+from ld_utils import getPreviousSoundsAllocation, getPreviousMatrixOrder, normalize_test_presentation_order
 from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
 from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
@@ -279,11 +279,12 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     trials_order = sum(pictures_allocation, [])
     trials_order = [card.rstrip('.png') for card in trials_order]
     random.shuffle(trials_order)
+    trials_order = normalize_test_presentation_order(trials_order, pictures_allocation)
 
     exp.add_experiment_info(
         f'Test_Block_{nBlock}_timing_{exp.clock.time}')  # Add sync info
     exp.add_experiment_info(f'Test_Block_{nBlock}_Presentation_Order')
-    exp.add_experiment_info(trials_order)
+    exp.add_experiment_info(str(trials_order))
     matrix_i = matrices[0]
     matrix_i.plotDefault(bs, True)
     for trial_index, card in enumerate(trials_order):

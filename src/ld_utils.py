@@ -251,6 +251,24 @@ def normalize_presentation_order(presentation_order, learning_matrix, random_mat
 
     return new_presentation_order
 
+
+def normalize_test_presentation_order(trials_order, pictures_allocation):
+    positions = []
+    for card in trials_order:
+        category = card[0]
+        matrix_index = classPictures.index(category)
+        positions.append(pictures_allocation[matrix_index].index(card))
+
+    while any([positions[i] == positions[i + 1] for i in range(len(positions) - 1)]):
+        zipped_lists = list(zip(positions, trials_order))
+        random.shuffle(zipped_lists)
+
+        positions, trials_order = zip(*zipped_lists)
+        positions, trials_order = list(positions), list(trials_order)
+
+    return trials_order
+
+
 def subfinder(mylist, pattern):
     answers = []
     for i in range(len(mylist) - len(pattern)+1):
