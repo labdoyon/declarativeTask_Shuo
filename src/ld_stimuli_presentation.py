@@ -170,7 +170,7 @@ for category in classPicturesPresentationOrder:
     exp.clock.wait(presentationCard, process_control_events=True)
     exp.add_experiment_info(
         'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
-            category, exp.clock.wait, soundIndex, sound, process_control_events=True), process_control_events=True)
+            category, exp.clock.time, soundIndex, sound))
     show_and_hide_text_box(bs, instructions_listen_sound, 0, just_hide=True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
