@@ -1,6 +1,8 @@
 import ast
 import ntpath
 import os
+import random
+
 import pygame
 from datetime import datetime
 from time import time
@@ -103,8 +105,10 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName, matrix_index, mat
     dataFiles = [each for each in os.listdir(dataFolder) if each.endswith('.xpd')]
 
     for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
         previousDate = parse(agg[2]['date'])
 
         try:
@@ -133,7 +137,10 @@ def getPreviousSoundsAllocation(subjectName, daysBefore, experienceName):
     dataFiles = [each for each in os.listdir(dataFolder) if each.endswith('.xpd')]
 
     for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
         previousDate = parse(agg[2]['date'])
 
         try:
@@ -164,33 +171,33 @@ def getPreviousMatrixOrder(subjectName, daysBefore, experienceName):
     for dataFile in dataFiles:
         try:
             agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-            previousDate = parse(agg[2]['date'])
+        except TypeError:
+            continue
+        previousDate = parse(agg[2]['date'])
 
-            try:
-                agg[3].index(experienceName)
-            except (ValueError):
-                continue
+        try:
+            agg[3].index(experienceName)
+        except (ValueError):
+            continue
 
-            if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
-                header = agg[3].split('\n#e ')
+        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
+            header = agg[3].split('\n#e ')
 
-                indexSubjectName = header.index('Subject:') + 1
-                if subjectName in header[indexSubjectName]:
-                    print('File found: ' + dataFile)
-                    elements = [element for element in header if 'MatrixPresentationOrder_' in element]
-                    target = elements[-1]
-                    target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
-                    target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
-                    target = ast.literal_eval(target)
-                    if not ignore_learned_matrices:
+            indexSubjectName = header.index('Subject:') + 1
+            if subjectName in header[indexSubjectName]:
+                print('File found: ' + dataFile)
+                elements = [element for element in header if 'MatrixPresentationOrder_' in element]
+                target = elements[-1]
+                target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
+                target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
+                target = ast.literal_eval(target)
+                if not ignore_learned_matrices:
+                    output = target
+                else:
+                    if len(target) == len(classPictures):
                         output = target
-                    else:
-                        if len(target) == len(classPictures):
-                            output = target
-                        elif not output:
-                            output = target
-        except:
-            pass
+                    elif not output:
+                        output = target
 
     return output
 
@@ -202,7 +209,10 @@ def getLanguage(subjectName, daysBefore, experienceName):
     output = None
 
     for dataFile in dataFiles:
-        agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
         previousDate = parse(agg[2]['date'])
 
         try:
@@ -222,6 +232,24 @@ def getLanguage(subjectName, daysBefore, experienceName):
     # This ensures the latest language choice is used
     return output
 
+
+def normalize_presentation_order(presentation_order, learning_matrix, random_matrix):
+    positions = [int(i) for i in presentation_order[0]]
+    matrix_a_or_rec = [int(i) for i in presentation_order[1]]
+    images = [random_matrix[position] if matrix_a_or_rec[index] else learning_matrix[position]
+              for index, position in enumerate(positions)]
+
+    while any([positions[i] == positions[i+1] for i in range(len(positions)-1)]) or \
+            any([images[i] == images[i+1] for i in range(len(positions)-1)]):
+        zipped_lists = list(zip(positions, matrix_a_or_rec, images))
+        random.shuffle(zipped_lists)
+
+        positions, matrix_a_or_rec, images = zip(*zipped_lists)
+        positions, matrix_a_or_rec, images = list(positions), list(matrix_a_or_rec), list(images)
+
+    new_presentation_order = np.array([np.array(positions), np.array(matrix_a_or_rec)])
+
+    return new_presentation_order
 
 def subfinder(mylist, pattern):
     answers = []

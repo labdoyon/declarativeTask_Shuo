@@ -7,7 +7,7 @@ from expyriment.misc import constants
 
 from ld_matrix import LdMatrix
 from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse, getPreviousSoundsAllocation
-from ld_utils import getPreviousMatrixOrder, getLanguage
+from ld_utils import getLanguage, normalize_presentation_order
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
 from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
@@ -73,10 +73,7 @@ else:
 
 # TODO: needs to differ from last matrix presentation order
 matrices_to_present = np.array(range(len(classPictures)))
-old_matrix_presentation_order = getPreviousMatrixOrder(subjectName, 0, 'ReTest-Encoding')
-matrix_presentation_order = list(np.random.permutation(len(classPictures)))
-while matrix_presentation_order == old_matrix_presentation_order:
-    matrix_presentation_order = list(np.random.permutation(matrices_to_present))
+matrix_presentation_order = list(np.random.permutation(matrices_to_present))
 
 exp.add_experiment_info(
             'MatrixPresentationOrder_{}'.format(matrix_presentation_order))  # Add sync info
@@ -117,6 +114,9 @@ for i in matrix_presentation_order:
     presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder))
 
     presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
+    presentationOrder = normalize_presentation_order(presentationOrder,
+                                                     learning_matrix=learning_matrices[i],
+                                                     random_matrix=random_matrices[i])
 
     listCards = []
     for nCard in range(presentationOrder.shape[1]):
