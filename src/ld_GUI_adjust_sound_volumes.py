@@ -9,9 +9,9 @@ from config import debug, windowMode, windowSize, classPictures, sounds, \
     bgColor, arrow, textSize, textColor, cardColor, responseTime, mouseButton, clickColor, clicPeriod
 from ld_utils import getLanguage, setCursor, cardSize, readMouse
 from ld_stimuli_names import soundNames, ttl_instructions_text
-from ld_sound import change_volume, play_sound, delete_temp_files, dataFolder
+from ld_sound import change_volume, play_sound, delete_temp_files, dataFolder, create_temp_sound_files
 from ttl_catch_keyboard import wait_for_ttl_keyboard
-windowMode = True # TEST CODE
+
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
     control.defaults.window_size = misc.get_monitor_resolution()
@@ -46,7 +46,11 @@ mouse.set_logging(True)  # Log mouse
 mouse.hide_cursor(True, True)  # Hide cursor
 setCursor(arrow)
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
-soundsVolumeAdjustmentIndB = [0] * len(sounds)
+
+subject_file = 'soundsVolumeAdjustmentIndB_' + subject_name + '.pkl'
+with open(dataFolder + subject_file, 'wb') as f:
+    pickle.dump([0] * len(sounds), f)
+soundsVolumeAdjustmentIndB = create_temp_sound_files(subject_name)
 
 # 1. PLOT INTERFACE
 
@@ -161,7 +165,6 @@ for sound_index in range(len(sounds)):
 # Saving sounds adjustment: (this script is supposed to be executed in src)
 exp.add_experiment_info('Sounds Volume adjustment (in dB):')
 exp.add_experiment_info(str(soundsVolumeAdjustmentIndB))
-subject_file = 'soundsVolumeAdjustmentIndB_' + subject_name + '.pkl'
 with open(dataFolder + subject_file, 'wb') as f:
     pickle.dump(soundsVolumeAdjustmentIndB, f)
 
