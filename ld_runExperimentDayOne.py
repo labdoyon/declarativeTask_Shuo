@@ -125,11 +125,11 @@ soundVolumeAdjustment = CommandItem(text='sound Volume Adjustment',
                             menu=menu,
                             should_exit=False)
 
-dayOneAssociationLearning = CommandItem(text='Sound Category Association Learning',
-                            command=python + " src" + os.path.sep + "ld_association_learning.py",
-                            arguments='Association-Learning, ' + sys.argv[1],
-                            menu=menu,
-                            should_exit=False)
+# dayOneAssociationLearning = CommandItem(text='Sound Category Association Learning',
+#                             command=python + " src" + os.path.sep + "ld_association_learning.py",
+#                             arguments='Association-Learning, ' + sys.argv[1],
+#                             menu=menu,
+#                             should_exit=False)
 
 dayOneEncoding = CommandItem(text='Encoding',
                             command=python + " src" + os.path.sep + "ld_encoding.py",
@@ -155,27 +155,27 @@ dayOneRecognition = CommandItem(text="Recognition",
                                   menu=menu,
                                   should_exit=False)
 
-dayOneTestAssociationLearning = CommandItem(text='Test Sound Category Association Learning',
-                            command=python + " src" + os.path.sep + "ld_association_learning.py",
-                            arguments='Test-Association-Learning, ' + sys.argv[1],
-                            menu=menu,
-                            should_exit=False)
+# dayOneTestAssociationLearning = CommandItem(text='Test Sound Category Association Learning',
+#                             command=python + " src" + os.path.sep + "ld_association_learning.py",
+#                             arguments='Test-Association-Learning, ' + sys.argv[1],
+#                             menu=menu,
+#                             should_exit=False)
 
-dayOneConfig = CommandItem(text='Show config file',
-                           command=python + " src" + os.path.sep + "ld_showConfigFile.py",
-                           menu=menu,
-                           should_exit=False)
+# dayOneConfig = CommandItem(text='Show config file',
+#                            command=python + " src" + os.path.sep + "ld_showConfigFile.py",
+#                            menu=menu,
+#                            should_exit=False)
 
 menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneExample)
 menu.append_item(soundVolumeAdjustment)
 menu.append_item(dayOneStimuliPresentation)
-menu.append_item(dayOneAssociationLearning)
+# menu.append_item(dayOneAssociationLearning)
 menu.append_item(dayOneEncoding)
 menu.append_item(dayOneTestEncoding)
 menu.append_item(dayOneReTestEncoding)
 menu.append_item(dayOneRecognition)
-menu.append_item(dayOneTestAssociationLearning)
-menu.append_item(dayOneConfig)
+# menu.append_item(dayOneTestAssociationLearning)
+# menu.append_item(dayOneConfig)
 
 menu.show()
