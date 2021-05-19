@@ -135,7 +135,7 @@ for i in matrix_presentation_order:
         else:
             position = presentationOrder[0][nCard]
 
-        if presentationOrder[1][nCard] == 0: # Learning Matrix
+        if presentationOrder[1][nCard] == 0:  # Learning Matrix
             listCards.append(learning_matrices[i][int(position)])
         else:
             listCards.append(random_matrices[i][int(position)])
@@ -187,8 +187,9 @@ for i in matrix_presentation_order:
     matrixARectangle.plot(bs)
     matrixA.plot(bs)
     matrixNone.plot(bs)
-    matrix_i._cueCard.color = bgColor
-    bs = matrix_i.plotCueCard(False, bs)
+    for j in range(len(classPictures)):
+        matrix_i._cueCard[j].color = bgColor
+        bs = matrix_i.plotCueCard(j, False, bs)
 
     bs.present(False, True)
 

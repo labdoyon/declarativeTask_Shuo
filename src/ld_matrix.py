@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import subprocess
 from expyriment.stimuli import Circle, Rectangle, Shape
@@ -216,31 +217,13 @@ class LdMatrix(object):
                 nPict += 1
 
     def newRecognitionMatrix(self, previousMatrix, category):
-        # dummyMatrix is a matrix the size of previousMatrix that stores only the pictures category under 0,1,2 int format
-        # 0 = first category (often a images), 1 = second category (often b), etc.
-        dummyMatrix = [None] * len(previousMatrix)
-        for i in range(len(previousMatrix)):
-            for j in range(len(classPictures)):
-                if classPictures[j] in previousMatrix[i]:
-                    dummyMatrix[i] = j
-
-        # Shifting categories
-        perm = np.random.permutation(3).tolist()  # WARNING: PARAMETER HARD CODED
-        while any(perm[i] == range(3)[i] for i in range(3)):  # WARNING: PARAMETER HARD CODED
-            perm = np.random.permutation(3).tolist()  # WARNING: PARAMETER HARD CODED
-        dummyMatrix = [perm[i] for i in dummyMatrix]
-
-        # copying class Pictures to a different object
         tempListPictures = list(listPictures[category])
 
-        currentCategoryIndex = [0] * len(tempListPictures)
-
         # Filling matrix with images
-        newMatrix = [0] * len(previousMatrix)
-        for i in range(len(previousMatrix)):
-            category = dummyMatrix[i]
-            newMatrix[i] = tempListPictures[currentCategoryIndex[dummyMatrix[i]]]
-            currentCategoryIndex[category] += 1
+        newMatrix = tempListPictures
+        random.shuffle(newMatrix)
+        while np.any(np.array(newMatrix) == np.array(previousMatrix)):
+            random.shuffle(newMatrix)
 
         return newMatrix
 
