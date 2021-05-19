@@ -113,7 +113,7 @@ def show_and_hide_text_box(background, instructions_box, onscreen_time, just_sho
         instructionRectangle.plot(background)
         instructions_box.plot(background)
         background.present(False, True)
-        exp.clock.wait(onscreen_time)  # Short Rest between presentation and cue-recall
+        exp.clock.wait(onscreen_time, process_control_events=True)  # Short Rest between presentation and cue-recall
     if not just_show:
         instructionRectangle.plot(background)
         background.present(False, True)
@@ -137,14 +137,14 @@ show_and_hide_text_box(bs, instructions_ttl, 0, just_hide=True)
 exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
 
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-exp.clock.wait(ISI)
+exp.clock.wait(ISI, process_control_events=True)
 
 exp.add_experiment_info('Presentation start')
 instructions_presentation = create_instructions_box(instructions_presentation_text, (0, -(2*cardSize[1])))
 show_and_hide_text_box(bs, instructions_presentation, shortRest)
 
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-exp.clock.wait(ISI)
+exp.clock.wait(ISI, process_control_events=True)
 
 # PRESENTATION
 for category in classPicturesPresentationOrder:
@@ -167,14 +167,14 @@ for category in classPicturesPresentationOrder:
         (0, -(2*cardSize[1])))
     show_and_hide_text_box(bs, instructions_listen_sound, 0, just_show=True)
     m.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-    exp.clock.wait(presentationCard)
+    exp.clock.wait(presentationCard, process_control_events=True)
     exp.add_experiment_info(
         'PlayedSound_category_{}_timing_{}_soundIndex_{}_soundId_{}'.format(
-            category, exp.clock.wait, soundIndex, sound))
+            category, exp.clock.wait, soundIndex, sound, process_control_events=True), process_control_events=True)
     show_and_hide_text_box(bs, instructions_listen_sound, 0, just_hide=True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI)
+    exp.clock.wait(ISI, process_control_events=True)
 
     for i, picture in enumerate(category_pictures):
         m._cueCard[cuecard_index].setPicture(picturesFolderClass[category] + picture)  # Associate Picture to CueCard
@@ -189,7 +189,7 @@ for category in classPicturesPresentationOrder:
         exp.add_experiment_info(
             'ShowCard_pos_{}_card_{}_name_{}_timing_{}'.format('None', picture, picture_title, exp.clock.time))
         exp.data.add(['show', exp.clock.time, category, picture, picture_title])
-        exp.clock.wait(presentationCard)  # Wait presentationCard
+        exp.clock.wait(presentationCard, process_control_events=True)  # Wait presentationCard
         show_and_hide_text_box(bs, title, 0, just_show=False, just_hide=True)
         m.plotCueCard(cuecard_index, False, bs, True)  # Hide Cue
         exp.add_experiment_info(
@@ -197,7 +197,7 @@ for category in classPicturesPresentationOrder:
         exp.data.add(['hide', exp.clock.time, category, picture, picture_title])
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
 instructions_rest = create_instructions_box(ending_screen_text[language],
                                             (0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)))

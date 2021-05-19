@@ -108,7 +108,7 @@ setCursor(arrow)
 
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
-exp.clock.wait(shortRest)
+exp.clock.wait(shortRest, process_control_events=True)
 
 correctAnswers = np.zeros((len(classPictures), nbBlocksMax))
 currentCorrectAnswers = correctAnswers[0:len(classPictures), 0]
@@ -174,12 +174,12 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         instructions.plot(bs)
         bs.present(False, True)
 
-        exp.clock.wait(shortRest)
+        exp.clock.wait(shortRest, process_control_events=True)
         instructionRectangle.plot(bs)
         bs.present(False, True)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
         # LOG and SYNC: Start Presentation
         exp.add_experiment_info('StartPresentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))  # Add sync info
@@ -203,32 +203,32 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             instructions.plot(bs)
             bs.present(False, True)
 
-            exp.clock.wait(shortRest)
+            exp.clock.wait(shortRest, process_control_events=True)
             instructionRectangle.plot(bs)
             bs.present(False, True)
 
             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-            exp.clock.wait(ISI)
+            exp.clock.wait(ISI, process_control_events=True)
 
             for nCard in presentationOrder:
                 mouse.hide_cursor(True, True)
                 matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-                exp.clock.wait(SoundBeforeImageTime)
+                exp.clock.wait(SoundBeforeImageTime, process_control_events=True)
                 matrix_i.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
                 exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}_sound_{}'.format(
                     nCard, matrix_i.listPictures[nCard], exp.clock.time,
                     sounds[soundsAllocation_index[matrix_i._category]]))
 
-                exp.clock.wait(presentationCard)
+                exp.clock.wait(presentationCard, process_control_events=True)
                 matrix_i.plotCard(nCard, False, bs, True)
                 exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
                     nCard, matrix_i.listPictures[nCard], exp.clock.time))  # Add sync info
 
                 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-                exp.clock.wait(ISI)
+                exp.clock.wait(ISI, process_control_events=True)
 
             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-            exp.clock.wait(ISI)
+            exp.clock.wait(ISI, process_control_events=True)
 
         # REST BLOCK
         instructions = stimuli.TextLine(
@@ -242,7 +242,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         bs.present(False, True)
         exp.add_experiment_info(
             ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-        exp.clock.wait(restPeriod)
+        exp.clock.wait(restPeriod, process_control_events=True)
         exp.add_experiment_info(
             ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
         instructionRectangle.plot(bs)
@@ -263,13 +263,13 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     # LOG and SYNC Start Test
     exp.add_experiment_info(['StartTest_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
 
-    exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
+    exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
     instructionRectangle.plot(bs)
     bs.present(False, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI)
+    exp.clock.wait(ISI, process_control_events=True)
 
     ''' Cue Recall '''
 
@@ -311,7 +311,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         random.shuffle(cueCards)
 
         matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
-        exp.clock.wait(SoundBeforeImageTime)
+        exp.clock.wait(SoundBeforeImageTime, process_control_events=True)
 
         for i in range(len(classPictures)):
             cuecard_matrix = matrices[cueCards[i]['matrix_index']]
@@ -322,7 +322,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
             exp.add_experiment_info(
                 f"ShowCueCard_trialIndex_{str(trial_index)}_cueCardIndex_{i}_matrix_{cueCards[i]['category']}"
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
-        exp.clock.wait(presentationCard)
+        exp.clock.wait(presentationCard, process_control_events=True)
 
         instructions = stimuli.TextLine(choose_image_text[language],
                                         position=(
@@ -366,7 +366,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         bs.present(False, True)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=True, draw=True, no_feedback=no_feedback)
-                        exp.clock.wait(feedback_time)
+                        exp.clock.wait(feedback_time, process_control_events=True)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, True,
                                                                  show_or_hide=False, draw=True, no_feedback=no_feedback)
                         instructions = stimuli.TextLine(choose_position_text[language],
@@ -399,7 +399,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                                     if currentCard not in removeCards:
                                         matrix_i._matrix.item(currentCard).color = clickColor
                                         matrix_i.plotCard(currentCard, False, bs, True)
-                                        exp.clock.wait(clicPeriod)  # Wait 200ms
+                                        exp.clock.wait(clicPeriod, process_control_events=True)  # Wait 200ms
                                         matrix_i._matrix.item(currentCard).color = cardColor
                                         matrix_i.plotCard(currentCard, False, bs, True)
                                     instructionRectangle.plot(bs)
@@ -455,11 +455,11 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         valid_response = True
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
                                                                  show_or_hide=True, draw=True)
-                        exp.clock.wait(feedback_time)
+                        exp.clock.wait(feedback_time, process_control_events=True)
                         matrix_i.response_feedback_stimuli_frame(bs, matrix_cueCard.position, False,
                                                                  show_or_hide=False, draw=True)
 
-                        exp.clock.wait(inter_feedback_delay_time)
+                        exp.clock.wait(inter_feedback_delay_time, process_control_events=True)
                         for k in range(len(classPictures)):
                             if cueCards[k]['correct_card']:
                                 break
@@ -469,7 +469,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                         matrix_i.playSound(soundsAllocation_index, volumeAdjusted=volumeAdjusted)
                         matrix_i.response_feedback_stimuli_frame(bs, (matrix_i._cueCard[k]).position, True,
                                                                  show_or_hide=True, draw=True)
-                        exp.clock.wait(feedback_time)
+                        exp.clock.wait(feedback_time, process_control_events=True)
                         matrix_i.response_feedback_stimuli_frame(bs, (matrix_i._cueCard[k]).position, True,
                                                                  show_or_hide=False, draw=True)
                 else:
@@ -490,9 +490,9 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
                 f"_pos_{cuecard_pos}_card_{cuecard_card}_timing_{exp.clock.time}")
 
         # Longer than usual time between two trials, in order to ensure sounds aren't mixed up by participants
-        exp.clock.wait(presentationCard)
+        exp.clock.wait(presentationCard, process_control_events=True)
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
     if nbBlocksMax != 1 and experimentName != 'Encoding':
         matrix_i.plotDefault(bs, draw=True, show_matrix=False)
@@ -512,7 +512,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
 
         instructions.plot(bs)
         bs.present(False, True)
-        exp.clock.wait(shortRest)
+        exp.clock.wait(shortRest, process_control_events=True)
         instructionRectangle_results.plot(bs)
         bs.present(False, True)
 
@@ -529,8 +529,8 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
         matrices_to_present = np.delete(matrices_to_present, i)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI)
-    exp.clock.wait(shortRest)
+    exp.clock.wait(ISI, process_control_events=True)
+    exp.clock.wait(shortRest, process_control_events=True)
 
     instructions = stimuli.TextLine(
         rest_screen_text[language],
@@ -543,7 +543,7 @@ while min(currentCorrectAnswers) < correctAnswersMax and nBlock < nbBlocksMax:
     bs.present(False, True)
     exp.add_experiment_info(
         ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    exp.clock.wait(restPeriod)
+    exp.clock.wait(restPeriod, process_control_events=True)
     exp.add_experiment_info(
         ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
     instructionRectangle.plot(bs)
@@ -561,7 +561,7 @@ instructions = stimuli.TextLine(
 
 instructions.plot(bs)
 bs.present(False, True)
-exp.clock.wait(thankYouRest)
+exp.clock.wait(thankYouRest, process_control_events=True)
 instructionRectangle.plot(bs)
 bs.present(False, True)
 

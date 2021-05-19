@@ -151,7 +151,7 @@ for i in matrix_presentation_order:
     instructions.plot(bs)
     bs.present(False, True)
 
-    exp.clock.wait(shortRest)
+    exp.clock.wait(shortRest, process_control_events=True)
     instructionRectangle.plot(bs)
     bs.present(False, True)
 
@@ -211,7 +211,7 @@ for i in matrix_presentation_order:
                                                                 listCards[nCard],exp.clock.time,
                                                                 sounds[soundsAllocation_index[matrix_i._category]]))
 
-        exp.clock.wait(presentationCard)
+        exp.clock.wait(presentationCard, process_control_events=True)
         matrix_i.plotCard(locationCard, False, bs, True)
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                             listCards[nCard],
@@ -241,7 +241,7 @@ for i in matrix_presentation_order:
                                                max_width=None)
                     matrixA.plot(bs)
                     bs.present(False, True)
-                    exp.clock.wait(clicPeriod)
+                    exp.clock.wait(clicPeriod, process_control_events=True)
                     matrixA = stimuli.TextLine('  Correct location  ',
                                               position=(-windowSize[0]/float(4),
                                                         -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
@@ -265,7 +265,7 @@ for i in matrix_presentation_order:
                                                   max_width=None)
                     matrixNone.plot(bs)
                     bs.present(False, True)
-                    exp.clock.wait(clicPeriod)
+                    exp.clock.wait(clicPeriod, process_control_events=True)
                     matrixNone = stimuli.TextLine('  Wrong location  ',
                                                   position=(windowSize[0]/float(4),
                                                             -windowSize[1]/float(2) + (2*matrix_i.gap + cardSize[1])/float(2)),
@@ -289,7 +289,7 @@ for i in matrix_presentation_order:
                     break
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
 instructions = stimuli.TextLine(
     ending_screen_text[language],
@@ -300,7 +300,7 @@ instructions = stimuli.TextLine(
 
 instructions.plot(bs)
 bs.present(False, True)
-exp.clock.wait(thankYouRest)
+exp.clock.wait(thankYouRest, process_control_events=True)
 instructionRectangle.plot(bs)
 bs.present(False, True)
 

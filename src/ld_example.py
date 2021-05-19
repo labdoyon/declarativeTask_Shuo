@@ -57,7 +57,7 @@ setCursor(arrow)
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 m.plotDefault(bs, True)  # Draw default grid
 
-exp.clock.wait(shortRest)
+exp.clock.wait(shortRest, process_control_events=True)
 
 wait_for_ttl_keyboard()
 
@@ -74,24 +74,24 @@ instructionRectangle.plot(bs)
 instructions.plot(bs)
 bs.present(False, True)
 
-exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
+exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
 instructionRectangle.plot(bs)
 bs.present(False, True)
 
-exp.clock.wait(shortRest)
+exp.clock.wait(shortRest, process_control_events=True)
 
 for nCard in presentationOrder:
     mouse.hide_cursor(True, True)
     m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
-    exp.clock.wait(presentationCard)
+    exp.clock.wait(presentationCard, process_control_events=True)
     m.plotCard(nCard, False, bs, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI)
+    exp.clock.wait(ISI, process_control_events=True)
 
 presentationOrder = np.random.permutation(presentationOrder)
-exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
+exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
 instructions = stimuli.TextLine(' TEST ',
                                 position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
@@ -103,7 +103,7 @@ instructionRectangle.plot(bs)
 instructions.plot(bs)
 bs.present(False, True)
 
-exp.clock.wait(shortRest)  # Short Rest between presentation and cue-recall
+exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
 instructionRectangle.plot(bs)
 bs.present(False, True)
@@ -121,7 +121,7 @@ for nCard in presentationOrder:
 
     m.plotCueCard(cuecard_index, True, bs, True)  # Show Cue
 
-    exp.clock.wait(presentationCard)  # Wait presentationCard
+    exp.clock.wait(presentationCard, process_control_events=True)  # Wait presentationCard
 
     m.plotCueCard(cuecard_index, False, bs, True)  # Hide Cue
 
@@ -140,7 +140,7 @@ for nCard in presentationOrder:
             m._matrix.item(currentCard).color = clickColor
             m.plotCard(currentCard, False, bs, True)
 
-            exp.clock.wait(clicPeriod)  # Wait 500ms
+            exp.clock.wait(clicPeriod, process_control_events=True)  # Wait 500ms
 
             m._matrix.item(currentCard).color = cardColor
             m.plotCard(currentCard, False, bs, True)
@@ -169,7 +169,7 @@ for nCard in presentationOrder:
                       rt])
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI)
+    exp.clock.wait(ISI, process_control_events=True)
 
 
 if correctAnswers == 3:
@@ -182,6 +182,6 @@ if correctAnswers == 3:
     instructions.plot(bs)
     bs.present(False, True)
 
-    exp.clock.wait(responseTime)
+    exp.clock.wait(responseTime, process_control_events=True)
 
 
