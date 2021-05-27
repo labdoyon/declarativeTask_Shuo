@@ -5,11 +5,8 @@ from expyriment.misc import constants
 
 rawFolder = os.getcwd() + os.path.sep
 
-picturesFolder = rawFolder + 'stimulis' + os.path.sep
-picturesExamplesFolder = rawFolder + 'stimulisExample' + os.path.sep
-picturesXFolder = picturesFolder + 'association_test_X' + os.path.sep
+picturesFolder = rawFolder + 'stimulis' + os.path.sep + 'class-faces' + os.path.sep
 dataFolder = rawFolder + 'data' + os.path.sep
-soundsFolder = rawFolder + 'stimulis' + os.path.sep + 'sounds' + os.path.sep
 
 mouseButton = 1
 
@@ -20,7 +17,7 @@ picturesExamples = ['triangle.png', 'square.png', 'circle.png']
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 tempSounds = ['sound' + str(i) + '.wav' for i in range(len(sounds))]
 
-templatePicture = picturesFolder + 'class_a' + os.path.sep + 'a001.png'
+templatePicture = picturesFolder + 'class-hf' + os.path.sep + 'hf001.BMP'
 
 linesThickness = 0
 colorLine = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
@@ -166,8 +163,9 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     raise ValueError("""the number of blocks of learning is not equal to
     its number of subUnits * the number of blocks during a subUnit""")
 
-classPictures = ['a', 'b', 'c']
-picturesFolderClass = {category: picturesFolder+'class_'+category+os.path.sep for category in classPictures}
+classPictures = ['hf', 'hm', 'am', 'af']
+picturesFolderClass = {category: picturesFolder + os.path.sep + 'class-faces' +
+                                 'class-' + category+os.path.sep for category in classPictures}
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 # The setting below allows the experimenter to prevent a learned matrix (currentCorrectAnswers > correctAnswersMax)
