@@ -39,7 +39,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 
 textSize = 50
-matrixSize = (5, 4)
+matrixSize = (7, 7)
 cardSize = (90, 90)
 
 ''' Circles '''
@@ -146,13 +146,13 @@ elif matrixSize == (6, 6):
                       0, 1, 0, 2, 2, 0]
 elif matrixSize == (7, 7):
     removeCards = [24]
-    matrixTemplate = [0, 1, 1, 0, 2, 0, 2,
-                      2, 0, 0, 1, 2, 1, 1,
-                      1, 0, 2, 2, 1, 2, 0,
-                      2, 1, 0,    2, 0, 1,
-                      0, 2, 1, 2, 0, 1, 2,
-                      1, 2, 1, 0, 2, 0, 1,
-                      0, 1, 0, 1, 2, 2, 0]
+    matrixTemplate = [7, 0, 4, 3, 6, 1, 5,
+                      3, 2, 6, 5, 0, 7, 2,
+                      1, 5, 1, 2, 6, 4, 3,
+                      4, 7, 0,    7, 0, 1,
+                      6, 1, 3, 5, 4, 2, 4,
+                      5, 0, 7, 2, 3, 5, 6,
+                      2, 4, 3, 6, 1, 7, 0]
 elif matrixSize == (5, 4):
     matrixTemplate = [0] * 20
     removeCards = []
