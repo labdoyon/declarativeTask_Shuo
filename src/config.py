@@ -5,19 +5,19 @@ from expyriment.misc import constants
 
 rawFolder = os.getcwd() + os.path.sep
 
-picturesFolder = rawFolder + 'stimulis' + os.path.sep + 'class-faces' + os.path.sep
+picturesFolder = rawFolder + 'stimulis' + os.path.sep
 dataFolder = rawFolder + 'data' + os.path.sep
 
 mouseButton = 1
 
-windowMode = False  # if False use FullScreen
+windowMode = True  # if False use FullScreen
 windowSize = (1024, 768)  # if windowMode is True then use windowSize
 
 picturesExamples = ['triangle.png', 'square.png', 'circle.png']
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 tempSounds = ['sound' + str(i) + '.wav' for i in range(len(sounds))]
 
-templatePicture = picturesFolder + 'class-hf' + os.path.sep + 'hf001.BMP'
+templatePicture = picturesFolder + 'class-faces' + os.path.sep + 'class-hf' + os.path.sep + 'hf001.png'
 
 linesThickness = 0
 colorLine = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
@@ -37,7 +37,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 textSize = 50
 matrixSize = (7, 7)
-cardSize = (90, 90)
+cardSize = (80, 80)
 
 ''' Circles '''
 
@@ -142,7 +142,6 @@ elif matrixSize == (6, 6):
                       1, 2, 1, 2, 0, 1,
                       0, 1, 0, 2, 2, 0]
 elif matrixSize == (7, 7):
-    removeCards = [24]
     matrixTemplate = [7, 0, 4, 3, 6, 1, 5,
                       3, 2, 6, 5, 0, 7, 2,
                       1, 5, 1, 2, 6, 4, 3,
@@ -150,6 +149,8 @@ elif matrixSize == (7, 7):
                       6, 1, 3, 5, 4, 2, 4,
                       5, 0, 7, 2, 3, 5, 6,
                       2, 4, 3, 6, 1, 7, 0]
+    removeCards = [index for index, category in enumerate(matrixTemplate) if category > 3]
+    # if category > len(classPictures) /2
 elif matrixSize == (5, 4):
     matrixTemplate = [0] * 20
     removeCards = []
@@ -163,9 +164,11 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     raise ValueError("""the number of blocks of learning is not equal to
     its number of subUnits * the number of blocks during a subUnit""")
 
-classPictures = ['hf', 'hm', 'am', 'af']
-picturesFolderClass = {category: picturesFolder + os.path.sep + 'class-faces' +
-                                 'class-' + category+os.path.sep for category in classPictures}
+classPictures = ['hf', 'hm', 'am', 'af', 'bc', 'bo', 'sm', 'so']
+classPicturesAboveFolder = {'hf': 'class-faces', 'hm': 'class-faces', 'am': 'class-faces', 'af': 'class-faces',
+                                   'bc': 'class-places', 'bo': 'class-places', 'sm': 'class-places', 'so': 'class-places'}
+picturesFolderClass = {category: picturesFolder + classPicturesAboveFolder[category] + os.path.sep +
+                                 'class-' + category + os.path.sep for category in classPictures}
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 # The setting below allows the experimenter to prevent a learned matrix (currentCorrectAnswers > correctAnswersMax)
@@ -176,7 +179,8 @@ ignore_learned_matrices = False
 
 listPictures = {}
 for classPicture in classPictures:
-    listPictures[classPicture] = glob.glob(picturesFolderClass[classPicture] + classPicture + '*[0-9][0-9][0-9].png')
+    listPictures[classPicture] =\
+        glob.glob(picturesFolderClass[classPicture] + classPicture + '*[0-9][0-9][0-9].png')
 
 for category in classPictures:
     listPictures[category] = [p.replace(picturesFolderClass[category], '') for p in listPictures[category]]

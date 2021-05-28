@@ -8,7 +8,7 @@ from playsound import playsound
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
 from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
-from config import sounds, soundsFolder, tempSounds
+# from config import sounds, soundsFolder, tempSounds
 from config import feedback_frame_correct_color, feedback_frame_wrong_color
 
 class LdMatrix(object):
@@ -19,12 +19,11 @@ class LdMatrix(object):
         self._isFill = False
         self._isValid = False
         self._gap = None
-        self._cueCard = []
+        self._cueCard = None
         self._matrix = np.ndarray(shape=self._size, dtype=object)
         self._listPictures = []
         self._rowGap = 0
         self._columnGap = 0
-        self._category = None
 
         self.populate()  # Populate with cards
         self.isValidMatrix()  # Check Matrix validity
@@ -35,8 +34,7 @@ class LdMatrix(object):
         for nCard in range(self._matrix.size):
                 self._matrix.itemset(nCard, LdCard(cardSize))
 
-        for i in range(len(classPictures)):
-            self._cueCard.append(LdCard(cardSize, cueCardColor))
+        self._cueCard = LdCard(cardSize, cueCardColor)
 
     def isValidMatrix(self):
         spaceRowLeft = self.windowSize[0] - (self.size[0] * self._matrix.item(0).size[0])
@@ -83,26 +81,21 @@ class LdMatrix(object):
                     self._matrix.item(iCard).stimuli[1].reposition(self._matrix.item(iCard).position)
                     iCard += 1
 
-            for i in range(len(classPictures)):
-                rowPosition = 0 + (self.gap + sizeRows) * (i-1)
-                (self._cueCard[i]).position = (rowPosition, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
-                (self._cueCard[i]).stimuli[0].reposition(self._cueCard[i].position)
-                (self._cueCard[i]).stimuli[1].reposition(self._cueCard[i].position)
+            (self._cueCard).position = (0, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
+            (self._cueCard).stimuli[0].reposition(self._cueCard.position)
+            (self._cueCard).stimuli[1].reposition(self._cueCard.position)
         else:
             print('Matrix is not valid')
-
-    def associateCategory(self, category):
-        self._category = category
 
     def changeCueCardPosition(self, position, cue_index):
         sizeRows = self._matrix.item(0).size[0]  # Size of a card
         self._cueCard[cue_index].position = position
 
-    def plotCueCard(self, cue_index, showPicture, bs, draw=False):  # Plot cue Card
+    def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
-            self._cueCard[cue_index].stimuli[0].plot(bs)
+            self._cueCard.stimuli[0].plot(bs)
         else:
-            self._cueCard[cue_index].stimuli[1].plot(bs)
+            self._cueCard.stimuli[1].plot(bs)
         if draw:
             bs.present(False, True)
         else:
@@ -149,10 +142,7 @@ class LdMatrix(object):
 
             bs = self.plotCard(nCard, False, bs)
 
-        for i in range(len(classPictures)):
-            if not show_matrix:
-                self._cueCard[i].color = bgColor
-            bs = self.plotCueCard(i, False, bs)
+        bs = self.plotCueCard(False, bs)
 
         if (self.size[0] % 2 == 0) and (self.size[1] % 2 == 0):
             if show_matrix:
@@ -174,16 +164,24 @@ class LdMatrix(object):
         else:
             return bs
 
-    def findMatrix(self, category, previousMatrix=None, keep=False):
+    def findMatrix(self, previousMatrix=None, keep=False, populate_first_half=False):
 
         newMatrix = []
-
+        perm = np.random.permutation(numberClasses)
+        newListPictures = []
+        for category in classPictures:
+            newListPictures.append(listPictures[category])
+        newClassesPictures = np.asarray(newListPictures)[perm]
+        newClassesPictures = np.ndarray.tolist(newClassesPictures)
         if previousMatrix is None:   # New Matrix
-            pictures = list(listPictures[category])
-            for itemMatrix in range(self._size[0]*self._size[1]):
-                randomIndex = np.random.randint(0, len(pictures))
-                newMatrix.append(pictures[randomIndex])
-                pictures.remove(pictures[randomIndex])
+            for itemMatrix in matrixTemplate:
+                if not populate_first_half or itemMatrix < 4:  # int(len(classPictures)/2)
+                    currentClass = newClassesPictures[itemMatrix]
+                    randomIndex = np.random.randint(0, len(currentClass))
+                    newMatrix.append(currentClass[randomIndex])
+                    newClassesPictures[itemMatrix].remove(currentClass[randomIndex])
+                # else:
+                #     newMatrix.append(None)
         elif keep:  # Keep previous Matrix
             previousMatrix = np.asarray(previousMatrix)
             newMatrix = previousMatrix
@@ -192,7 +190,7 @@ class LdMatrix(object):
             while np.any(newMatrix == previousMatrix):
                 newMatrix = []
                 perm = np.random.permutation(numberClasses)
-                newClassesPictures = np.asarray(listPictures)[perm]
+                newClassesPictures = np.asarray(newListPictures)[perm]
                 newClassesPictures = np.ndarray.tolist(newClassesPictures)
                 for itemMatrix in matrixTemplate:
                     currentClass = newClassesPictures[itemMatrix]
@@ -202,13 +200,13 @@ class LdMatrix(object):
 
         return newMatrix
 
-    def associatePictures(self, newMatrix, pictureFolder=picturesFolder):
+    def associatePictures(self, newMatrix):
         nPict = 0
         for nCard in range(self._matrix.size):
-            if nCard not in removeCards:
-                if newMatrix[nPict][0] in classPictures:
+            if nCard not in removeCards and nPict < 24:
+                if newMatrix[nPict][:2] in classPictures:
                     self._matrix.item(nCard).setPicture(
-                        picturesFolderClass[newMatrix[nPict][0]] + newMatrix[nPict], False, picture=newMatrix[nPict])
+                        picturesFolderClass[newMatrix[nPict][:2]] + newMatrix[nPict], False, picture=newMatrix[nPict])
                 else:
                     self._matrix.item(nCard).setPicture(
                         pictureFolder + newMatrix[nPict], False, picture=newMatrix[nPict])
