@@ -42,20 +42,14 @@ exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
 m = LdMatrix(matrixSize, windowSize)  # Create Matrix
 keepMatrix = True
-if experimentName == 'Encoding':
+if experimentName == 'PreLearn':
     keepPreviousMatrix = False
-    no_feedback = False
-elif experimentName == 'Test-Encoding':
+elif 'PreTest' in experimentName or 'PostTest' in experimentName:
     keepPreviousMatrix = True
     nbBlocksMax = 1
-    no_feedback = True
-elif experimentName == 'ReTest-Encoding':
-    keepPreviousMatrix = True
-    nbBlocksMax = 1
-    no_feedback = True
 
 if keepPreviousMatrix:
-    previousMatrix = getPreviousMatrix(subjectName, 0, 'Encoding')
+    previousMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 else:
     previousMatrix = None
 newMatrix = m.findMatrix(previousMatrix, keepMatrix, populate_first_half=True)  # Find newMatrix
@@ -117,7 +111,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder)
 
     # PRESENTATION BLOCK
-    if 1 != nbBlocksMax or experimentName == 'Encoding':
+    if 1 != nbBlocksMax or experimentName == 'PreLearn':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
 
         instructions = stimuli.TextLine(presentation_screen_text[language],
@@ -214,9 +208,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}'.format(nCard,
                                                                               m.returnPicture(nCard),
                                                                               exp.clock.time))
-
         exp.clock.wait(presentationCard)  # Wait presentationCard
-
         m.plotCueCard(False, bs, True)  # Hide Cue
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
                                                                               exp.clock.time))
