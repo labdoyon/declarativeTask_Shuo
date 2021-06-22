@@ -9,10 +9,10 @@ from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
 from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
 # from config import sounds, soundsFolder, tempSounds
-from config import feedback_frame_correct_color, feedback_frame_wrong_color
+from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture
 
 class LdMatrix(object):
-    def __init__(self, size, windowSize):
+    def __init__(self, size, windowSize, override_remove_cards=None):
         self._windowSize = windowSize
         self._size = size
         self._threshold = 0
@@ -24,6 +24,7 @@ class LdMatrix(object):
         self._listPictures = []
         self._rowGap = 0
         self._columnGap = 0
+        self._override_remove_cards = override_remove_cards
 
         self.populate()  # Populate with cards
         self.isValidMatrix()  # Check Matrix validity
@@ -116,6 +117,8 @@ class LdMatrix(object):
         return self._matrix.item(nCard).picture
 
     def plotDefault(self, bs, draw=False, show_matrix=True):
+        if self._override_remove_cards is not None:
+            removeCards = self._override_remove_cards
         for nCard in range(self._matrix.size):
             if nCard in removeCards or not show_matrix:
                  self._matrix.item(nCard).color = bgColor
@@ -144,7 +147,7 @@ class LdMatrix(object):
         else:
             return bs
 
-    def findMatrix(self, previousMatrix=None, keep=False, populate_first_half=False):
+    def findMatrix(self, previousMatrix=None, keep=False):
 
         newMatrix = []
         perm = np.random.permutation(numberClasses)
@@ -155,11 +158,10 @@ class LdMatrix(object):
         newClassesPictures = np.ndarray.tolist(newClassesPictures)
         if previousMatrix is None:   # New Matrix
             for itemMatrix in matrixTemplate:
-                if not populate_first_half or itemMatrix < 4:  # int(len(classPictures)/2)
-                    currentClass = newClassesPictures[itemMatrix]
-                    randomIndex = np.random.randint(0, len(currentClass))
-                    newMatrix.append(currentClass[randomIndex])
-                    newClassesPictures[itemMatrix].remove(currentClass[randomIndex])
+                currentClass = newClassesPictures[itemMatrix]
+                randomIndex = np.random.randint(0, len(currentClass))
+                newMatrix.append(currentClass[randomIndex])
+                newClassesPictures[itemMatrix].remove(currentClass[randomIndex])
                 # else:
                 #     newMatrix.append(None)
         elif keep:  # Keep previous Matrix
@@ -182,14 +184,16 @@ class LdMatrix(object):
 
     def associatePictures(self, newMatrix):
         nPict = 0
+        if self._override_remove_cards is not None:
+            removeCards = self._override_remove_cards
         for nCard in range(self._matrix.size):
-            if nCard not in removeCards and nPict < 24:
+            if nCard not in removeCards:  # and nPict < 24:
                 if newMatrix[nPict][:2] in classPictures:
                     self._matrix.item(nCard).setPicture(
                         picturesFolderClass[newMatrix[nPict][:2]] + newMatrix[nPict], False, picture=newMatrix[nPict])
                 else:
                     self._matrix.item(nCard).setPicture(
-                        pictureFolder + newMatrix[nPict], False, picture=newMatrix[nPict])
+                        templatePicture, False, picture=newMatrix[nPict])
                 self._matrix.item(nCard).stimuli[0].scale(self._matrix.item(nCard).size[0]/float(300))
                 self._listPictures.append(newMatrix[nPict])
                 nPict += 1
@@ -217,6 +221,8 @@ class LdMatrix(object):
                 nPict += 1
 
     def checkPosition(self, position, cue_card=False):
+        if self._override_remove_cards is not None:
+            removeCards = self._override_remove_cards
         if not cue_card:
             for nCard in range(self._matrix.size):
                 if nCard not in removeCards:

@@ -1,7 +1,7 @@
 import sys
 
 import numpy as np
-import random
+from math import floor
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
@@ -40,19 +40,22 @@ exp.add_experiment_info(language)  # Save Subject Code
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
-m = LdMatrix(matrixSize, windowSize)  # Create Matrix
 keepMatrix = True
 if experimentName == 'PreLearn':
     keepPreviousMatrix = False
+    removeCards = [floor(matrixSize[0]*matrixSize[1]/2)] + \
+                  [index for index, category in enumerate(matrixTemplate) if category > 3]
 elif 'PreTest' in experimentName or 'PostTest' in experimentName:
     keepPreviousMatrix = True
     nbBlocksMax = 1
+
+m = LdMatrix(matrixSize, windowSize, override_remove_cards=removeCards)  # Create Matrix
 
 if keepPreviousMatrix:
     previousMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 else:
     previousMatrix = None
-newMatrix = m.findMatrix(previousMatrix, keepMatrix, populate_first_half=True)  # Find newMatrix
+newMatrix = m.findMatrix(previousMatrix, keepMatrix)  # Find newMatrix
 
 exp.add_experiment_info('Image categories (original order; src/config.py order): ')
 exp.add_experiment_info(str(classPictures))
@@ -88,7 +91,7 @@ instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSi
     0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
 
 ''' Presentation all locations '''
-presentationOrder = newRandomPresentation()
+presentationOrder = newRandomPresentation(override_remove_cards=removeCards)
 
 instructions_ttl = stimuli.TextLine(ttl_instructions_text[language],
                                     position=(
@@ -108,8 +111,7 @@ instructionRectangle.plot(bs)
 bs.present(False, True)
 
 while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
-    presentationOrder = newRandomPresentation(presentationOrder)
-
+    presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
     # PRESENTATION BLOCK
     if 1 != nbBlocksMax or experimentName == 'PreLearn':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
@@ -138,8 +140,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             mouse.hide_cursor(True, True)
             exp.clock.wait(SoundBeforeImageTime, process_control_events=True)
             m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
-            print(m.listPictures)
-            print(presentationOrder)
             exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))
 
@@ -196,7 +196,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.clock.wait(ISI, process_control_events=True)
 
     ''' Cue Recall '''
-    presentationOrder = newRandomPresentation(presentationOrder)
+    presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
     exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
     exp.add_experiment_info(str(presentationOrder))
     for nCard in presentationOrder:

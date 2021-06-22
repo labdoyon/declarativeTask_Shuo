@@ -59,7 +59,9 @@ def plotLine(bs, gap, color=bgColor):
     return bs
 
 
-def newRandomPresentation(oldPresentation=None):
+def newRandomPresentation(oldPresentation=None, override_remove_cards=None):
+    if override_remove_cards is not None:
+        removeCards = override_remove_cards
 
     newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
     if removeCards:

@@ -149,7 +149,10 @@ elif matrixSize == (7, 7):
                       6, 1, 3, 5, 4, 2, 4,
                       5, 0, 7, 2, 3, 5, 6,
                       2, 4, 3, 6, 1, 7, 0]
-    removeCards = [index for index, category in enumerate(matrixTemplate) if category > 3]
+    # matrixTemplate = [matrixTemplate[i * 7:(i + 1) * 7] for i in range(7)]
+    # matrixTemplate = np.array([np.array(matrixTemplate[0:(i + 1) * 7]) for i in range(7)])
+    removeCards = [24]
+    # removeCards = [index for index, category in enumerate(matrixTemplate) if category > 3]
     # if category > len(classPictures) /2
 elif matrixSize == (5, 4):
     matrixTemplate = [0] * 20
