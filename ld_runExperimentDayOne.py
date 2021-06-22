@@ -20,12 +20,14 @@ def getPrevious(subjectName, daysBefore, experienceName, target):
     output = None
 
     for dataFile in dataFiles:
-        agg = expyriment.misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-        previousDate = parse(agg[2]['date'])
-
+        try:
+            agg = expyriment.misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+            previousDate = parse(agg[2]['date'])
+        except TypeError:  # values missing in data file, data file corrupted
+            continue
         try:
             agg[3].index(experienceName)
-        except ValueError:
+        except ValueError:  # value not found
             continue
         if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
             header = agg[3].split('\n#e ')
