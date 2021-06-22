@@ -32,7 +32,7 @@ class LdMatrix(object):
     def populate(self):
 
         for nCard in range(self._matrix.size):
-                self._matrix.itemset(nCard, LdCard(cardSize))
+            self._matrix.itemset(nCard, LdCard(cardSize))
 
         self._cueCard = LdCard(cardSize, cueCardColor)
 
@@ -81,9 +81,9 @@ class LdMatrix(object):
                     self._matrix.item(iCard).stimuli[1].reposition(self._matrix.item(iCard).position)
                     iCard += 1
 
-            (self._cueCard).position = (0, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
-            (self._cueCard).stimuli[0].reposition(self._cueCard.position)
-            (self._cueCard).stimuli[1].reposition(self._cueCard.position)
+            self._cueCard.position = (0, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
+            self._cueCard.stimuli[0].reposition(self._cueCard.position)
+            self._cueCard.stimuli[1].reposition(self._cueCard.position)
         else:
             print('Matrix is not valid')
 
@@ -114,26 +114,6 @@ class LdMatrix(object):
 
     def returnPicture(self, nCard):
         return self._matrix.item(nCard).picture
-
-    def playSound(self, soundsAllocation_index, volumeAdjusted = False):
-        if volumeAdjusted:
-            command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder +\
-                      tempSounds[soundsAllocation_index[self._category]]
-            subprocess.call(command)
-        else:
-            command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder +\
-                      sounds[soundsAllocation_index[self._category]]
-            subprocess.call(command)
-
-    def playCueSound(self, volumeAdjusted = False):
-        if volumeAdjusted:
-            command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder + \
-                      tempSounds[self._cueCard.sound]
-            subprocess.call(command)
-        else:
-            command = 'ffplay -nodisp -loglevel quiet -autoexit ' + soundsFolder + \
-                      sounds[self._cueCard.sound]
-            subprocess.call(command)
 
     def plotDefault(self, bs, draw=False, show_matrix=True):
         for nCard in range(self._matrix.size):
