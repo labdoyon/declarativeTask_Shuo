@@ -98,15 +98,21 @@ dayOnePostRecog1 = CommandItem(text="9. PostRecog1",
                                 menu=menu,
                                 should_exit=False)
 
-dayOnePostTest2 = CommandItem(text='8. PostTest2',
+dayOnePostTest2 = CommandItem(text='12. PostTest2',
                                    command=python + " src" + os.path.sep + "ld_encoding.py",
                                    arguments='PostTest2, ' + sys.argv[1],
                                    menu=menu,
                                    should_exit=False)
 
-dayOnePostRecog2 = CommandItem(text="9. PostRecog2",
+dayOnePostRecog2 = CommandItem(text="13. PostRecog2",
                                 command=python + " src" + os.path.sep + "ld_recognition.py ",
                                 arguments="PostRecog2, " + sys.argv[1],
+                                menu=menu,
+                                should_exit=False)
+
+dayOnePostLearn = CommandItem(text="14. PostRecog2",
+                                command=python + " src" + os.path.sep + "ld_encoding.py",
+                                arguments="PostLearn, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
 
@@ -119,5 +125,6 @@ menu.append_item(dayOnePostTest1)
 menu.append_item(dayOnePostRecog1)
 menu.append_item(dayOnePostTest2)
 menu.append_item(dayOnePostRecog2)
+menu.append_item(dayOnePostLearn)
 
 menu.show()
