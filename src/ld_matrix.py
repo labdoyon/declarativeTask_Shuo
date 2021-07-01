@@ -171,7 +171,7 @@ class LdMatrix(object):
                 #     newMatrix.append(None)
         elif keep:  # Keep previous Matrix
             previousMatrix = np.asarray(previousMatrix)
-            newMatrix = previousMatrix
+            newMatrix = list(previousMatrix)
         else:    # New Matrix different from previous matrix
             newMatrix = previousMatrix
             while np.any(newMatrix == previousMatrix):
@@ -191,6 +191,8 @@ class LdMatrix(object):
         nPict = 0
         if self._override_remove_cards is not None:
             removeCards = self._override_remove_cards
+        else:
+            from config import removeCards
         for nCard in range(self._matrix.size):
             if nCard not in removeCards:  # and nPict < 24:
                 if newMatrix[nPict][:2] in classPictures:
@@ -230,9 +232,9 @@ class LdMatrix(object):
             removeCards = self._override_remove_cards
         if not cue_card:
             for nCard in range(self._matrix.size):
-                if nCard not in removeCards:
-                    if self._matrix.item(nCard).stimuli[1].overlapping_with_position(position):
-                        return nCard
+                # if nCard not in removeCards:
+                if self._matrix.item(nCard).stimuli[1].overlapping_with_position(position):
+                    return nCard
             return None
         else:
             for cuecard_index in range(len(classPictures)):

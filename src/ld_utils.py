@@ -62,6 +62,8 @@ def plotLine(bs, gap, color=bgColor):
 def newRandomPresentation(oldPresentation=None, override_remove_cards=None):
     if override_remove_cards is not None:
         removeCards = override_remove_cards
+    else:
+        from config import removeCards
 
     newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
     if removeCards:
@@ -128,7 +130,7 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
                 previousMatrix = ast.literal_eval(header[indexPositions].split('\n')[0].split('\n')[0])
                 return previousMatrix
 
-    return False
+    return None
 
 
 def getPreviousSoundsAllocation(subjectName, daysBefore, experienceName):
