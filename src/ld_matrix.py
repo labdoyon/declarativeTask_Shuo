@@ -4,6 +4,7 @@ import subprocess
 from expyriment.stimuli import Circle, Rectangle, Shape
 from expyriment.misc import constants, geometry
 from playsound import playsound
+from math import ceil
 
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
@@ -117,11 +118,11 @@ class LdMatrix(object):
         return self._matrix.item(nCard).picture
 
     def plotDefault(self, bs, draw=False, show_matrix=True):
-        if self._override_remove_cards is not None:
-            removeCards = self._override_remove_cards
+        # We plot all cards, even if they are in removeCards, as the matrix should appear complete and regular.
         for nCard in range(self._matrix.size):
-            if nCard in removeCards or not show_matrix:
-                 self._matrix.item(nCard).color = bgColor
+            # if nCard in removeCards or not show_matrix:
+            if not show_matrix:
+                self._matrix.item(nCard).color = bgColor
 
             bs = self.plotCard(nCard, False, bs)
 
@@ -150,7 +151,11 @@ class LdMatrix(object):
     def findMatrix(self, previousMatrix=None, keep=False):
 
         newMatrix = []
-        perm = np.random.permutation(numberClasses)
+        # This means faces will always be in the the squares spots allocated to faces. Faces images will be shuffled
+        # within spaces allocated to faces. Same for buildings
+        faces_categories = list(range(ceil(numberClasses/2)))
+        building_categories = list(range(ceil(numberClasses/2), numberClasses))
+        perm = np.hstack((np.random.permutation(faces_categories), np.random.permutation(building_categories)))
         newListPictures = []
         for category in classPictures:
             newListPictures.append(listPictures[category])

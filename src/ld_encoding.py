@@ -41,13 +41,31 @@ exp.add_experiment_info(language)  # Save Subject Code
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
 keepMatrix = True
+only_faces = False
+only_buildings = False
+keepPreviousMatrix = True
 if experimentName == 'PreLearn':
-    keepPreviousMatrix = False
-    removeCards = [floor(matrixSize[0]*matrixSize[1]/2)] + \
-                  [index for index, category in enumerate(matrixTemplate) if category > 3]
+    keepPreviousMatrix = True
+    center = floor(matrixSize[0]*matrixSize[1]/2)
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category > 3]
+    only_faces = True
 elif 'PreTest' in experimentName or 'PostTest' in experimentName:
     keepPreviousMatrix = True
     nbBlocksMax = 1
+    center = floor(matrixSize[0]*matrixSize[1]/2)
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category > 3]
+    only_faces = True
+elif 'PostLearn' in experimentName:
+    keepPreviousMatrix = True
+    center = floor(matrixSize[0]*matrixSize[1]/2)
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category <= 3]
+    only_buildings = True
 
 m = LdMatrix(matrixSize, windowSize, override_remove_cards=removeCards)  # Create Matrix
 
@@ -61,10 +79,23 @@ exp.add_experiment_info('Image categories (original order; src/config.py order):
 exp.add_experiment_info(str(classPictures))
 control.initialize(exp)
 
-m.associatePictures(newMatrix)  # Associate Pictures to cards
-exp.add_experiment_info(['Positions pictures:'])
-exp.add_experiment_info(str(m.listPictures))  # Add listPictures
+exp.add_experiment_info('Positions pictures:')
+exp.add_experiment_info(str(newMatrix))  # Add listPictures
 
+if only_faces:
+    local_matrix = [element for index, element in enumerate(newMatrix) if matrixTemplate[index] < 4]
+elif only_buildings:
+    local_matrix = [element for index, element in enumerate(newMatrix) if matrixTemplate[index] > 3]
+else:
+    local_matrix = newMatrix
+
+m.associatePictures(local_matrix)  # Associate Pictures to cards
+if only_faces:
+    exp.add_experiment_info('faces_only_matrix:')
+    exp.add_experiment_info(str(m.listPictures))  # Add listPictures
+elif only_buildings:
+    exp.add_experiment_info('building_only_matrix:')
+    exp.add_experiment_info(str(m.listPictures))  # Add listPictures
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -233,7 +264,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                     valid_response = True
                 except:
                     exp.add_experiment_info('Response_pos_{}_ERROR_timing_{}'.format(currentCard, exp.clock.time))
-                if currentCard is not None and currentCard not in removeCards:
+                if currentCard is not None:  # and currentCard not in removeCards:
                     m._matrix.item(currentCard).color = clickColor
                     m.plotCard(currentCard, False, bs, True)
 

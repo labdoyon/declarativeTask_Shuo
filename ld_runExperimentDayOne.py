@@ -110,7 +110,7 @@ dayOnePostRecog2 = CommandItem(text="13. PostRecog2",
                                 menu=menu,
                                 should_exit=False)
 
-dayOnePostLearn = CommandItem(text="14. PostRecog2",
+dayOnePostLearn = CommandItem(text="14. PostLearn",
                                 command=python + " src" + os.path.sep + "ld_encoding.py",
                                 arguments="PostLearn, " + sys.argv[1],
                                 menu=menu,
