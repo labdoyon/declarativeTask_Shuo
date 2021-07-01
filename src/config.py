@@ -6,6 +6,7 @@ from expyriment.misc import constants
 rawFolder = os.getcwd() + os.path.sep
 
 picturesFolder = rawFolder + 'stimulis' + os.path.sep
+picturesExamplesFolder = rawFolder + 'stimulisExample' + os.path.sep
 dataFolder = rawFolder + 'data' + os.path.sep
 
 mouseButton = 1
