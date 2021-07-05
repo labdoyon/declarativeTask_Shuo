@@ -205,14 +205,37 @@ class LdMatrix(object):
                 self._listPictures.append(newMatrix[nPict])
                 nPict += 1
 
-    def newRecognitionMatrix(self, previousMatrix, category):
-        tempListPictures = list(listPictures[category])
+    def newRecognitionMatrix(self, previousMatrix):
+        # dummyMatrix is a matrix the size of previousMatrix that stores only the pictures category under 0,1,2 int format
+        # 0 = first category (often a images), 1 = second category (often b), etc.
+        dummyMatrix = [None] * len(previousMatrix)
+        for i in range(len(previousMatrix)):
+            for j in range(len(classPictures)):
+                if classPictures[j] in previousMatrix[i]:
+                    dummyMatrix[i] = j
+
+        # Shifting categories
+        # perm = np.random.permutation(numberClasses).tolist()
+        faces_categories = list(range(ceil(numberClasses / 2)))
+        building_categories = list(range(ceil(numberClasses / 2), numberClasses))
+        perm = np.hstack((np.random.permutation(faces_categories), np.random.permutation(building_categories))).tolist()
+        while any(perm[i] == range(numberClasses)[i] for i in range(numberClasses)):
+            perm = np.hstack(
+                (np.random.permutation(faces_categories), np.random.permutation(building_categories))).tolist()
+        dummyMatrix = [perm[i] for i in dummyMatrix]
+
+        # copying class Pictures to a different object
+        tempListPictures = dict(listPictures)
+        number_of_images_per_category = int(len(matrixTemplate)/numberClasses)
+        CategoryIndexes = {key: list(range(number_of_images_per_category)) for key in listPictures.keys()}
 
         # Filling matrix with images
-        newMatrix = tempListPictures
-        random.shuffle(newMatrix)
-        while np.any(np.array(newMatrix) == np.array(previousMatrix)):
-            random.shuffle(newMatrix)
+        newMatrix = [0] * len(previousMatrix)
+        for i in range(len(previousMatrix)):
+            category = classPictures[dummyMatrix[i]]
+            category_image_index = random.choice(CategoryIndexes[category])
+            newMatrix[i] = tempListPictures[category][category_image_index]
+            CategoryIndexes[category].remove(category_image_index)
 
         return newMatrix
 
