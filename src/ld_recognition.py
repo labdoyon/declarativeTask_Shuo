@@ -4,6 +4,7 @@ import numpy as np
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc._timer import get_time
 from expyriment.misc import constants
+from math import floor
 
 from ld_matrix import LdMatrix
 from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
@@ -31,18 +32,31 @@ exp.add_experiment_info('Subject: ')  # Save Subject Code
 exp.add_experiment_info(subjectName)  # Save Subject Code
 language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language: ')
+only_faces = True
+exp.add_experiment_info(f'only_faces: {only_faces}')
 
 # Save time, Response, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'Matrix', 'CorrectAnswer', 'RT'])
 
-exp.add_experiment_info('Learning: ')  # Save Subject Code
 learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
+exp.add_experiment_info('Learning: ')  # Save Subject Code
 exp.add_experiment_info(str(learningMatrix))  # Add listPictures
+if only_faces:
+    local_learning_matrix = [element for index, element in enumerate(learningMatrix) if matrixTemplate[index] < 4]
+    exp.add_experiment_info('faces_only_matrix:')
+    exp.add_experiment_info(str(local_learning_matrix))  # Add listPictures
+else:
+    local_learning_matrix = learningMatrix
 
-exp.add_experiment_info('RandomMatrix: ')  # Save Subject Code
 randomMatrix = m.newRecognitionMatrix(learningMatrix)
-
+exp.add_experiment_info('RandomMatrix: ')  # Save Subject Code
 exp.add_experiment_info(str(randomMatrix))  # Add listPictures
+if only_faces:
+    local_random_matrix = [element for index, element in enumerate(randomMatrix) if matrixTemplate[index] < 4]
+    exp.add_experiment_info('faces_only_random_matrix:')
+    exp.add_experiment_info(str(local_random_matrix))  # Add listPictures
+else:
+    local_random_matrix = randomMatrix
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -73,11 +87,15 @@ wait_for_ttl_keyboard()
 exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
 
 exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
-
-presentationMatrixLearningOrder = newRandomPresentation()
+center = floor(matrixSize[0] * matrixSize[1] / 2)
+removeCards = [center] + \
+              [index + 1 if index >= center else index
+               for index, category in enumerate(matrixTemplate) if category > 3]
+only_faces = True
+presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
 presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(m.size[0]*m.size[1]-len(removeCards))))
 
-presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder)
+presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder, override_remove_cards=removeCards)
 presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(m.size[0]*m.size[1]-len(removeCards))))
 
 presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder))
@@ -86,7 +104,7 @@ presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder
 
 listCards = []
 for nCard in range(presentationOrder.shape[1]):
-    if removeCards:
+    if len(removeCards):
         removeCards.sort()
         removeCards = np.asarray(removeCards)
         tempPosition = presentationOrder[0][nCard]
@@ -102,9 +120,9 @@ for nCard in range(presentationOrder.shape[1]):
         position = presentationOrder[0][nCard]
 
     if presentationOrder[1][nCard] == 0:  # Learning Matrix
-        listCards.append(learningMatrix[int(position)])
+        listCards.append(local_learning_matrix[int(position)])
     else:
-        listCards.append(randomMatrix[int(position)])
+        listCards.append(local_random_matrix[int(position)])
 
 exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
 
@@ -139,7 +157,7 @@ matrixARectangle = stimuli.Rectangle(size=matrixA.surface_size, position=matrixA
 
 matrixNone = stimuli.TextLine('  Wrong location  ',
                               position=(windowSize[0]/float(4),
-                                      -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
+                                        -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                               text_size=textSize,
                               text_colour=textColor,
                               background_colour=cardColor)
