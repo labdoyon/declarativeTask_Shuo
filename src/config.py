@@ -160,7 +160,7 @@ elif matrixSize == (5, 4):
     removeCards = []
 
 # correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
-correctAnswersMax = 13
+correctAnswersMax = 18
 numberBlocksLearning = 10
 numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
