@@ -168,9 +168,9 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     raise ValueError("""the number of blocks of learning is not equal to
     its number of subUnits * the number of blocks during a subUnit""")
 
-classPictures = ['hf', 'hm', 'am', 'af', 'bc', 'bo', 'sm', 'so']
+classPictures = ['hf', 'hm', 'am', 'af', 'bc', 'bo', 'sc', 'so']
 classPicturesAboveFolder = {'hf': 'class-faces', 'hm': 'class-faces', 'am': 'class-faces', 'af': 'class-faces',
-                                   'bc': 'class-places', 'bo': 'class-places', 'sm': 'class-places', 'so': 'class-places'}
+                                   'bc': 'class-places', 'bo': 'class-places', 'sc': 'class-places', 'so': 'class-places'}
 picturesFolderClass = {category: picturesFolder + classPicturesAboveFolder[category] + os.path.sep +
                                  'class-' + category + os.path.sep for category in classPictures}
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
