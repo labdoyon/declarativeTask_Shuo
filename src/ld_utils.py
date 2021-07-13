@@ -384,3 +384,15 @@ def newSoundAllocation():
 
 def absoluteTime(firstTime):
     return int((time()*1000))-firstTime
+
+
+def vertices_frame(size, frame_thickness):
+    return [(size[0]-frame_thickness, 0),
+            (0, -size[1]),
+            (-size[0], 0),
+            (0, size[1]),
+            (frame_thickness, 0),
+            (0, -(size[1]-frame_thickness)),
+            (size[0]-2*frame_thickness, 0),
+            (0, size[1]-2*frame_thickness),
+            (-(size[0]-2*frame_thickness), 0)]

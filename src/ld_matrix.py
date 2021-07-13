@@ -11,6 +11,7 @@ from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listP
 from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
 # from config import sounds, soundsFolder, tempSounds
 from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture
+from ld_utils import vertices_frame
 
 class LdMatrix(object):
     def __init__(self, size, windowSize, override_remove_cards=None):
@@ -83,15 +84,19 @@ class LdMatrix(object):
                     self._matrix.item(iCard).stimuli[1].reposition(self._matrix.item(iCard).position)
                     iCard += 1
 
-            self._cueCard.position = (0, self._windowSize[1]/float(2) - self.gap - sizeRows/float(2.0))
+            cueRowPosition = -self._windowSize[0] / 2 + rowGap + self.gap * 3 + 3 * sizeRows + sizeRows / 2
+            cueColumnPosition = self._windowSize[1] / 2 - (
+                        columnGap + self.gap * 3 + 3 * sizeColumns + sizeColumns / 2)
+
+            self._cueCard.position = (cueRowPosition, cueColumnPosition)
             self._cueCard.stimuli[0].reposition(self._cueCard.position)
             self._cueCard.stimuli[1].reposition(self._cueCard.position)
         else:
             print('Matrix is not valid')
 
-    def changeCueCardPosition(self, position, cue_index):
+    def changeCueCardPosition(self, position):
         sizeRows = self._matrix.item(0).size[0]  # Size of a card
-        self._cueCard[cue_index].position = position
+        self._cueCard.position = position
 
     def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
@@ -142,6 +147,12 @@ class LdMatrix(object):
                 local_color = bgColor
             centerSquare = Rectangle(cardSize, colour=local_color, position=(0, 0))
             centerSquare.plot(bs)
+
+        # Show black vertices around cue card in the middle of the screen:
+        cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
+                                              vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
+                                              colour=constants.C_BLACK)
+        cue_card_surrounding_vertices.plot(bs)
 
         if draw:
             bs.present(False, True)
