@@ -236,6 +236,37 @@ def getLanguage(subjectName, daysBefore, experienceName):
     return output
 
 
+def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
+    currentDate = datetime.now()
+    dataFiles = [file for file in os.listdir(dataFolder) if file.endswith('.xpd')]
+
+    output = None
+
+    for dataFile in dataFiles:
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
+        previousDate = parse(agg[2]['date'])
+
+        try:
+            agg[3].index(experienceName)
+        except ValueError:
+            continue
+        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
+            header = agg[3].split('\n#e ')
+
+            indexSubjectName = header.index('Subject:') + 1
+            if subjectName in header[indexSubjectName]:
+                print('File found: ' + dataFile)
+                indexPositions = header.index('start_by_faces_or_places:') + 1
+                language = header[indexPositions].split('\n')[0].split('\n')[0]
+                output = language
+
+    # This ensures the latest language choice is used
+    return output
+
+
 def normalize_presentation_order(presentation_order, learning_matrix, random_matrix):
     positions = [int(i) for i in presentation_order[0]]
     matrix_a_or_rec = [int(i) for i in presentation_order[1]]

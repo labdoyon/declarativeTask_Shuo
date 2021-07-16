@@ -9,6 +9,7 @@ from expyriment.misc._timer import get_time
 from ld_matrix import LdMatrix
 from ld_utils import getPreviousSoundsAllocation, getPreviousMatrixOrder, normalize_test_presentation_order
 from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
+from ld_utils import getPlacesOrFacesChoice
 # from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
 from ttl_catch_keyboard import wait_for_ttl_keyboard
@@ -36,36 +37,41 @@ exp.add_experiment_info(subjectName)
 language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language: ')
 exp.add_experiment_info(language)  # Save Subject Code
+faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
+exp.add_experiment_info('start_by_faces_or_places:')
+exp.add_experiment_info(faces_places_choice)  # Save Subject Code
+
+center = floor(matrixSize[0] * matrixSize[1] / 2)
+if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':
+    only_faces = True
+    only_places = False
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('faces')
+    exp.add_experiment_info(faces_places_choice)  # Save Subject Code
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category > 3]
+elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'places':
+    only_faces = False
+    only_places = True
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('places')
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category <= 3]
 
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
 keepMatrix = True
-only_faces = False
-only_buildings = False
 keepPreviousMatrix = True
 if experimentName == 'PreLearn':
     keepPreviousMatrix = True
-    center = floor(matrixSize[0]*matrixSize[1]/2)
-    removeCards = [center] + \
-                  [index + 1 if index >= center else index
-                   for index, category in enumerate(matrixTemplate) if category > 3]
-    only_faces = True
 elif 'PreTest' in experimentName or 'PostTest' in experimentName:
     keepPreviousMatrix = True
     nbBlocksMax = 1
-    center = floor(matrixSize[0]*matrixSize[1]/2)
-    removeCards = [center] + \
-                  [index + 1 if index >= center else index
-                   for index, category in enumerate(matrixTemplate) if category > 3]
-    only_faces = True
 elif 'PostLearn' in experimentName:
     keepPreviousMatrix = True
-    center = floor(matrixSize[0]*matrixSize[1]/2)
-    removeCards = [center] + \
-                  [index + 1 if index >= center else index
-                   for index, category in enumerate(matrixTemplate) if category <= 3]
-    only_buildings = True
 
 m = LdMatrix(matrixSize, windowSize, override_remove_cards=removeCards)  # Create Matrix
 
@@ -84,7 +90,7 @@ exp.add_experiment_info(str(newMatrix))  # Add listPictures
 
 if only_faces:
     local_matrix = [element for index, element in enumerate(newMatrix) if matrixTemplate[index] < 4]
-elif only_buildings:
+elif only_places:
     local_matrix = [element for index, element in enumerate(newMatrix) if matrixTemplate[index] > 3]
 else:
     local_matrix = newMatrix
@@ -93,8 +99,8 @@ m.associatePictures(local_matrix)  # Associate Pictures to cards
 if only_faces:
     exp.add_experiment_info('faces_only_matrix:')
     exp.add_experiment_info(str(m.listPictures))  # Add listPictures
-elif only_buildings:
-    exp.add_experiment_info('building_only_matrix:')
+elif only_places:
+    exp.add_experiment_info('places_only_matrix:')
     exp.add_experiment_info(str(m.listPictures))  # Add listPictures
 
 exp.add_experiment_info('Image classes order:')

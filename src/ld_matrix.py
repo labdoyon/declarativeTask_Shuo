@@ -163,7 +163,7 @@ class LdMatrix(object):
 
         newMatrix = []
         # This means faces will always be in the the squares spots allocated to faces. Faces images will be shuffled
-        # within spaces allocated to faces. Same for buildings
+        # within spaces allocated to faces. Same for places
         faces_categories = list(range(ceil(numberClasses/2)))
         building_categories = list(range(ceil(numberClasses/2), numberClasses))
         perm = np.hstack((np.random.permutation(faces_categories), np.random.permutation(building_categories)))

@@ -196,3 +196,25 @@ inter_feedback_delay_time = 1000
 choose_location_minimum_response_time = 3000
 
 debug = False
+
+supported_start_by_choices = ['start_with_faces', 'start_with_places']
+experiment_use_faces_or_places = {
+    # start with faces
+    'start_with_faces':
+        {'PreLearn':    'faces',
+         'PreTest':     'faces',
+         'PostTest1':   'faces',
+         'PostRecog1':  'faces',
+         'PostTest2: ': 'faces',
+         'PostRecog2':  'faces',
+         'PostLearn':   'places'},
+    # start with places
+    'start_with_places':
+        {'PreLearn':    'places',
+         'PreTest':     'places',
+         'PostTest1':   'places',
+         'PostRecog1':  'places',
+         'PostTest2: ': 'places',
+         'PostRecog2':  'places',
+         'PostLearn':   'faces'}
+}

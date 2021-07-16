@@ -8,7 +8,7 @@ from math import floor
 
 from ld_matrix import LdMatrix
 from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
-from ld_utils import getLanguage
+from ld_utils import getLanguage, getPlacesOrFacesChoice
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
 from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
@@ -32,8 +32,21 @@ exp.add_experiment_info('Subject: ')  # Save Subject Code
 exp.add_experiment_info(subjectName)  # Save Subject Code
 language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language: ')
-only_faces = True
-exp.add_experiment_info(f'only_faces: {only_faces}')
+faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
+exp.add_experiment_info('start_by_faces_or_places:')
+exp.add_experiment_info(faces_places_choice)  # Save Subject Code
+
+if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':
+    only_faces = True
+    only_places = False
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('faces')
+elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'places':
+    only_faces = False
+    only_places = True
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('places')
+
 
 # Save time, Response, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'Matrix', 'CorrectAnswer', 'RT'])
@@ -45,6 +58,10 @@ if only_faces:
     local_learning_matrix = [element for index, element in enumerate(learningMatrix) if matrixTemplate[index] < 4]
     exp.add_experiment_info('faces_only_matrix:')
     exp.add_experiment_info(str(local_learning_matrix))  # Add listPictures
+elif only_places:
+    local_learning_matrix = [element for index, element in enumerate(learningMatrix) if matrixTemplate[index] > 3]
+    exp.add_experiment_info('places_only_matrix:')
+    exp.add_experiment_info(str(local_learning_matrix))  # Add listPictures
 else:
     local_learning_matrix = learningMatrix
 
@@ -54,6 +71,10 @@ exp.add_experiment_info(str(randomMatrix))  # Add listPictures
 if only_faces:
     local_random_matrix = [element for index, element in enumerate(randomMatrix) if matrixTemplate[index] < 4]
     exp.add_experiment_info('faces_only_random_matrix:')
+    exp.add_experiment_info(str(local_random_matrix))  # Add listPictures
+elif only_places:
+    local_random_matrix = [element for index, element in enumerate(randomMatrix) if matrixTemplate[index] > 3]
+    exp.add_experiment_info('places_only_random_matrix:')
     exp.add_experiment_info(str(local_random_matrix))  # Add listPictures
 else:
     local_random_matrix = randomMatrix
