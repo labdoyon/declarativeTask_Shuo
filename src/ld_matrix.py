@@ -40,6 +40,8 @@ class LdMatrix(object):
         self._cueCard = LdCard(cardSize, cueCardColor)
 
     def isValidMatrix(self):
+        # spaceRowLeft = window width (windowscreen x dimension, integer, number of pixels) - \
+        # matrix X size (an integer, the number of cards per row) * card x dimension (integer, number of pixels)
         spaceRowLeft = self.windowSize[0] - (self.size[0] * self._matrix.item(0).size[0])
         spaceColumnLeft = self.windowSize[1] - ((self.size[1] + 2) * self._matrix.item(0).size[1]) - 2 * linesThickness
 
