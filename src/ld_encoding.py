@@ -116,7 +116,6 @@ mouse.hide_cursor(True, True)  # Hide cursor
 setCursor(arrow)
 
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
-m.plotDefault(bs, True)  # Draw default grid
 
 exp.clock.wait(shortRest, process_control_events=True)
 
@@ -167,6 +166,9 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         instructionRectangle.plot(bs)
         bs.present(False, True)
 
+        m.plotDefault(bs, True)  # Draw default grid
+        bs.present(False, True)
+
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI, process_control_events=True)
 
@@ -175,7 +177,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         for nCard in presentationOrder:
             mouse.hide_cursor(True, True)
-            exp.clock.wait(SoundBeforeImageTime, process_control_events=True)
             m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
             exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))
@@ -187,6 +188,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
             exp.clock.wait(ISI, process_control_events=True)
+
+        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+        exp.clock.wait(ISI, process_control_events=True)
+
+        m.plotDefault(bs, True, show_matrix=False)  # Draw default grid
+        bs.present(False, True)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI, process_control_events=True)
@@ -227,6 +234,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
     instructionRectangle.plot(bs)
+    bs.present(False, True)
+
+    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+    exp.clock.wait(ISI, process_control_events=True)
+
+    m.plotDefault(bs, True)  # Draw default grid
     bs.present(False, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
@@ -312,6 +325,9 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
+
+    m.plotDefault(bs, True, show_matrix=False)  # Draw default grid
+    bs.present(False, True)
 
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':

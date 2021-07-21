@@ -151,9 +151,14 @@ class LdMatrix(object):
             centerSquare.plot(bs)
 
         # Show black vertices around cue card in the middle of the screen:
-        cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
-                                              vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
-                                              colour=constants.C_BLACK)
+        if show_matrix:
+            cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
+                                                  vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
+                                                  colour=constants.C_BLACK)
+        else:
+            cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
+                                                  vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
+                                                  colour=bgColor)
         cue_card_surrounding_vertices.plot(bs)
 
         if draw:

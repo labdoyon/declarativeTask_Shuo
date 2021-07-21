@@ -50,7 +50,6 @@ presentationCard = 2000
 
 responseTime = 5000
 AssociationResponseTime = 10000
-SoundBeforeImageTime = 200
 shortRest = 2500
 thankYouRest = 5000
 restPeriod = 15000
