@@ -187,10 +187,10 @@ matrixNoneRectangle = stimuli.Rectangle(size=matrixNone.surface_size, position=m
                                         colour=cardColor)
 
 
-bs = m.plotDefault(bs)  # Draw default grid
-matrixARectangle.plot(bs)
-matrixA.plot(bs)
-matrixNone.plot(bs)
+# m.plotDefault(bs)  # Draw default grid
+# matrixARectangle.plot(bs)
+# matrixA.plot(bs)
+# matrixNone.plot(bs)
 m._cueCard.color = bgColor
 bs = m.plotCueCard(False, bs)
 
@@ -204,20 +204,42 @@ for nCard in range(presentationOrder.shape[1]):
     else:
         showMatrix = 'MatrixRandom'
 
+    bs = m.plotDefault(bs)  # Draw default grid
+    bs.present(False, True)
+
+    ISI = design.randomize.rand_int(300, 500)
+    exp.clock.wait(300, process_control_events=True)
+
     category = listCards[nCard][:2]
     m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
     picture = listCards[nCard].rstrip(".png")
     m.plotCard(locationCard, True, bs, True)
 
     exp.add_experiment_info(
-        'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard,
-                                                            listCards[nCard], exp.clock.time))
+        'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
 
     exp.clock.wait(presentationCard, process_control_events=True)
     m.plotCard(locationCard, False, bs, True)
     exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                         listCards[nCard],
                                                                         exp.clock.time)])  # Add sync info
+
+    ISI = design.randomize.rand_int(300, 500)
+    exp.clock.wait(ISI, process_control_events=True)
+
+    m.plotDefault(bs, True, show_matrix=False)
+    bs.present(False, True)
+
+    ISI = design.randomize.rand_int(300, 500)
+    exp.clock.wait(ISI, process_control_events=True)
+
+    matrixARectangle.colour = cardColor
+    matrixNoneRectangle.colour = cardColor
+    matrixARectangle.plot(bs)
+    matrixA.plot(bs)
+    matrixNoneRectangle.plot(bs)
+    matrixNone.plot(bs)
+    bs.present(False, True)
 
     time_left = responseTime
     valid_response = False
@@ -288,6 +310,15 @@ for nCard in range(presentationOrder.shape[1]):
                 exp.data.add([exp.clock.time, showMatrix, False, rt])
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
                 break
+
+    ISI = design.randomize.rand_int(300, 500)
+    exp.clock.wait(ISI, process_control_events=True)
+
+    matrixARectangle.colour = bgColor
+    matrixNoneRectangle.colour = bgColor
+    matrixARectangle.plot(bs)
+    matrixNoneRectangle.plot(bs)
+    bs.present(False, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     exp.clock.wait(ISI, process_control_events=True)

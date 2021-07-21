@@ -8,7 +8,8 @@ from math import ceil
 
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
-from config import numberClasses, classPictures, picturesFolderClass, picturesFolder
+from config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor
+
 # from config import sounds, soundsFolder, tempSounds
 from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture
 from ld_utils import vertices_frame
@@ -130,6 +131,8 @@ class LdMatrix(object):
             # if nCard in removeCards or not show_matrix:
             if not show_matrix:
                 self._matrix.item(nCard).color = bgColor
+            else:
+                self._matrix.item(nCard).color = cardColor
 
             bs = self.plotCard(nCard, False, bs)
 
