@@ -44,7 +44,7 @@ class LdMatrix(object):
         # spaceRowLeft = window width (windowscreen x dimension, integer, number of pixels) - \
         # matrix X size (an integer, the number of cards per row) * card x dimension (integer, number of pixels)
         spaceRowLeft = self.windowSize[0] - (self.size[0] * self._matrix.item(0).size[0])
-        spaceColumnLeft = self.windowSize[1] - ((self.size[1] + 2) * self._matrix.item(0).size[1]) - 2 * linesThickness
+        spaceColumnLeft = self.windowSize[1] - (self.size[1] * self._matrix.item(0).size[1]) - 2 * linesThickness
 
         spaceRowLeftPerGap = spaceRowLeft/(self.size[0] + 1)
         spaceColumnLeftPerGap = spaceColumnLeft/(self.size[1] + 1 + 4)  # 4: gaps top and bottom
@@ -156,11 +156,11 @@ class LdMatrix(object):
         # Show black vertices around cue card in the middle of the screen:
         if show_matrix:
             cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
-                                                  vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
+                                                  vertex_list=vertices_frame(size=(105, 105), frame_thickness=5),
                                                   colour=constants.C_BLACK)
         else:
             cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
-                                                  vertex_list=vertices_frame(size=(100, 100), frame_thickness=10),
+                                                  vertex_list=vertices_frame(size=(105, 105), frame_thickness=5),
                                                   colour=bgColor)
         cue_card_surrounding_vertices.plot(bs)
 
@@ -299,9 +299,9 @@ class LdMatrix(object):
         else:
             color = bgColor
 
-        geometry.vertices_frame(size=(100, 100), frame_thickness=10)
+        geometry.vertices_frame(size=(105, 105), frame_thickness=5)
         response_stimuli = Shape(position=position,
-                                 vertex_list=geometry.vertices_frame(size=(100, 100), frame_thickness=10),
+                                 vertex_list=geometry.vertices_frame(size=(105, 105), frame_thickness=5),
                                  colour=color)
 
         response_stimuli.plot(bs)
