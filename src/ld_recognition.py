@@ -167,7 +167,7 @@ exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync inf
 
 
 matrixA = stimuli.TextLine('  Correct location  ',
-                           position=(-windowSize[0]/float(4),
+                           position=(windowSize[0]/float(4),
                                      -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                            text_size=textSize,
                            text_colour=textColor,
@@ -177,7 +177,7 @@ matrixARectangle = stimuli.Rectangle(size=matrixA.surface_size, position=matrixA
                                      colour=cardColor)
 
 matrixNone = stimuli.TextLine('  Wrong location  ',
-                              position=(windowSize[0]/float(4),
+                              position=(-windowSize[0]/float(4),
                                         -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                               text_size=textSize,
                               text_colour=textColor,
@@ -257,7 +257,7 @@ for nCard in range(presentationOrder.shape[1]):
                 valid_response = True
                 exp.data.add([exp.clock.time, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
                 matrixA = stimuli.TextLine('  Correct location  ',
-                                           position=(-windowSize[0]/float(4),
+                                           position=(windowSize[0]/float(4),
                                                      -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                                            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                            text_underline=None, text_colour=textColor,
@@ -267,7 +267,7 @@ for nCard in range(presentationOrder.shape[1]):
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
                 matrixA = stimuli.TextLine('  Correct location  ',
-                                           position=(-windowSize[0]/float(4),
+                                           position=(windowSize[0]/float(4),
                                                      -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                                            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                            text_underline=None, text_colour=textColor,
@@ -281,7 +281,7 @@ for nCard in range(presentationOrder.shape[1]):
                 valid_response = True
                 exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
                 matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(windowSize[0]/float(4),
+                                              position=(-windowSize[0]/float(4),
                                                         -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                                               text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                               text_underline=None, text_colour=textColor,
@@ -291,7 +291,7 @@ for nCard in range(presentationOrder.shape[1]):
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
                 matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(windowSize[0]/float(4),
+                                              position=(-windowSize[0]/float(4),
                                                         -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
                                               text_font=None, text_size=textSize, text_bold=None, text_italic=None,
                                               text_underline=None, text_colour=textColor,
