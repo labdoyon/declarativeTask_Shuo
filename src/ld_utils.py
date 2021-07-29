@@ -259,7 +259,7 @@ def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
                 print('File found: ' + dataFile)
-                indexPositions = header.index('start_by_faces_or_places:') + 1
+                indexPositions = header.index('start_by_class1_or_class2:') + 1
                 language = header[indexPositions].split('\n')[0].split('\n')[0]
                 output = language
 

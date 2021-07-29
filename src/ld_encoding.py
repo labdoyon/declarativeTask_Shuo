@@ -38,8 +38,10 @@ language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language: ')
 exp.add_experiment_info(language)  # Save Subject Code
 faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
-exp.add_experiment_info('start_by_faces_or_places:')
-exp.add_experiment_info(faces_places_choice)  # Save Subject Code
+exp.add_experiment_info('start_by_class1_or_class2:')
+exp.add_experiment_info(faces_places_choice)
+exp.add_experiment_info('start_by_faces_or_places (same as above but explicit):')
+exp.add_experiment_info(supported_start_by_choices_explicit[faces_places_choice])
 
 center = floor(matrixSize[0] * matrixSize[1] / 2)
 if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':

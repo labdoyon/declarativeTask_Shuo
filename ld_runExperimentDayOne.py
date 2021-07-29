@@ -50,7 +50,7 @@ subjectName = sys.argv[1]
 language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
 
-faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_by_faces_or_places:')
+faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_by_class1_or_class2:')
 # 'None' if no choice was selected previously, said choice otherwise, e.g. 'start_with_faces'
 
 python = 'py'
@@ -58,14 +58,14 @@ python = 'py'
 # Create the menu
 menu = CursesMenu(
     title="DECOPM", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + str(language) +
-                             ' ; faces_or_places: ' + str(faces_places_choice))
+                             ' ; class1_or_class2: ' + str(faces_places_choice))
 
 dayOneChooseLanguage = CommandItem(text='choose language',
                                    command=python + " src" + os.path.sep + "ld_choose_language.py",
                                    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu,
                                    should_exit=False)
 
-dayOneChooseFacesPlaces = CommandItem(text='choose: start by faces or places?',
+dayOneChooseFacesPlaces = CommandItem(text='choose: start by class1 or class2?',
                                       command=python + " src" + os.path.sep + "ld_choose_faces_places.py",
                                       arguments='choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu,
                                       should_exit=False)

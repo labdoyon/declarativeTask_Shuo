@@ -13,12 +13,12 @@ faces_places_choice = arguments[2]
 
 if faces_places_choice == 'None':
     python = 'py'
-    menu = CursesMenu(title="choose to start the experiment by faces or places")
+    menu = CursesMenu(title="choose to start the experiment by class1 or class2")
 
     choose_language = []
     for i, supported_choice in enumerate(supported_start_by_choices):
         choose_language.append(
-            CommandItem(text='start with ' + supported_choice + ' for the experiment for this participant',
+            CommandItem(text=supported_choice + ' for the experiment for this participant',
                         command=python + " src" + os.path.sep + "ld_choose_faces_places.py",
                         arguments='choose-faces-places, ' + subject_name + ', ' + supported_choice,
                         menu=menu,
@@ -32,7 +32,7 @@ else:
     exp = expyriment.design.Experiment(experimentName)  # Save experiment name
     exp.add_experiment_info('Subject:')  # Save Subject Code
     exp.add_experiment_info(subject_name)
-    exp.add_experiment_info('start_by_faces_or_places:')
+    exp.add_experiment_info('start_by_class1_or_class2:')
     exp.add_experiment_info(faces_places_choice)
     expyriment.control.initialize(exp)
     expyriment.control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
