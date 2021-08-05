@@ -99,7 +99,6 @@ def extract_matrix_and_data(i_folder, i_file, recognition=False, learning=False)
     ttl_timestamp = int(re.search('timing_([0-9]+)', ttl_event).group(1))
     try:  # Earlier version of the program
         faces_or_places = find_xpd_file(header2, 'faces_or_places_for_this_experiment:')
-        print(header2)
     except:
         faces_or_places = find_xpd_file(header2, 'start_by_class1_or_class2:')
 
@@ -127,7 +126,6 @@ def extract_matrix_and_data(i_folder, i_file, recognition=False, learning=False)
         cards_order = [int(x) for x in cards_order[0:-1]]
         matrix_rec_or_a = cards_order[int(len(cards_order)/2):]
         presentation_order = cards_order[:int(len(cards_order)/2)]
-        print(matrix_rec_or_a)
 
     # matrix_pictures = ast.literal_eval(
     #     header2[header2.index(matrix_position) + 1].split('\n')[0].split('\n')[0])
@@ -276,12 +274,6 @@ def recognition_extract_events(events, matrix_pictures, local_matrix, recognitio
         for i in range(len(presentation_order)):
             if presentation_order[i] > removeCards[0]:
                 presentation_order[i] = presentation_order[i] - 1
-    print('recognition_matrix')
-    print(recognition_matrix)
-    # print('matrix_rec_or_a')
-    # print(matrix_rec_or_a)
-    # print('presentation_order')
-    # print(presentation_order)
     for i in range(len(cards)*2):
         if matrix_rec_or_a[i]:
             recognition_cards_order[recognition_matrix[presentation_order[i]]] = i
@@ -513,15 +505,11 @@ def write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached
             else:
                 try:
                     if not day.recognition:
-                        try:
-                            item_list.extend([day.cards_order[0][card], day.cards_distance_to_correct_card[0][card],
-                                              day.position_response_index_responded[0][card],
-                                              day.position_response_reaction_time[0][card], day.show_card_absolute_time[0][card],
-                                              day.hide_card_absolute_time[0][card]])
-                        except:
-                            print()
+                        item_list.extend([day.cards_order[0][card], day.cards_distance_to_correct_card[0][card],
+                                          day.position_response_index_responded[0][card],
+                                          day.position_response_reaction_time[0][card], day.show_card_absolute_time[0][card],
+                                          day.hide_card_absolute_time[0][card]])
                     else:
-                            # try:
                         item_list.extend([day.cards_order[card], day.cards_answer[card],
                                           day.cards_reaction_time[card], day.show_card_absolute_time[card],
                                           day.hide_card_absolute_time[card],
@@ -531,8 +519,6 @@ def write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached
                                           day.show_recognition_card_absolute_time[card],
                                           day.hide_recognition_card_absolute_time[card],
                                           day.cards_distance_to_correct_card[card]])
-                        # except:
-                        #     print()
                 except KeyError:
                     if not day.recognition:
                         item_list.extend(['script_failed_extract_data']*len(test_recall_suffixes))
