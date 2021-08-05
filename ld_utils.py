@@ -189,7 +189,7 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
             register_on = True
             # we start collecting the answers
             order = 0  # we start a 0, first card/image presented during the test
-        elif 'Block' in event and 'Presentation' in event:
+        elif 'Block' in event and 'StartPresentation' in event:
             register_on = False
             try:
                 del hidden_card; del card; del position
@@ -242,11 +242,12 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
             response = re.search('(?<=card_)\w+', event).group(0)
             response_time = int(re.search('timing_([0-9]+)', event).group(1))
             position_response_reaction_time[block_number][card] = response_time - reaction_start
+
+            response_position = re.search('pos_([0-9]+)_', event).group(1)
+            position_response_index_responded[block_number][card] = response_position
             if response == card:
                 cards_distance_to_correct_card[block_number][card] = 0
             else:
-                response_position = re.search('pos_([0-9]+)_', event).group(1)
-                position_response_index_responded[block_number][card] = response_position
                 cards_distance_to_correct_card[block_number][card] = distance.euclidean(
                     np.unravel_index(int(position), matrix_size),
                     np.unravel_index(int(response_position), matrix_size))
@@ -465,8 +466,9 @@ def write_csv_learning(i_csv, matrix_pictures, cards_order, cards_distance_to_co
     for card in cards:
         # Add item; Add category
         card = card.rstrip('.png')
-        card_class = card[0]
-        item_list = [card, card_class]
+        card_class = card[:2]
+        position = matrix_pictures.index(card)
+        item_list = [card, card_class, position]
         # add answers and card orders
         for block_number in range(number_blocks):
             try:
@@ -492,7 +494,6 @@ def write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached
         except AttributeError:
             pass
         card_class = card[:2]
-        matrix_index = classes_order.index(card_class)
         position = matrix_pictures.index(card)
         item_list = [card, card_class, position]
         for i in range(len(days)):

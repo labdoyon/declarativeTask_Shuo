@@ -80,7 +80,7 @@ for single_pt_file in participant_files:
                 day1_PreLearn.hide_card_learning_absolute_time,\
                 day1_PreLearn.cards_learning_order, \
                 day1_PreLearn.cards_position, \
-                day1_PreLearn.position_response_index_responded, \
+                day1_PreLearn.position_response_index_responded = \
                 extract_events(events, matrix_size, ttl_timestamp=day1_PreLearn.ttl_in_data, mode='learning')
 
             output_file_learning_prelearn = learning_file_name(output_location, "PreLearn")
@@ -196,7 +196,7 @@ for single_pt_file in participant_files:
                 day2_PostLearn.hide_card_learning_absolute_time,\
                 day2_PostLearn.cards_learning_order, \
                 day2_PostLearn.cards_position, \
-                day2_PostLearn.position_response_index_responded, \
+                day2_PostLearn.position_response_index_responded = \
                 extract_events(day2_PostLearn.events, day2_PostLearn.matrix_size,
                                ttl_timestamp=day2_PostLearn.ttl_in_data, mode='learning')
 
