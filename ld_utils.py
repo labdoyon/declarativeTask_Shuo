@@ -413,7 +413,7 @@ def recognition_extract_events(events, matrix_pictures, local_matrix, recognitio
 
 
 def write_csv(output_file, matrix_pictures,
-              classes_order=None, sounds_order=None,
+              classes_order=None,
               days=None, number_blocks=0,
               cards_order=None, cards_distance_to_correct_card=None, position_response_reaction_time=None,
               show_card_absolute_time=None,
