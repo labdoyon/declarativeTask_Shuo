@@ -7,18 +7,24 @@ import ast
 import re
 from scipy.spatial import distance
 from expyriment.misc import data_preprocessing
-from config import removeCards, matrixSize, matrixTemplate, classPictures, presentationCard
+from xpd_to_tsv_config import removeCards, matrixSize, matrixTemplate, classPictures, presentationCard
 
 
 dont_suppress_card_double_checking = True
-test_recall_suffixes = \
-            ['matrixA_order'] + \
-            ['matrixA_distanceToMatrixA', 'matrixA_position_responded', 'matrixA_ReactionTime',
-             'matrixA_ShowTime', 'matrixA_HideTime']
+
+first_columns = ['Item', 'Class', 'MatrixA_X_coord', 'MatrixA_Y_coord']
+
+test_recall_suffixes = ['matrixA_order', 'matrixA_distanceToMatrixA', 'matrixA_X_clicked', 'matrixA_Y_clicked',
+                        'matrixA_ReactionTime', 'matrixA_ShowTime', 'matrixA_HideTime']
+
 test_recognition_suffixes = \
     ['matrixA_order', 'matrixA_answer', 'matrixA_ReactionTime', 'matrixA_ShowTime', 'matrixA_HideTime',
      'matrixR_order', 'matrixR_answer', 'matrixR_ReactionTime', 'matrixR_ShowTime', 'matrixR_HideTime',
      'matrixR_distanceToMatrixA']
+
+learning_suffixes = ['matrixA_order', 'matrixA_distanceToMatrixA', 'matrixA_X_clicked', 'matrixA_Y_clicked',
+                     'matrixA_ReactionTime', 'matrixA_ShowTime', 'matrixA_HideTime',
+                     'matrixA_learning_order', 'matrixA_LearningShowTime', 'matrixA_LearningHideTime']
 
 
 class CorrectCards(object):
@@ -78,6 +84,17 @@ class Day(object):
             self.show_recognition_card_absolute_time = {}
             self.hide_recognition_card_absolute_time = {}
             self.recognition_matrix = []
+
+
+def matrix_index_to_xy_coordinates(matrix_index):
+    # this function takes the matrix_index of an image (integer from 0 to 48 in case of a 7-by-7 matrix) and returns
+    # the X and Y coord of the image in the matrix
+    # (X=1, Y=1) being the top left corner of the matrix, and (X=7, Y=7) being the bottom right corner of the matrix
+    # the matrix is populated in columns: as in, matrix_index 0 to 6 are positions (1,1), (1,2), (1,3) ... (1,7),
+    # matrix_index 7 to 13 are positions (2,1), (2,2), (2,3) ... (2,6) in (X,Y) coordinates, and so on
+    # we add +1 so X and Y are indexed from 1 and not from 0
+    matrix_x_coord, matrix_y_coord = divmod(int(matrix_index), matrixSize[1])
+    return matrix_x_coord+1, matrix_y_coord+1
 
 
 def learning_file_name(output_location, suffix):
@@ -169,7 +186,8 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
     position_response_reaction_time = []  # the reaction time of the subject when presented with this card in the test phase
     show_card_absolute_time = []
     hide_card_absolute_time = []
-    position_response_index_responded = []
+    position_response_x_responded = []
+    position_response_y_responded = []
     if mode == 'learning':
         show_card_learning_absolute_time = []
         hide_card_learning_absolute_time = []
@@ -184,7 +202,8 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
             position_response_reaction_time.append({})
             hide_card_absolute_time.append({})
             show_card_absolute_time.append({})
-            position_response_index_responded.append({})
+            position_response_x_responded.append({})
+            position_response_y_responded.append({})
             block_number = len(cards_position) - 1
             register_on = True
             # we start collecting the answers
@@ -237,14 +256,16 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
         elif ('NoResponse' in event or 'pos_None_ERROR' in event) and register_on:
             position_response_reaction_time[block_number][card] = 'noResponse'
             cards_distance_to_correct_card[block_number][card] = 'noResponse'
-            position_response_index_responded[block_number][card] = 'noResponse'
+            position_response_x_responded[block_number][card] = 'noResponse'
+            position_response_y_responded[block_number][card] = 'noResponse'
         elif 'Response' in event and 'NoResponse' not in event and 'pos_None_ERROR' not in event and register_on:
             response = re.search('(?<=card_)\w+', event).group(0)
             response_time = int(re.search('timing_([0-9]+)', event).group(1))
             position_response_reaction_time[block_number][card] = response_time - reaction_start
 
             response_position = re.search('pos_([0-9]+)_', event).group(1)
-            position_response_index_responded[block_number][card] = response_position
+            position_response_x_responded[block_number][card], position_response_y_responded[block_number][card] = \
+                matrix_index_to_xy_coordinates(response_position)
             if response == card:
                 cards_distance_to_correct_card[block_number][card] = 0
             else:
@@ -255,10 +276,12 @@ def extract_events(events, matrix_size, ttl_timestamp=None, mode=None):
     if mode == 'learning':
         return cards_order, cards_distance_to_correct_card, position_response_reaction_time, block_number + 1, \
                show_card_absolute_time, hide_card_absolute_time, show_card_learning_absolute_time, \
-               hide_card_learning_absolute_time, cards_learning_order, cards_position, position_response_index_responded
+               hide_card_learning_absolute_time, cards_learning_order, cards_position, \
+               position_response_x_responded, position_response_y_responded
     else:
         return cards_order, cards_distance_to_correct_card, position_response_reaction_time, block_number + 1, \
-            show_card_absolute_time, hide_card_absolute_time, cards_position, position_response_index_responded
+            show_card_absolute_time, hide_card_absolute_time, cards_position, position_response_x_responded, \
+            position_response_y_responded
 
 
 def recognition_extract_events(events, matrix_pictures, local_matrix, recognition_matrix, local_recognition_matrix,
@@ -421,25 +444,20 @@ def write_csv(output_file, matrix_pictures,
               cards_learning_order=None,
               show_card_learning_absolute_time=None,
               hide_card_learning_absolute_time=None,
-              days_not_reached=[False]*3):
+              position_response_x_responded=None,
+              position_response_y_responded=None,
+              days_not_reached=[False]*5):
 
     if days is None:
         days = []
     i_csv = csv.writer(open(output_file, "w", newline=''))
 
-    first_row = ['Item', 'Class', 'Position']
+    first_row = list(first_columns)
     if not days:
         block_range = range(number_blocks)
         for i in block_range:
             first_row.extend(
-                ['Learning_Block' + str(i) + '_matrixA_order',
-                 'Learning_Block' + str(i) + '_matrixA_distanceToMatrixA',
-                 'Learning_Block' + str(i) + '_matrixA_ReactionTime',
-                 'Learning_Block' + str(i) + '_matrixA_ShowTime',
-                 'Learning_Block' + str(i) + '_matrixA_HideTime',
-                 'Learning_Block' + str(i) + '_matrixA_learning_order',
-                 'Learning_Block' + str(i) + '_matrixA_LearningShowTime',
-                 'Learning_Block' + str(i) + '_matrixA_LearningHideTime'])
+                ['Learning_Block' + str(i) + '_' + element for element in learning_suffixes])
     else:
         preTest_recall_titles = ['PreTest_Recall_' + item for item in test_recall_suffixes]
         postTest1_recall_titles = ['PostTest1_Recall_' + item for item in test_recall_suffixes]
@@ -453,6 +471,7 @@ def write_csv(output_file, matrix_pictures,
         write_csv_learning(i_csv, matrix_pictures, cards_order, cards_distance_to_correct_card, position_response_reaction_time,
                            show_card_absolute_time, hide_card_absolute_time, number_blocks,
                            cards_learning_order, show_card_learning_absolute_time, hide_card_learning_absolute_time,
+                           position_response_x_responded, position_response_y_responded,
                            classes_order=classes_order)
     else:
         write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached)
@@ -461,19 +480,30 @@ def write_csv(output_file, matrix_pictures,
 def write_csv_learning(i_csv, matrix_pictures, cards_order, cards_distance_to_correct_card, position_response_reaction_time,
                        show_card_absolute_time, hide_card_absolute_time, number_blocks,
                        cards_learning_order, show_card_learning_absolute_time, hide_card_learning_absolute_time,
-                       classes_order=None, sounds_order=None, classes_to_sounds=None):
+                       position_response_x_responded, position_response_y_responded,
+                       classes_order=None):
     cards = [card for card in np.sort(matrix_pictures) if card is not None]
     for card in cards:
         # Add item; Add category
         card = card.rstrip('.png')
         card_class = card[:2]
-        position = matrix_pictures.index(card)
-        item_list = [card, card_class, position]
+        card_index = matrix_pictures.index(card)
+
+        if card_index > min(removeCards):
+            removeCards_sorted = sorted(removeCards)
+            for remove_card in removeCards_sorted:
+                if card_index > remove_card:
+                    card_index += 1
+
+        card_x_coord, card_y_coord = matrix_index_to_xy_coordinates(card_index)
+        item_list = [card, card_class, card_x_coord, card_y_coord]
         # add answers and card orders
         for block_number in range(number_blocks):
             try:
                 item_list.extend([
                     cards_order[block_number][card], cards_distance_to_correct_card[block_number][card],
+                    position_response_x_responded[block_number][card],
+                    position_response_y_responded[block_number][card],
                     position_response_reaction_time[block_number][card], show_card_absolute_time[block_number][card],
                     hide_card_absolute_time[block_number][card],
 
@@ -481,7 +511,7 @@ def write_csv_learning(i_csv, matrix_pictures, cards_order, cards_distance_to_co
                     hide_card_learning_absolute_time[block_number][card]
                      ])
             except KeyError:
-                item_list.extend(['script_failed_extract_data']*8)
+                item_list.extend(['script_failed_extract_data']*len(learning_suffixes))
         i_csv.writerow(item_list)
 
 
@@ -507,7 +537,8 @@ def write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached
                 try:
                     if not day.recognition:
                         item_list.extend([day.cards_order[0][card], day.cards_distance_to_correct_card[0][card],
-                                          day.position_response_index_responded[0][card],
+                                          day.position_response_x_responded[0][card],
+                                          day.position_response_y_responded[0][card],
                                           day.position_response_reaction_time[0][card], day.show_card_absolute_time[0][card],
                                           day.hide_card_absolute_time[0][card]])
                     else:
@@ -596,7 +627,7 @@ def merge_csv(output_file, csv_list):
                         if i == 0:
                             rows[j] += row
                         else:
-                            rows[j] += row[3:]
+                            rows[j] += row[len(first_columns):]
             except IOError:
                 pass
         for j in range(len(rows)):

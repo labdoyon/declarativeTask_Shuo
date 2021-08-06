@@ -80,7 +80,8 @@ for single_pt_file in participant_files:
                 day1_PreLearn.hide_card_learning_absolute_time,\
                 day1_PreLearn.cards_learning_order, \
                 day1_PreLearn.cards_position, \
-                day1_PreLearn.position_response_index_responded = \
+                day1_PreLearn.position_response_x_responded,\
+                day1_PreLearn.position_response_y_responded = \
                 extract_events(events, matrix_size, ttl_timestamp=day1_PreLearn.ttl_in_data, mode='learning')
 
             output_file_learning_prelearn = learning_file_name(output_location, "PreLearn")
@@ -94,6 +95,8 @@ for single_pt_file in participant_files:
                       show_card_learning_absolute_time=day1_PreLearn.show_card_learning_absolute_time,
                       hide_card_learning_absolute_time=day1_PreLearn.hide_card_learning_absolute_time,
                       cards_learning_order=day1_PreLearn.cards_learning_order,
+                      position_response_x_responded=day1_PreLearn.position_response_x_responded,
+                      position_response_y_responded=day1_PreLearn.position_response_y_responded,
                       classes_order=classes_orders)
 
             break
@@ -108,7 +111,8 @@ for single_pt_file in participant_files:
                 day1_PreTest.number_blocks, day1_PreTest.show_card_absolute_time, \
                 day1_PreTest.hide_card_absolute_time,\
                 day1_PreTest.cards_position, \
-                day1_PreTest.position_response_index_responded =\
+                day1_PreTest.position_response_x_responded, \
+                day1_PreTest.position_response_y_responded =\
                 extract_events(day1_PreTest.events, day1_PreTest.matrix_size)
             day1_PreTest_not_reached = False
             break
@@ -122,7 +126,8 @@ for single_pt_file in participant_files:
                 day2_PostTest1.position_response_reaction_time,\
                 day2_PostTest1.number_blocks, day2_PostTest1.show_card_absolute_time, \
                 day2_PostTest1.hide_card_absolute_time,\
-                day2_PostTest1.cards_position, day2_PostTest1.position_response_index_responded = \
+                day2_PostTest1.cards_position, day2_PostTest1.position_response_x_responded, \
+                day2_PostTest1.position_response_y_responded =\
                 extract_events(day2_PostTest1.events, day2_PostTest1.matrix_size,
                                ttl_timestamp=day2_PostTest1.ttl_in_data)
             day2_PostTest1_not_reached = False
@@ -157,8 +162,9 @@ for single_pt_file in participant_files:
 
             day2_PostTest2.cards_order, day2_PostTest2.cards_distance_to_correct_card, day2_PostTest2.position_response_reaction_time,\
                 day2_PostTest2.number_blocks, day2_PostTest2.show_card_absolute_time, \
-                day2_PostTest2.hide_card_absolute_time, day2_PostTest2.cards_position,\
-                day2_PostTest2.position_response_index_responded = \
+                day2_PostTest2.hide_card_absolute_time, day2_PostTest2.cards_position, \
+                day2_PostTest2.position_response_x_responded, \
+                day2_PostTest2.position_response_y_responded = \
                 extract_events(day2_PostTest2.events, day2_PostTest2.matrix_size, ttl_timestamp=day2_PostTest2.ttl_in_data)
             day2_PostTest2_not_reached = False
             break
@@ -196,7 +202,8 @@ for single_pt_file in participant_files:
                 day2_PostLearn.hide_card_learning_absolute_time,\
                 day2_PostLearn.cards_learning_order, \
                 day2_PostLearn.cards_position, \
-                day2_PostLearn.position_response_index_responded = \
+                day2_PostLearn.position_response_x_responded, \
+                day2_PostLearn.position_response_y_responded = \
                 extract_events(day2_PostLearn.events, day2_PostLearn.matrix_size,
                                ttl_timestamp=day2_PostLearn.ttl_in_data, mode='learning')
 
@@ -211,6 +218,8 @@ for single_pt_file in participant_files:
                       show_card_learning_absolute_time=day2_PostLearn.show_card_learning_absolute_time,
                       hide_card_learning_absolute_time=day2_PostLearn.hide_card_learning_absolute_time,
                       cards_learning_order=day2_PostLearn.cards_learning_order,
+                      position_response_x_responded=day2_PostLearn.position_response_x_responded,
+                      position_response_y_responded=day2_PostLearn.position_response_y_responded,
                       classes_order=day2_PostLearn.classes_orders)
             day2_PostLearn_not_reached = False
             break
