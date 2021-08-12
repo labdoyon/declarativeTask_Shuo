@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import subprocess
-from expyriment.stimuli import Circle, Rectangle, Shape
+from expyriment.stimuli import Shape, FixCross
 from expyriment.misc import constants, geometry
 from playsound import playsound
 from math import ceil
@@ -11,8 +11,9 @@ from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listP
 from config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor
 
 # from config import sounds, soundsFolder, tempSounds
-from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture
+from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture, fixation_cross_thickness
 from ld_utils import vertices_frame
+
 
 class LdMatrix(object):
     def __init__(self, size, windowSize, override_remove_cards=None):
@@ -28,6 +29,7 @@ class LdMatrix(object):
         self._rowGap = 0
         self._columnGap = 0
         self._override_remove_cards = override_remove_cards
+        self._cross = None
 
         self.populate()  # Populate with cards
         self.isValidMatrix()  # Check Matrix validity
@@ -38,7 +40,8 @@ class LdMatrix(object):
         for nCard in range(self._matrix.size):
             self._matrix.itemset(nCard, LdCard(cardSize))
 
-        self._cueCard = LdCard(cardSize, cueCardColor)
+        self._cueCard = LdCard(cardSize, bgColor)
+        self._cross = FixCross(size=cardSize, colour=cardColor, line_width=fixation_cross_thickness)
 
     def isValidMatrix(self):
         # spaceRowLeft = window width (windowscreen x dimension, integer, number of pixels) - \
@@ -58,7 +61,6 @@ class LdMatrix(object):
             print('This matrix is not Valid')
             import sys
             sys.exit()
-
 
     def scale(self):
         for nCard in range(self._matrix.size):
@@ -87,13 +89,19 @@ class LdMatrix(object):
                     self._matrix.item(iCard).stimuli[1].reposition(self._matrix.item(iCard).position)
                     iCard += 1
 
-            cueRowPosition = -self._windowSize[0] / 2 + rowGap + self.gap * 3 + 3 * sizeRows + sizeRows / 2
-            cueColumnPosition = self._windowSize[1] / 2 - (
+            cue_row_position = -self._windowSize[0] / 2 + rowGap + self.gap * 3 + 3 * sizeRows + sizeRows / 2
+            cue_column_position = self._windowSize[1] / 2 - (
                         columnGap + self.gap * 3 + 3 * sizeColumns + sizeColumns / 2)
 
-            self._cueCard.position = (cueRowPosition, cueColumnPosition)
+            self._cueCard.position = (cue_row_position, cue_column_position)
             self._cueCard.stimuli[0].reposition(self._cueCard.position)
             self._cueCard.stimuli[1].reposition(self._cueCard.position)
+
+            fix_cross_row_position = -self._windowSize[0] / 2 + rowGap + self.gap * 3 + 3 * sizeRows + sizeRows / 2
+            fix_cross_column_position = self._windowSize[1] / 2 - (
+                    columnGap + self.gap * 3 + 3 * sizeColumns + sizeColumns / 2)
+
+            self._cross.reposition((fix_cross_row_position, fix_cross_column_position))
         else:
             print('Matrix is not valid')
 
@@ -106,6 +114,7 @@ class LdMatrix(object):
             self._cueCard.stimuli[0].plot(bs)
         else:
             self._cueCard.stimuli[1].plot(bs)
+            self._cross.plot(bs)
         if draw:
             bs.present(False, True)
         else:
@@ -127,9 +136,10 @@ class LdMatrix(object):
 
     def plotDefault(self, bs, draw=False, show_matrix=True):
         # We plot all cards, even if they are in removeCards, as the matrix should appear complete and regular.
+        # edit: plotting fixation cross instead of plotting all cards, therefore not plotting removeCards
         for nCard in range(self._matrix.size):
-            # if nCard in removeCards or not show_matrix:
-            if not show_matrix:
+            # if not show_matrix:
+            if nCard in removeCards or not show_matrix:
                 self._matrix.item(nCard).color = bgColor
             else:
                 self._matrix.item(nCard).color = cardColor
@@ -137,32 +147,6 @@ class LdMatrix(object):
             bs = self.plotCard(nCard, False, bs)
 
         bs = self.plotCueCard(False, bs)
-
-        if (self.size[0] % 2 == 0) and (self.size[1] % 2 == 0):
-            if show_matrix:
-                local_color = dotColor
-            else:
-                local_color = bgColor
-            centerDot = Circle(self.gap/2, colour=local_color, position=(0, 0))
-            centerDot.plot(bs)
-        elif (self.size[0] % 2 == 1) and (self.size[1] % 2 == 1):
-            if show_matrix:
-                local_color = constants.C_WHITE
-            else:
-                local_color = bgColor
-            centerSquare = Rectangle(cardSize, colour=local_color, position=(0, 0))
-            centerSquare.plot(bs)
-
-        # Show black vertices around cue card in the middle of the screen:
-        if show_matrix:
-            cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
-                                                  vertex_list=vertices_frame(size=(105, 105), frame_thickness=5),
-                                                  colour=constants.C_BLACK)
-        else:
-            cue_card_surrounding_vertices = Shape(position=self._cueCard.position,
-                                                  vertex_list=vertices_frame(size=(105, 105), frame_thickness=5),
-                                                  colour=bgColor)
-        cue_card_surrounding_vertices.plot(bs)
 
         if draw:
             bs.present(False, True)
