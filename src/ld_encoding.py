@@ -125,28 +125,20 @@ correctAnswers = np.zeros(nbBlocksMax)
 currentCorrectAnswers = 0
 nBlock = 0
 
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
-    0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
-
 ''' Presentation all locations '''
 presentationOrder = newRandomPresentation(override_remove_cards=removeCards)
 
-instructions_ttl = stimuli.TextLine(ttl_instructions_text[language],
-                                    position=(
-                                        0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-                                    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                    text_underline=None, text_colour=textColor,
-                                    background_colour=bgColor,
-                                    max_width=None)
-instructionRectangle.plot(bs)
-instructions_ttl.plot(bs)
+m.plotDefault(bs, draw=False)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
 wait_for_ttl_keyboard()
 exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
 
-instructionRectangle.plot(bs)
-bs.present(False, True)
+m.plot_instructions_rectangle(bs, instructions_card, draw=True)
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI, process_control_events=True)
 
 while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
@@ -154,21 +146,13 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     if 1 != nbBlocksMax or experimentName == 'PreLearn':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
 
-        instructions = stimuli.TextLine(presentation_screen_text[language],
-                                        position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                        text_underline=None, text_colour=textColor,
-                                        background_colour=bgColor,
-                                        max_width=None)
-        instructionRectangle.plot(bs)
-        instructions.plot(bs)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
         bs.present(False, True)
 
         exp.clock.wait(shortRest, process_control_events=True)
-        instructionRectangle.plot(bs)
-        bs.present(False, True)
-
-        m.plotDefault(bs, True)  # Draw default grid
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
@@ -194,40 +178,24 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI, process_control_events=True)
 
-        m.plotDefault(bs, True, show_matrix=False)  # Draw default grid
-        bs.present(False, True)
-
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
-
         # REST BLOCK
-        instructions = stimuli.TextLine(
-            rest_screen_text[language],
-            position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-            text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-            text_underline=None, text_colour=textColor, background_colour=bgColor,
-            max_width=None)
-
-        instructions.plot(bs)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
         bs.present(False, True)
+
         exp.add_experiment_info(
             ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
         exp.clock.wait(restPeriod, process_control_events=True)
         exp.add_experiment_info(
             ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-        instructionRectangle.plot(bs)
-        bs.present(False, True)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=True)
+
+    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+    exp.clock.wait(ISI, process_control_events=True)
 
     # TEST BLOCK
-    instructions = stimuli.TextLine(' TEST ',
-                                    position=(
-                                        0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-                                    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                    text_underline=None, text_colour=textColor,
-                                    background_colour=bgColor,
-                                    max_width=None)
-    instructionRectangle.plot(bs)
-    instructions.plot(bs)
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions(bs, instructions_card, ' TEST ', draw=False)
     bs.present(False, True)
 
     # LOG and SYNC Start Test
@@ -235,13 +203,8 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
     exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
-    instructionRectangle.plot(bs)
-    bs.present(False, True)
-
-    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI, process_control_events=True)
-
-    m.plotDefault(bs, True)  # Draw default grid
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions_card(bs, instructions_card, draw=False)
     bs.present(False, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
@@ -328,55 +291,48 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI)
 
-    m.plotDefault(bs, True, show_matrix=False)  # Draw default grid
-    bs.present(False, True)
-
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
-
-        instructions = stimuli.TextLine('You got ' + str(int(correctAnswers[nBlock])) + ' out of ' + str(m._matrix.size-len(removeCards)),
-                                        position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                        text_underline=None, text_colour=textColor, background_colour=bgColor,
-                                        max_width=None)
-        instructions.plot(bs)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions(bs, instructions_card,
+                            'You got ' + str(int(correctAnswers[nBlock])) + ' out of '
+                            + str(m._matrix.size-len(removeCards)), draw=False)
         bs.present(False, True)
 
         exp.clock.wait(shortRest)
 
-        instructionRectangle.plot(bs)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
 
-    instructions = stimuli.TextLine(
-        rest_screen_text[language],
-        position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-        text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-        text_underline=None, text_colour=textColor, background_colour=bgColor,
-        max_width=None)
+        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+        exp.clock.wait(ISI)
 
-    instructions.plot(bs)
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
     bs.present(False, True)
+
     exp.add_experiment_info(
         ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
     exp.clock.wait(restPeriod, process_control_events=True)
     exp.add_experiment_info(
         ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    instructionRectangle.plot(bs)
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions_card(bs, instructions_card, draw=False)
     bs.present(False, True)
 
     nBlock += 1
 
-instructions = stimuli.TextLine(
-    ending_screen_text[language],
-    position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-    text_underline=None, text_colour=textColor, background_colour=bgColor,
-    max_width=None)
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI)
 
-instructions.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
 bs.present(False, True)
+
 exp.clock.wait(thankYouRest, process_control_events=True)
-instructionRectangle.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 control.end()

@@ -153,6 +153,8 @@ elif matrixSize == (7, 7):
     # matrixTemplate = [matrixTemplate[i * 7:(i + 1) * 7] for i in range(7)]
     # matrixTemplate = np.array([np.array(matrixTemplate[0:(i + 1) * 7]) for i in range(7)])
     removeCards = [24]
+    # five cards, the row straight under the center card, expect the two cards on the side
+    instructions_card = [24 + 1 + i*7 for i in range(-2, 3)]
     # removeCards = [index for index, category in enumerate(matrixTemplate) if category > 3]
     # if category > len(classPictures) /2
 elif matrixSize == (5, 4):

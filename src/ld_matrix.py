@@ -1,14 +1,14 @@
 import random
 import numpy as np
 import subprocess
-from expyriment.stimuli import Shape, FixCross
+from expyriment.stimuli import Shape, FixCross, TextLine, Rectangle
 from expyriment.misc import constants, geometry
 from playsound import playsound
 from math import ceil
 
 from ld_card import LdCard
 from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
-from config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor
+from config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor, textSize, textColor
 
 # from config import sounds, soundsFolder, tempSounds
 from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture, fixation_cross_thickness
@@ -105,6 +105,60 @@ class LdMatrix(object):
         else:
             print('Matrix is not valid')
 
+    def plot_instructions_rectangle(self, bs, instructions_card, draw=True):
+        x_length = len(instructions_card)*cardSize[0] + (len(instructions_card)+1) * self.gap
+        position = (0, None)
+
+        # taking the lowest possible x coordinate
+        for card_index in instructions_card:
+            if position[1] is None:
+                position = (0, self._matrix.item(card_index).position[1])
+            elif position[1] < self._matrix.item(card_index).position[1]:
+                position = (0, self._matrix.item(card_index).position[1])
+        position = (position[0], position[1])
+
+        instruction_rectangle = Rectangle(size=(x_length, self.gap * 2 + cardSize[1]), position=position, colour=constants.C_DARKGREY)
+
+        instruction_rectangle.plot(bs)
+
+        if draw:
+            bs.present(False, True)
+        else:
+            return bs
+
+    def plot_instructions(self, bs, instructions_card, instructions_text, draw=True):
+        x_length = len(instructions_card)*cardSize[0] + (len(instructions_card)-1) * self.gap+10
+        position = (0, None)
+
+        # taking the lowest possible x coordinate
+        for card_index in instructions_card:
+            if position[1] is None:
+                position = (0, self._matrix.item(card_index).position[1])
+            elif position[1] < self._matrix.item(card_index).position[1]:
+                position = (0, self._matrix.item(card_index).position[1])
+
+        instructions = TextLine(instructions_text, position=position,
+                                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
+                                text_underline=None, text_colour=textColor,
+                                background_colour=bgColor, max_width=None)
+
+        instructions.plot(bs)
+
+        if draw:
+            bs.present(False, True)
+        else:
+            return bs
+
+    def plot_instructions_card(self, bs, instructions_card, draw=True):
+        for card_index in instructions_card:
+            bs = self.plotCard(card_index, False, bs)
+
+        if draw:
+            bs.present(False, True)
+        else:
+            return bs
+        return None
+
     def changeCueCardPosition(self, position):
         sizeRows = self._matrix.item(0).size[0]  # Size of a card
         self._cueCard.position = position
@@ -113,6 +167,7 @@ class LdMatrix(object):
         if showPicture is True:
             self._cueCard.stimuli[0].plot(bs)
         else:
+            self._cueCard.color = bgColor
             self._cueCard.stimuli[1].plot(bs)
             self._cross.plot(bs)
         if draw:
