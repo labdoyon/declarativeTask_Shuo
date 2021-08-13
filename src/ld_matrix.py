@@ -42,7 +42,8 @@ class LdMatrix(object):
             self._matrix.itemset(nCard, LdCard(cardSize))
 
         self._cueCard = LdCard(cardSize, bgColor)
-        self._cross = FixCross(size=cardSize, colour=cardColor, line_width=fixation_cross_thickness)
+        self._cross = FixCross(size=(cardSize[0]/2, cardSize[1]/2), colour=cardColor,
+                               line_width=fixation_cross_thickness)
 
     def isValidMatrix(self):
         # spaceRowLeft = window width (windowscreen x dimension, integer, number of pixels) - \
