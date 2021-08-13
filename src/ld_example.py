@@ -6,9 +6,10 @@ from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from ld_matrix import LdMatrix
-from ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf
+from ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
+from ld_stimuli_names import presentation_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -26,14 +27,14 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 exp.add_experiment_info(['Subject: '])  # Save Subject Code
 exp.add_experiment_info([subjectName])  # Save Subject Code
+language = str(getLanguage(subjectName, 0, 'choose-language'))
+exp.add_experiment_info('language: ')
+exp.add_experiment_info(language)  # Save Subject Code
 
 # Save time, nblocks, position, correctAnswer, RT
 exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
 
 m = LdMatrix(matrixSize, windowSize)  # Create Matrix
-
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
-    0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
 
 picturesExamples = np.random.permutation(picturesExamples)
 
@@ -64,19 +65,14 @@ wait_for_ttl_keyboard()
 exp.add_experiment_info(['Block {} - Presentation'.format(0)])  # Add listPictures
 exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
 
-instructions = stimuli.TextLine(' PRESENTATION ',
-                                position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                text_underline=None, text_colour=textColor,
-                                background_colour=bgColor,
-                                max_width=None)
-instructionRectangle.plot(bs)
-instructions.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
 bs.present(False, True)
 
 exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
-instructionRectangle.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 exp.clock.wait(shortRest, process_control_events=True)
@@ -93,19 +89,14 @@ for nCard in presentationOrder:
 presentationOrder = np.random.permutation(presentationOrder)
 exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
-instructions = stimuli.TextLine(' TEST ',
-                                position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                text_underline=None, text_colour=textColor,
-                                background_colour=bgColor,
-                                max_width=None)
-instructionRectangle.plot(bs)
-instructions.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ' TEST ', draw=False)
 bs.present(False, True)
 
 exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
 
-instructionRectangle.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 correctAnswers = 0
@@ -173,13 +164,8 @@ for nCard in presentationOrder:
 
 
 if correctAnswers == 3:
-    instructions = stimuli.TextLine(' PERFECT ',
-                                    position=(0, -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                    text_underline=None, text_colour=textColor,
-                                    background_colour=bgColor,
-                                    max_width=None)
-    instructions.plot(bs)
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions(bs, instructions_card, ' PERFECT ', draw=False)
     bs.present(False, True)
 
     exp.clock.wait(responseTime, process_control_events=True)

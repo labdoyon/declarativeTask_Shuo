@@ -21,7 +21,7 @@ else:
     control.defaults.window_mode = windowMode
     control.defaults.window_size = windowSize
 
-m = LdMatrix(matrixSize, windowSize)  # Create Matrix
+m = LdMatrix(matrixSize, windowSize, recognition_bigger_cuecard=True)  # Create Matrix
 
 arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment name and subject
 experimentName = arguments[0]
@@ -93,21 +93,20 @@ mouse.hide_cursor(True, True)  # Hide cursor
 setCursor(arrow)
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
-instructionRectangle = stimuli.Rectangle(size=(windowSize[0], m.gap * 2 + cardSize[1]), position=(
-    0, -windowSize[1]/float(2) + (2 * m.gap + cardSize[1])/float(2)), colour=constants.C_DARKGREY)
-instructions_ttl = stimuli.TextLine(ttl_instructions_text[language],
-                                    position=(
-                                        0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-                                    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                    text_underline=None, text_colour=textColor,
-                                    background_colour=bgColor,
-                                    max_width=None)
-instructionRectangle.plot(bs)
-instructions_ttl.plot(bs)
+m.plotDefault(bs)  # Draw default grid
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
 wait_for_ttl_keyboard()
 exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
+bs.present(False, True)
+
+ISI = design.randomize.rand_int(300, 500)
+exp.clock.wait(300, process_control_events=True)
 
 exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
 center = floor(matrixSize[0] * matrixSize[1] / 2)
@@ -149,54 +148,33 @@ for nCard in range(presentationOrder.shape[1]):
 
 exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
 
-instructions = stimuli.TextLine(' RECOGNITION ',
-                                position=(0, -windowSize[1] / float(2) +
-                                          (2 * m.gap + cardSize[1]) / float(2)),
-                                text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                text_underline=None, text_colour=textColor,
-                                background_colour=bgColor,
-                                max_width=None)
-instructionRectangle.plot(bs)
-instructions.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ' RECOGNITION ', draw=False)
 bs.present(False, True)
 
 exp.clock.wait(shortRest, process_control_events=True)
-instructionRectangle.plot(bs)
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 # LOG and SYNC
 exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
 
 
-matrixA = stimuli.TextLine('  Correct location  ',
-                           position=(windowSize[0]/float(4),
-                                     -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                           text_size=textSize,
-                           text_colour=textColor,
-                           background_colour=cardColor)
+matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                          position=(cardSize[0]/4 + m.gap/8, 0),
+                          text_size=textSize,
+                          text_colour=constants.C_GREEN,
+                          background_colour=cardColor)
 
-matrixARectangle = stimuli.Rectangle(size=matrixA.surface_size, position=matrixA.position,
-                                     colour=cardColor)
+matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                             position=(-cardSize[0]/4 - m.gap/8, 0),
+                             text_size=textSize,
+                             text_colour=constants.C_RED,
+                             background_colour=cardColor)
 
-matrixNone = stimuli.TextLine('  Wrong location  ',
-                              position=(-windowSize[0]/float(4),
-                                        -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                              text_size=textSize,
-                              text_colour=textColor,
-                              background_colour=cardColor)
-
-matrixNoneRectangle = stimuli.Rectangle(size=matrixNone.surface_size, position=matrixNone.position,
-                                        colour=cardColor)
-
-
-# m.plotDefault(bs)  # Draw default grid
-# matrixARectangle.plot(bs)
-# matrixA.plot(bs)
-# matrixNone.plot(bs)
-m._cueCard.color = bgColor
-bs = m.plotCueCard(False, bs)
-
-bs.present(False, True)
+m.plotCueCard(False, bs, draw=True)
 
 for nCard in range(presentationOrder.shape[1]):
     locationCard = int(presentationOrder[0][nCard])
@@ -205,9 +183,6 @@ for nCard in range(presentationOrder.shape[1]):
         showMatrix = 'MatrixA'
     else:
         showMatrix = 'MatrixRandom'
-
-    bs = m.plotDefault(bs)  # Draw default grid
-    bs.present(False, True)
 
     ISI = design.randomize.rand_int(300, 500)
     exp.clock.wait(300, process_control_events=True)
@@ -229,17 +204,10 @@ for nCard in range(presentationOrder.shape[1]):
     ISI = design.randomize.rand_int(300, 500)
     exp.clock.wait(ISI, process_control_events=True)
 
-    m.plotDefault(bs, True, show_matrix=False)
-    bs.present(False, True)
-
     ISI = design.randomize.rand_int(300, 500)
     exp.clock.wait(ISI, process_control_events=True)
 
-    matrixARectangle.colour = cardColor
-    matrixNoneRectangle.colour = cardColor
-    matrixARectangle.plot(bs)
     matrixA.plot(bs)
-    matrixNoneRectangle.plot(bs)
     matrixNone.plot(bs)
     bs.present(False, True)
 
@@ -255,50 +223,43 @@ for nCard in range(presentationOrder.shape[1]):
         mouse.hide_cursor(True, True)
 
         if rt is not None:
-            if matrixARectangle.overlapping_with_position(position):
+            if matrixA.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
-                matrixA = stimuli.TextLine('  Correct location  ',
-                                           position=(windowSize[0]/float(4),
-                                                     -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                           text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                           text_underline=None, text_colour=textColor,
-                                           background_colour=clickColor,
-                                           max_width=None)
+                matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                                          position=(cardSize[0]/4 + m.gap/8, 0),
+                                          text_size=textSize,
+                                          text_colour=constants.C_GREEN,
+                                          background_colour=clickColor)
                 matrixA.plot(bs)
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixA = stimuli.TextLine('  Correct location  ',
-                                           position=(windowSize[0]/float(4),
-                                                     -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                           text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                           text_underline=None, text_colour=textColor,
-                                           background_colour=cardColor,
-                                           max_width=None)
+                matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                                          position=(cardSize[0]/4 + m.gap/8, 0),
+                                          text_size=textSize,
+                                          text_colour=constants.C_GREEN,
+                                          background_colour=cardColor)
                 matrixA.plot(bs)
                 bs.present(False, True)
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
-            elif matrixNoneRectangle.overlapping_with_position(position):
+            elif matrixNone.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
-                matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(-windowSize[0]/float(4),
-                                                        -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                              text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                              text_underline=None, text_colour=textColor,
-                                              background_colour=clickColor,
-                                              max_width=None)
+                matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                                             position=(-cardSize[0]/4 - m.gap/8, 0),
+                                             text_size=textSize,
+                                             text_colour=constants.C_RED,
+                                             background_colour=clickColor)
+
                 matrixNone.plot(bs)
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixNone = stimuli.TextLine('  Wrong location  ',
-                                              position=(-windowSize[0]/float(4),
-                                                        -windowSize[1]/float(2) + (2*m.gap + cardSize[1])/float(2)),
-                                              text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-                                              text_underline=None, text_colour=textColor,
-                                              background_colour=cardColor,
-                                              max_width=None)
+                matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
+                                             position=(-cardSize[0]/4 - m.gap/8, 0),
+                                             text_size=textSize,
+                                             text_colour=constants.C_RED,
+                                             background_colour=cardColor)
                 matrixNone.plot(bs)
                 bs.present(False, True)
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
@@ -316,24 +277,23 @@ for nCard in range(presentationOrder.shape[1]):
     ISI = design.randomize.rand_int(300, 500)
     exp.clock.wait(ISI, process_control_events=True)
 
-    matrixARectangle.colour = bgColor
-    matrixNoneRectangle.colour = bgColor
-    matrixARectangle.plot(bs)
-    matrixNoneRectangle.plot(bs)
+    m.plotCueCard(False, bs, draw=True)
+
+    ISI = design.randomize.rand_int(300, 500)
+    exp.clock.wait(ISI, process_control_events=True)
+
     bs.present(False, True)
 
     ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     exp.clock.wait(ISI, process_control_events=True)
 
-instructions = stimuli.TextLine(
-    ending_screen_text[language],
-    position=(0, -windowSize[1] / float(2) + (2 * m.gap + cardSize[1]) / float(2)),
-    text_font=None, text_size=textSize, text_bold=None, text_italic=None,
-    text_underline=None, text_colour=textColor, background_colour=bgColor,
-    max_width=None)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
+bs.present(False, True)
 
-instructions.plot(bs)
-bs.present(False, True)
 exp.clock.wait(thankYouRest, process_control_events=True)
-instructionRectangle.plot(bs)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
+
+control.end()

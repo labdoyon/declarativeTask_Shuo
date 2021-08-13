@@ -16,7 +16,7 @@ from ld_utils import vertices_frame
 
 
 class LdMatrix(object):
-    def __init__(self, size, windowSize, override_remove_cards=None):
+    def __init__(self, size, windowSize, override_remove_cards=None, recognition_bigger_cuecard=False):
         self._windowSize = windowSize
         self._size = size
         self._threshold = 0
@@ -30,6 +30,7 @@ class LdMatrix(object):
         self._columnGap = 0
         self._override_remove_cards = override_remove_cards
         self._cross = None
+        self._recognition_bigger_cuecard = recognition_bigger_cuecard
 
         self.populate()  # Populate with cards
         self.isValidMatrix()  # Check Matrix validity
@@ -92,6 +93,9 @@ class LdMatrix(object):
             cue_row_position = -self._windowSize[0] / 2 + rowGap + self.gap * 3 + 3 * sizeRows + sizeRows / 2
             cue_column_position = self._windowSize[1] / 2 - (
                         columnGap + self.gap * 3 + 3 * sizeColumns + sizeColumns / 2)
+
+            if self._recognition_bigger_cuecard:
+                self._cueCard = LdCard((cardSize[0]+self.gap/2, cardSize[1]+self.gap/2), bgColor)
 
             self._cueCard.position = (cue_row_position, cue_column_position)
             self._cueCard.stimuli[0].reposition(self._cueCard.position)
@@ -158,10 +162,6 @@ class LdMatrix(object):
         else:
             return bs
         return None
-
-    def changeCueCardPosition(self, position):
-        sizeRows = self._matrix.item(0).size[0]  # Size of a card
-        self._cueCard.position = position
 
     def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
         if showPicture is True:
