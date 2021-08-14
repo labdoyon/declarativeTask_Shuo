@@ -106,7 +106,7 @@ m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 ISI = design.randomize.rand_int(300, 500)
-exp.clock.wait(300, process_control_events=True)
+exp.clock.wait(ISI, process_control_events=True)
 
 exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
 center = floor(matrixSize[0] * matrixSize[1] / 2)

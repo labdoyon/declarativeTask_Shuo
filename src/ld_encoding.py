@@ -223,7 +223,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}'.format(nCard,
                                                                               m.returnPicture(nCard),
                                                                               exp.clock.time))
-        exp.clock.wait(presentationCard)  # Wait presentationCard
+        exp.clock.wait(presentationCard, process_control_events=True)  # Wait presentationCard
         m.plotCueCard(False, bs, True)  # Hide Cue
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
                                                                               exp.clock.time))
@@ -252,7 +252,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                     m._matrix.item(currentCard).color = clickColor
                     m.plotCard(currentCard, False, bs, True)
 
-                    exp.clock.wait(clicPeriod)  # Wait 200ms
+                    exp.clock.wait(clicPeriod, process_control_events=True)  # Wait 200ms
 
                     m._matrix.item(currentCard).color = cardColor
                     m.plotCard(currentCard, False, bs, True)
@@ -289,7 +289,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 break
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
@@ -299,14 +299,14 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                             + str(m._matrix.size-len(removeCards)), draw=False)
         bs.present(False, True)
 
-        exp.clock.wait(shortRest)
+        exp.clock.wait(shortRest, process_control_events=True)
 
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI)
+        exp.clock.wait(ISI, process_control_events=True)
 
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
     m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
@@ -324,7 +324,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     nBlock += 1
 
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-exp.clock.wait(ISI)
+exp.clock.wait(ISI, process_control_events=True)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
