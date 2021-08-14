@@ -161,20 +161,24 @@ bs.present(False, True)
 # LOG and SYNC
 exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
 
+button_size = (cardSize[0]/2 + m.gap/8, cardSize[1])
+matrixA_position = (cardSize[0]/4 + m.gap/4, 0)
+matrixNone_position = (-cardSize[0]/4 - m.gap/4, 0)
 
-matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                          position=(cardSize[0]/4 + m.gap/8, 0),
+matrixA = stimuli.TextBox(text='R', size=button_size,
+                          position=matrixA_position,
                           text_size=textSize,
                           text_colour=constants.C_GREEN,
                           background_colour=cardColor)
 
-matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                             position=(-cardSize[0]/4 - m.gap/8, 0),
+matrixNone = stimuli.TextBox('W', size=button_size,
+                             position=matrixNone_position,
                              text_size=textSize,
                              text_colour=constants.C_RED,
                              background_colour=cardColor)
 
-m.plotCueCard(False, bs, draw=True)
+ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+exp.clock.wait(ISI, process_control_events=True)
 
 for nCard in range(presentationOrder.shape[1]):
     locationCard = int(presentationOrder[0][nCard])
@@ -183,9 +187,6 @@ for nCard in range(presentationOrder.shape[1]):
         showMatrix = 'MatrixA'
     else:
         showMatrix = 'MatrixRandom'
-
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(300, process_control_events=True)
 
     category = listCards[nCard][:2]
     m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
@@ -200,13 +201,10 @@ for nCard in range(presentationOrder.shape[1]):
     exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                         listCards[nCard],
                                                                         exp.clock.time)])  # Add sync info
-
     ISI = design.randomize.rand_int(300, 500)
     exp.clock.wait(ISI, process_control_events=True)
 
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(ISI, process_control_events=True)
-
+    m.plotCueCard(False, bs, draw=False, nocross=True)
     matrixA.plot(bs)
     matrixNone.plot(bs)
     bs.present(False, True)
@@ -226,16 +224,16 @@ for nCard in range(presentationOrder.shape[1]):
             if matrixA.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
-                matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                                          position=(cardSize[0]/4 + m.gap/8, 0),
+                matrixA = stimuli.TextBox(text='R', size=button_size,
+                                          position=matrixA_position,
                                           text_size=textSize,
                                           text_colour=constants.C_GREEN,
                                           background_colour=clickColor)
                 matrixA.plot(bs)
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixA = stimuli.TextBox(text='C', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                                          position=(cardSize[0]/4 + m.gap/8, 0),
+                matrixA = stimuli.TextBox(text='R', size=button_size,
+                                          position=matrixA_position,
                                           text_size=textSize,
                                           text_colour=constants.C_GREEN,
                                           background_colour=cardColor)
@@ -246,8 +244,8 @@ for nCard in range(presentationOrder.shape[1]):
             elif matrixNone.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
-                matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                                             position=(-cardSize[0]/4 - m.gap/8, 0),
+                matrixNone = stimuli.TextBox('W', size=button_size,
+                                             position=matrixNone_position,
                                              text_size=textSize,
                                              text_colour=constants.C_RED,
                                              background_colour=clickColor)
@@ -255,8 +253,8 @@ for nCard in range(presentationOrder.shape[1]):
                 matrixNone.plot(bs)
                 bs.present(False, True)
                 exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixNone = stimuli.TextBox('W', size=(cardSize[0]/2 + m.gap/4, cardSize[1]),
-                                             position=(-cardSize[0]/4 - m.gap/8, 0),
+                matrixNone = stimuli.TextBox('W', size=button_size,
+                                             position=matrixNone_position,
                                              text_size=textSize,
                                              text_colour=constants.C_RED,
                                              background_colour=cardColor)

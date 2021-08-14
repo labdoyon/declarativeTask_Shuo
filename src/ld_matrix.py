@@ -164,9 +164,12 @@ class LdMatrix(object):
             return bs
         return None
 
-    def plotCueCard(self, showPicture, bs, draw=False):  # Plot cue Card
+    def plotCueCard(self, showPicture, bs, draw=False, nocross=False):  # Plot cue Card
         if showPicture is True:
             self._cueCard.stimuli[0].plot(bs)
+        elif nocross:
+            self._cueCard.color = bgColor
+            self._cueCard.stimuli[1].plot(bs)
         else:
             self._cueCard.color = bgColor
             self._cueCard.stimuli[1].plot(bs)
