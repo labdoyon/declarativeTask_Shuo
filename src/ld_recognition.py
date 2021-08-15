@@ -108,12 +108,28 @@ bs.present(False, True)
 ISI = design.randomize.rand_int(300, 500)
 exp.clock.wait(ISI, process_control_events=True)
 
-exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
 center = floor(matrixSize[0] * matrixSize[1] / 2)
-removeCards = [center] + \
-              [index + 1 if index >= center else index
-               for index, category in enumerate(matrixTemplate) if category > 3]
-only_faces = True
+
+if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':
+    only_faces = True
+    only_places = False
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('faces')
+    exp.add_experiment_info(faces_places_choice)  # Save Subject Code
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category > 3]
+elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'places':
+    only_faces = False
+    only_places = True
+    exp.add_experiment_info('faces_or_places_for_this_experiment:')
+    exp.add_experiment_info('places')
+    removeCards = [center] + \
+                  [index + 1 if index >= center else index
+                   for index, category in enumerate(matrixTemplate) if category <= 3]
+
+exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
+
 presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
 presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(m.size[0]*m.size[1]-len(removeCards))))
 
