@@ -9,7 +9,7 @@ from expyriment.misc._timer import get_time
 from ld_matrix import LdMatrix
 from ld_utils import getPreviousSoundsAllocation, getPreviousMatrixOrder, normalize_test_presentation_order
 from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
-from ld_utils import getPlacesOrFacesChoice
+from ld_utils import getPlacesOrFacesChoice, generate_bids_filename
 # from ld_sound import create_temp_sound_files, delete_temp_files
 from config import *
 from ttl_catch_keyboard import wait_for_ttl_keyboard
@@ -32,6 +32,14 @@ experimentName = arguments[0]
 subjectName = arguments[1]
 
 exp = design.Experiment(experimentName)  # Save experiment name
+session = experiment_session[experimentName]
+output_dir = 'sourcedata' + os.path.sep +\
+             'sub-' + subjectName + os.path.sep +\
+             'ses-' + session + os.path.sep +\
+             'beh'
+io.defaults.datafile_directory = output_dir
+io.defaults.eventfile_directory = output_dir
+
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)
 language = str(getLanguage(subjectName, 0, 'choose-language'))
@@ -110,6 +118,23 @@ exp.add_experiment_info(str(classPictures))
 
 control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
 exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
+
+i = 1
+wouldbe_datafile = generate_bids_filename(
+        subjectName, session, experimentName, filename_suffix='_beh', filename_extension='.xpd')
+wouldbe_eventfile = generate_bids_filename(
+    subjectName, session, experimentName, filename_suffix='_events', filename_extension='.xpe')
+
+while os.path.isfile(io.defaults.datafile_directory + os.path.sep + wouldbe_datafile) or \
+        os.path.isfile(io.defaults.eventfile_directory + os.path.sep + wouldbe_eventfile):
+    i += 1
+    i_string = '0' * (2 - len(str(i))) + str(i)  # 0 padding, assuming 2-digits number
+    wouldbe_datafile = generate_bids_filename(subjectName, session, experimentName, filename_suffix='_beh',
+                                              filename_extension='.xpd', run=i_string)
+    wouldbe_eventfile = generate_bids_filename(subjectName, session, experimentName, filename_suffix='_events',
+                                               filename_extension='.xpe', run=i_string)
+exp.data.rename(wouldbe_datafile)
+exp.events.rename(wouldbe_eventfile)
 
 mouse = io.Mouse()  # Create Mouse instance
 mouse.set_logging(True)  # Log mouse
