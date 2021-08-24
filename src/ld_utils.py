@@ -117,7 +117,7 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
 
     for dataFile in data_files:
         try:
-            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
         except TypeError:
             continue
         previousDate = parse(agg[2]['date'])
@@ -186,7 +186,7 @@ def getPreviousMatrixOrder(subjectName, daysBefore, experienceName):
 
     for dataFile in data_files:
         try:
-            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
         except TypeError:
             continue
         previousDate = parse(agg[2]['date'])
@@ -271,7 +271,7 @@ def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
 
     for dataFile in data_files:
         try:
-            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
+            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
         except TypeError:
             continue
         previousDate = parse(agg[2]['date'])
