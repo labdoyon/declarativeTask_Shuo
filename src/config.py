@@ -11,7 +11,7 @@ dataFolder = rawFolder + 'data' + os.path.sep
 
 mouseButton = 1
 
-windowMode = False  # if False use FullScreen
+windowMode = True  # if False use FullScreen
 windowSize = (1024, 768)  # if windowMode is True then use windowSize
 
 picturesExamples = ['triangle.png', 'square.png', 'circle.png']
@@ -225,3 +225,17 @@ experiment_use_faces_or_places = {
          'PostRecog2':  'places',
          'PostLearn':   'faces'}
 }
+
+sessions = ['presleep', 'postsleep']
+experiment_session = {
+    'choose-language':      'presleep',
+    'choose-faces-places':  'presleep',
+    'Example':              'presleep',
+
+    'PreLearn':             'presleep',
+    'PreTest':              'presleep',
+    'PostTest1':            'postsleep',
+    'PostRecog1':           'postsleep',
+    'PostTest2: ':          'postsleep',
+    'PostRecog2':           'postsleep',
+    'PostLearn':            'postsleep'}
