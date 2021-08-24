@@ -240,6 +240,6 @@ experiment_session = {
     'PostTest1':            'postsleep',
     'PostRecog1':           'postsleep',
     'PostPVT2':           'postsleep',
-    'PostTest2: ':          'postsleep',
+    'PostTest2':          'postsleep',
     'PostRecog2':           'postsleep',
     'PostLearn':            'postsleep'}
