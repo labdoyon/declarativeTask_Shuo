@@ -231,11 +231,15 @@ experiment_session = {
     'choose-language':      'presleep',
     'choose-faces-places':  'presleep',
     'Example':              'presleep',
+    'PrePVT':              'presleep',
 
     'PreLearn':             'presleep',
     'PreTest':              'presleep',
+
+    'PostPVT1':            'postsleep',
     'PostTest1':            'postsleep',
     'PostRecog1':           'postsleep',
+    'PostPVT2':           'postsleep',
     'PostTest2: ':          'postsleep',
     'PostRecog2':           'postsleep',
     'PostLearn':            'postsleep'}

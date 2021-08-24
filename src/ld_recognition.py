@@ -30,10 +30,13 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 
 session = experiment_session[experimentName]
-output_dir = 'sourcedata' + os.path.sep +\
+session_dir = 'sourcedata' + os.path.sep +\
              'sub-' + subjectName + os.path.sep +\
-             'ses-' + session + os.path.sep +\
+             'ses-' + session
+output_dir = session_dir + os.path.sep +\
              'beh'
+if not os.path.isdir(session_dir):
+    os.mkdir(session_dir)
 io.defaults.datafile_directory = output_dir
 io.defaults.eventfile_directory = output_dir
 
