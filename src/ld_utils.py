@@ -464,3 +464,23 @@ def generate_bids_filename(subject_id, session, task, filename_suffix='_beh', fi
         return 'sub-' + subject_id + '_ses-' + session + '_task-' + task +\
                '_run-' + str(run) +\
                filename_suffix + filename_extension
+
+
+def rename_output_files_to_BIDS(subject_name, session, experiment_name,
+                                datafile_dir, eventfile_dir):
+    i = 1
+    wouldbe_datafile = generate_bids_filename(
+        subject_name, session, experiment_name, filename_suffix='_beh', filename_extension='.xpd')
+    wouldbe_eventfile = generate_bids_filename(
+        subject_name, session, experiment_name, filename_suffix='_events', filename_extension='.xpe')
+
+    while os.path.isfile(datafile_dir + os.path.sep + wouldbe_datafile) or \
+            os.path.isfile(eventfile_dir + os.path.sep + wouldbe_eventfile):
+        i += 1
+        i_string = '0' * (2 - len(str(i))) + str(i)  # 0 padding, assuming 2-digits number
+        wouldbe_datafile = generate_bids_filename(subject_name, session, experiment_name, filename_suffix='_beh',
+                                                  filename_extension='.xpd', run=i_string)
+        wouldbe_eventfile = generate_bids_filename(subject_name, session, experiment_name, filename_suffix='_events',
+                                                   filename_extension='.xpe', run=i_string)
+
+    return wouldbe_datafile, wouldbe_eventfile

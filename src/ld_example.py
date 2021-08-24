@@ -6,7 +6,7 @@ from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from ld_matrix import LdMatrix
-from ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, generate_bids_filename
+from ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, rename_output_files_to_BIDS
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
 from ld_stimuli_names import presentation_screen_text
@@ -53,22 +53,11 @@ presentationOrder = presentationOrder[0:3]
 control.initialize(exp)
 control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
 
-i = 1
-wouldbe_datafile = generate_bids_filename(
-        subjectName, session, experimentName, filename_suffix='_beh', filename_extension='.xpd')
-wouldbe_eventfile = generate_bids_filename(
-    subjectName, session, experimentName, filename_suffix='_events', filename_extension='.xpe')
-
-while os.path.isfile(io.defaults.datafile_directory + os.path.sep + wouldbe_datafile) or \
-        os.path.isfile(io.defaults.eventfile_directory + os.path.sep + wouldbe_eventfile):
-    i += 1
-    i_string = '0' * (2 - len(str(i))) + str(i)  # 0 padding, assuming 2-digits number
-    wouldbe_datafile = generate_bids_filename(subjectName, session, experimentName, filename_suffix='_beh',
-                                              filename_extension='.xpd', run=i_string)
-    wouldbe_eventfile = generate_bids_filename(subjectName, session, experimentName, filename_suffix='_events',
-                                               filename_extension='.xpe', run=i_string)
-exp.data.rename(wouldbe_datafile)
-exp.events.rename(wouldbe_eventfile)
+bids_datafile, bids_eventfile = rename_output_files_to_BIDS(subjectName, session, experimentName,
+                                                            io.defaults.datafile_directory,
+                                                            io.defaults.eventfile_directory)
+exp.data.rename(bids_datafile)
+exp.events.rename(bids_eventfile)
 
 nPict = 0
 for nCard in presentationOrder:

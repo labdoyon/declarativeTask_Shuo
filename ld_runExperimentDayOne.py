@@ -93,6 +93,12 @@ dayOneExample = CommandItem(text='Example',
 #                             menu=menu,
 #                             should_exit=False)
 
+dayOnePrePVT = CommandItem(text='4. PrePVT',
+                           command=python + " src" + sep + "ld_pvt.py",
+                           arguments='PrePVT, ' + sys.argv[1],
+                           menu=menu,
+                           should_exit=False)
+
 dayOnePreLearn = CommandItem(text='2. PreLearn',
                              command=python + " src" + sep + "ld_encoding.py",
                              arguments='PreLearn, ' + sys.argv[1],
@@ -105,6 +111,12 @@ dayOnePreTest = CommandItem(text='5. PreTest',
                                  menu=menu,
                                  should_exit=False)
 
+dayOnePostPVT1 = CommandItem(text='7. PostPVT1',
+                             command=python + " src" + sep + "ld_pvt.py",
+                             arguments='PostPVT1, ' + sys.argv[1],
+                             menu=menu,
+                             should_exit=False)
+
 dayOnePostTest1 = CommandItem(text='8. PostTest1',
                                    command=python + " src" + sep + "ld_encoding.py",
                                    arguments='PostTest1, ' + sys.argv[1],
@@ -116,6 +128,12 @@ dayOnePostRecog1 = CommandItem(text="9. PostRecog1",
                                 arguments="PostRecog1, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
+
+dayOnePostPVT2 = CommandItem(text='7. PostPVT2',
+                             command=python + " src" + sep + "ld_pvt.py",
+                             arguments='PostPVT2, ' + sys.argv[1],
+                             menu=menu,
+                             should_exit=False)
 
 dayOnePostTest2 = CommandItem(text='12. PostTest2',
                                    command=python + " src" + sep + "ld_encoding.py",
@@ -139,10 +157,13 @@ menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneChooseFacesPlaces)
 menu.append_item(dayOneExample)
 # menu.append_item(dayOneStimuliPresentation)
+menu.append_item(dayOnePrePVT)
 menu.append_item(dayOnePreLearn)
 menu.append_item(dayOnePreTest)
+menu.append_item(dayOnePostPVT1)
 menu.append_item(dayOnePostTest1)
 menu.append_item(dayOnePostRecog1)
+menu.append_item(dayOnePostPVT2)
 menu.append_item(dayOnePostTest2)
 menu.append_item(dayOnePostRecog2)
 menu.append_item(dayOnePostLearn)

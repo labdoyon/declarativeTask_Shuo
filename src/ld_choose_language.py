@@ -4,7 +4,7 @@ import expyriment
 from cursesmenu import *
 from cursesmenu.items import *
 from config import experiment_session
-from ld_utils import generate_bids_filename
+from ld_utils import rename_output_files_to_BIDS
 from ld_stimuli_names import supported_languages
 
 sep = os.path.sep
@@ -51,22 +51,10 @@ else:
     expyriment.control.initialize(exp)
     expyriment.control.start(exp, auto_create_subject_id=True, skip_ready_screen=True)
 
-    i = 1
-    wouldbe_datafile = generate_bids_filename(
-        subject_name, session, experimentName, filename_suffix='_beh', filename_extension='.xpd')
-    wouldbe_eventfile = generate_bids_filename(
-        subject_name, session, experimentName, filename_suffix='_events', filename_extension='.xpe')
-
-    while os.path.isfile(expyriment.io.defaults.datafile_directory + sep + wouldbe_datafile) or \
-            os.path.isfile(expyriment.io.defaults.eventfile_directory + sep + wouldbe_eventfile):
-        i += 1
-        i_string = '0' * (2 - len(str(i))) + str(i)  # 0 padding, assuming 2-digits number
-        wouldbe_datafile = generate_bids_filename(subject_name, session, experimentName, filename_suffix='_beh',
-                                                  filename_extension='.xpd', run=i_string)
-        wouldbe_eventfile = generate_bids_filename(subject_name, session, experimentName, filename_suffix='_events',
-                                                   filename_extension='.xpe', run=i_string)
-
-    exp.data.rename(wouldbe_datafile)
-    exp.events.rename(wouldbe_eventfile)
+    bids_datafile, bids_eventfile = rename_output_files_to_BIDS(subject_name, session, experimentName,
+                                                                expyriment.io.defaults.datafile_directory,
+                                                                expyriment.io.defaults.eventfile_directory)
+    exp.data.rename(bids_datafile)
+    exp.events.rename(bids_eventfile)
 
     expyriment.control.end()
