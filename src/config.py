@@ -11,7 +11,7 @@ dataFolder = rawFolder + 'data' + os.path.sep
 
 mouseButton = 1
 
-windowMode = True  # if False use FullScreen
+windowMode = False  # if False use FullScreen
 windowSize = (1024, 768)  # if windowMode is True then use windowSize
 
 picturesExamples = ['triangle.png', 'square.png', 'circle.png']
