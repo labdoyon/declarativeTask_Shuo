@@ -101,8 +101,8 @@ def learning_file_name(output_location, suffix):
     return os.getcwd() + os.path.sep + output_location + '_learning_' + suffix +'.csv'
 
 
-def extract_matrix_and_data(i_folder, i_file, recognition=False, learning=False):
-    header = data_preprocessing.read_datafile(i_folder + i_file, only_header_and_variable_names=True)
+def extract_matrix_and_data(i_file, recognition=False, learning=False):
+    header = data_preprocessing.read_datafile(i_file, only_header_and_variable_names=True)
 
     # Extracting pictures' positions in the matrix
     header2 = header[3].split('\n#e ')
