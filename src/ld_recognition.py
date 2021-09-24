@@ -63,7 +63,8 @@ elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'pla
 
 
 # Save time, Response, correctAnswer, RT
-exp.add_data_variable_names(['Time', 'Matrix', 'CorrectAnswer', 'RT'])
+exp.add_data_variable_names(['Time', 'categoryPresented', 'CorrectLocationShown',
+                             'subjectAnswered', 'subjectCorrect', 'ResponseTime'])
 
 learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 exp.add_experiment_info('Learning: ')  # Save Subject Code
@@ -258,7 +259,8 @@ for nCard in range(presentationOrder.shape[1]):
         if rt is not None:
             if matrixA.overlapping_with_position(position):
                 valid_response = True
-                exp.data.add([exp.clock.time, showMatrix, bool(presentationOrder[1][nCard] == 0), rt])
+                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+                              'correct', bool(presentationOrder[1][nCard] == 0), rt])
                 matrixA = stimuli.TextBox(text='R', size=button_size,
                                           position=matrixA_position,
                                           text_size=textSize,
@@ -278,6 +280,8 @@ for nCard in range(presentationOrder.shape[1]):
 
             elif matrixNone.overlapping_with_position(position):
                 valid_response = True
+                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+                              'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
                 exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
                 matrixNone = stimuli.TextBox('W', size=button_size,
                                              position=matrixNone_position,
@@ -297,14 +301,16 @@ for nCard in range(presentationOrder.shape[1]):
                 bs.present(False, True)
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
         else:
-            exp.data.add([exp.clock.time, showMatrix, False, rt])
+            exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, rt])
             exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
-        if rt is not None:
+            valid_response = True
+        if rt is not None and not valid_response:
             if rt < time_left - clicPeriod:
                 time_left = time_left - clicPeriod - rt
             else:
-                exp.data.add([exp.clock.time, showMatrix, False, rt])
+                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, None])
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
+                valid_response = True
                 break
 
     ISI = design.randomize.rand_int(300, 500)
