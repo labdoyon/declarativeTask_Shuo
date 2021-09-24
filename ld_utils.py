@@ -525,7 +525,13 @@ def write_csv_test(i_csv, matrix_pictures, classes_order, days, days_not_reached
             pass
         card_class = card[:2]
         position = matrix_pictures.index(card)
-        item_list = [card, card_class, position]
+        if position > min(removeCards):
+            removeCards_sorted = sorted(removeCards)
+            for remove_card in removeCards_sorted:
+                if position > remove_card:
+                    position += 1
+        card_x_coord, card_y_coord = matrix_index_to_xy_coordinates(position)
+        item_list = [card, card_class, card_x_coord, card_y_coord]
         for i in range(len(days)):
             day = days[i]
             if days_not_reached[i]:
