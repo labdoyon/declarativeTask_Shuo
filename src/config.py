@@ -58,6 +58,8 @@ clicPeriod = 200
 pvt_min_max_ISI = (1000, 4000)
 pvt_show_feedback_duration = 1000
 pvt_number_trials = 15
+pvt_max_trial_duration = 5000
+pvt_experiment_max_duration = 3 * 60 * 1000  # 3 minutes
 
 min_max_ISI = [500, 1500]  # [min, max] inter_stimulus interval
 

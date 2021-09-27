@@ -79,7 +79,14 @@ inter_trial_start_time = get_time()
 mouse.clear()
 exp.keyboard.clear()
 
+pvt_experiment_start_time = get_time()
+
 for i in range(pvt_number_trials):
+
+    if (get_time() - pvt_experiment_start_time) * 1000 > pvt_experiment_max_duration:
+        exp.add_experiment_info(f'Trial_{i}_experiment-ended-due-to-lack-of-time_time_{get_time()}')
+        break
+
     exp.add_experiment_info(f'Trial_{i}')
     # Inter-Trial section
     # exp.clock.wait(isi_before_next_trial, process_control_events=True)
@@ -117,7 +124,7 @@ for i in range(pvt_number_trials):
     response = None
     start_time = get_time()
     exp.add_experiment_info(f'Trial_{i}_start-time_{int(start_time*1000)}')
-    while response is None:
+    while response is None and (get_time() - start_time) * 1000 < pvt_max_trial_duration:
         time_to_present = str(int((get_time() - start_time) * 1000))  # display in ms
         number_to_display = expyriment.stimuli.TextLine(time_to_present, position=(0, 0),
                                                         text_size=45, text_colour=textColor,
@@ -141,3 +148,5 @@ for i in range(pvt_number_trials):
     mouse.clear()
 
     inter_trial_start_time = get_time()
+
+exp.add_experiment_info(f'Experiment-completed_time_{get_time()}')
