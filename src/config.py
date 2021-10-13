@@ -47,7 +47,8 @@ startSpace = cardSize[1] + 20
 
 nbBlocksMax = 10
 
-presentationCard = 3000
+TR_duration = 2160  # in ms
+presentationCard = TR_duration
 
 responseTime = 5000
 AssociationResponseTime = 10000
