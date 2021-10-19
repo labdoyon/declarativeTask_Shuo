@@ -96,14 +96,17 @@ ISI = design.randomize.rand_int(300, 500)
 exp.clock.wait(ISI, process_control_events=True)
 
 exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
-presentationMatrixLearningOrder = newRandomPresentation()
-presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(m.size[0]*m.size[1]-len(removeCards))))
+presentationMatrixLearningOrder = newRandomPresentation(number_trials=mvpa_number_trials_correct_position)
+presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(len(presentationMatrixLearningOrder))))
 
-presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder)
-presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(m.size[0]*m.size[1]-len(removeCards))))
+presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
+                                                      number_trials=mvpa_number_trials_wrong_position)
+presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(len(presentationMatrixRandomOrder))))
 
-presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder))
+presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
+                              np.full(mvpa_number_null_events, np.nan)))
 
+presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder, presentationNull))
 presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
 
 listCards = []

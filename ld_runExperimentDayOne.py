@@ -153,6 +153,12 @@ dayOnePostLearn = CommandItem(text="14. PostLearn",
                                 menu=menu,
                                 should_exit=False)
 
+dayOneMVPA = CommandItem(text="15. MVPA",
+                                command=python + " src" + sep + "ld_mvpa.py",
+                                arguments="MVPA, " + sys.argv[1],
+                                menu=menu,
+                                should_exit=False)
+
 menu.append_item(dayOneChooseLanguage)
 menu.append_item(dayOneChooseFacesPlaces)
 menu.append_item(dayOneExample)
@@ -167,5 +173,6 @@ menu.append_item(dayOnePostPVT2)
 menu.append_item(dayOnePostTest2)
 menu.append_item(dayOnePostRecog2)
 menu.append_item(dayOnePostLearn)
+menu.append_item(dayOneMVPA)
 
 menu.show()

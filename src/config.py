@@ -133,15 +133,13 @@ arrow1 = (' XX                                                                  
           '                                                                                ',
           '                                                                                ',
           '                                                                                ')
-
+removeCards = []
 if matrixSize == (4, 4):
     matrixTemplate = [0]*16
-    removeCards = []
 elif matrixSize == (5, 5):
     matrixTemplate = [2,0,2,1,1,1,1,0,2,0,2,2,0,1,2,1,2,2,0,0,0,1,0,1]
     removeCards = [12]
 elif matrixSize == (6, 6):
-    removeCards = []
     matrixTemplate = [0, 1, 1, 2, 0, 2,
                       2, 0, 0, 2, 1, 1,
                       1, 0, 2, 1, 2, 0,
@@ -165,7 +163,6 @@ elif matrixSize == (7, 7):
     # if category > len(classPictures) /2
 elif matrixSize == (5, 4):
     matrixTemplate = [0] * 20
-    removeCards = []
 
 # correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
 correctAnswersMax = 18
@@ -196,6 +193,12 @@ for classPicture in classPictures:
 
 for category in classPictures:
     listPictures[category] = [p.replace(picturesFolderClass[category], '') for p in listPictures[category]]
+
+# MVPA
+mvpa_number_blocks = 4
+mvpa_number_trials_correct_position = 32  # per block per category
+mvpa_number_trials_wrong_position = 13  # per block per category
+mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
 
 feedback_frame_correct_color = constants.C_GREEN
 feedback_frame_wrong_color = constants.C_RED
@@ -234,15 +237,16 @@ experiment_session = {
     'choose-language':      'presleep',
     'choose-faces-places':  'presleep',
     'Example':              'presleep',
-    'PrePVT':              'presleep',
+    'PrePVT':               'presleep',
 
     'PreLearn':             'presleep',
     'PreTest':              'presleep',
 
-    'PostPVT1':            'postsleep',
+    'PostPVT1':             'postsleep',
     'PostTest1':            'postsleep',
     'PostRecog1':           'postsleep',
-    'PostPVT2':           'postsleep',
-    'PostTest2':          'postsleep',
+    'PostPVT2':             'postsleep',
+    'PostTest2':            'postsleep',
     'PostRecog2':           'postsleep',
-    'PostLearn':            'postsleep'}
+    'PostLearn':            'postsleep',
+    'MVPA':                 'postsleep'}

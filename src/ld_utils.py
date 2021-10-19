@@ -60,30 +60,45 @@ def plotLine(bs, gap, color=bgColor):
     return bs
 
 
-def newRandomPresentation(oldPresentation=None, override_remove_cards=None):
+def newRandomPresentation(oldPresentation=None, override_remove_cards=None, number_trials=None):
     if override_remove_cards is not None:
         removeCards = override_remove_cards
     else:
         from config import removeCards
 
     newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
-    if removeCards:
+    if len(removeCards):
         removeCards.sort(reverse=True)
         for nCard in removeCards:
             newPresentation = np.delete(newPresentation, nCard)
 
+    if number_trials is not None:
+        if not isinstance(number_trials, int):
+            raise TypeError("<number_trials> should be an integer")
+        if not number_trials >= 0:
+            raise TypeError("<number_trials> should be a positive integer (0 is valid)")
+
+        default_trials = np.copy(newPresentation)
+        if number_trials > len(newPresentation):
+            quotient, remainder = divmod(number_trials, len(newPresentation))
+            # if the number of trials is several times (more than 1 time) the size of the matrix
+            # Quotient
+            for i in range(quotient-1):
+                newPresentation = np.hstack((newPresentation, default_trials))
+            # Remainder
+            trials_to_be_added = default_trials
+            np.random.shuffle(trials_to_be_added)
+            trials_to_be_added = trials_to_be_added[:remainder]
+            newPresentation = np.hstack((newPresentation, trials_to_be_added))
+            np.random.shuffle(newPresentation)
+        elif number_trials < len(newPresentation):
+            np.random.shuffle(newPresentation)
+            newPresentation = newPresentation[:number_trials]
+
     newPresentation = np.random.permutation(newPresentation)
 
     if oldPresentation is not None:
-
         while len(longestSubstringFinder(str(oldPresentation), str(newPresentation)).split()) > 2:
-            newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
-
-            if removeCards:
-                removeCards.sort(reverse=True)
-                for nCard in removeCards:
-                    newPresentation = np.delete(newPresentation, nCard)
-
             newPresentation = np.random.permutation(newPresentation)
 
     return newPresentation
