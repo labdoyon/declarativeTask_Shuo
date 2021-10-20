@@ -10,7 +10,7 @@ from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMo
 from ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
 from ttl_catch_keyboard import wait_for_ttl_keyboard
 from config import *
-from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
+from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -95,44 +95,6 @@ bs.present(False, True)
 ISI = design.randomize.rand_int(300, 500)
 exp.clock.wait(ISI, process_control_events=True)
 
-exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
-presentationMatrixLearningOrder = newRandomPresentation(number_trials=mvpa_number_trials_correct_position)
-presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(len(presentationMatrixLearningOrder))))
-
-presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
-                                                      number_trials=mvpa_number_trials_wrong_position)
-presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(len(presentationMatrixRandomOrder))))
-
-presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
-                              np.full(mvpa_number_null_events, np.nan)))
-
-presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder, presentationNull))
-presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
-
-listCards = []
-for nCard in range(presentationOrder.shape[1]):
-    if len(removeCards):
-        removeCards.sort()
-        removeCards = np.asarray(removeCards)
-        tempPosition = presentationOrder[0][nCard]
-        index = 0
-        try:
-            index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
-        except:
-            pass
-
-        position = tempPosition - index
-
-    else:
-        position = presentationOrder[0][nCard]
-
-    if presentationOrder[1][nCard] == 0:  # Learning Matrix
-        listCards.append(learningMatrix[int(position)])
-    else:
-        listCards.append(randomMatrix[int(position)])
-
-exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
-
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ' RECOGNITION ', draw=False)
 bs.present(False, True)
@@ -146,7 +108,7 @@ bs.present(False, True)
 # LOG and SYNC
 exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
 
-button_size = (cardSize[0]/2 + m.gap/8, cardSize[1])
+button_size = (cardSize[0]/2 + m.gap/8, cardSize[1]*2/3)
 matrixA_position = (cardSize[0]/4 + m.gap/4, 0)
 matrixNone_position = (-cardSize[0]/4 - m.gap/4, 0)
 
@@ -165,115 +127,170 @@ matrixNone = stimuli.TextBox('W', size=button_size,
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
 exp.clock.wait(ISI, process_control_events=True)
 
-for nCard in range(presentationOrder.shape[1]):
-    locationCard = int(presentationOrder[0][nCard])
+for n_block in range(mvpa_number_blocks):
+    exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(n_block, exp.clock.time))
+    exp.add_experiment_info('Presentation Order_Block_{}_'.format(n_block))  # Save Presentation Order
+    presentationMatrixLearningOrder = newRandomPresentation(number_trials=mvpa_number_trials_correct_position)
+    presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(len(presentationMatrixLearningOrder))))
 
-    if bool(presentationOrder[1][nCard] == 0):
-        showMatrix = 'MatrixA'
-    else:
-        showMatrix = 'MatrixRandom'
+    presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
+                                                          number_trials=mvpa_number_trials_wrong_position)
+    presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(len(presentationMatrixRandomOrder))))
 
-    category = listCards[nCard][:2]
-    m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
-    picture = listCards[nCard].rstrip(".png")
-    m.plotCard(locationCard, True, bs, True)
+    presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
+                                  np.full(mvpa_number_null_events, np.nan)))
 
-    exp.add_experiment_info(
-        'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
+    presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder, presentationNull))
+    presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
 
-    exp.clock.wait(presentationCard, process_control_events=True)
-    m.plotCard(locationCard, False, bs, True)
-    exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
-                                                                        listCards[nCard],
-                                                                        exp.clock.time)])  # Add sync info
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(ISI, process_control_events=True)
+    listCards = []
+    for nCard in range(presentationOrder.shape[1]):
+        if len(removeCards):
+            removeCards.sort()
+            removeCards = np.asarray(removeCards)
+            tempPosition = presentationOrder[0][nCard]
+            index = 0
+            try:
+                index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
+            except:
+                pass
 
-    m.plotCueCard(False, bs, draw=False, nocross=True)
-    matrixA.plot(bs)
-    matrixNone.plot(bs)
-    bs.present(False, True)
+            position = tempPosition - index
 
-    time_left = responseTime
-    valid_response = False
-    rt = 0
-    while not valid_response and rt is not None:
-        mouse.show_cursor(True, True)
-
-        start = get_time()
-        rt, position = readMouse(start, mouseButton, time_left)  # time_left instead of response tine
-
-        mouse.hide_cursor(True, True)
-
-        if rt is not None:
-            if matrixA.overlapping_with_position(position):
-                valid_response = True
-                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
-                              'correct', bool(presentationOrder[1][nCard] == 0), rt])
-                matrixA = stimuli.TextBox(text='R', size=button_size,
-                                          position=matrixA_position,
-                                          text_size=textSize,
-                                          text_colour=constants.C_GREEN,
-                                          background_colour=clickColor)
-                matrixA.plot(bs)
-                bs.present(False, True)
-                exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixA = stimuli.TextBox(text='R', size=button_size,
-                                          position=matrixA_position,
-                                          text_size=textSize,
-                                          text_colour=constants.C_GREEN,
-                                          background_colour=cardColor)
-                matrixA.plot(bs)
-                bs.present(False, True)
-                exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
-
-            elif matrixNone.overlapping_with_position(position):
-                valid_response = True
-                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
-                              'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
-                exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
-                matrixNone = stimuli.TextBox('W', size=button_size,
-                                             position=matrixNone_position,
-                                             text_size=textSize,
-                                             text_colour=constants.C_RED,
-                                             background_colour=clickColor)
-
-                matrixNone.plot(bs)
-                bs.present(False, True)
-                exp.clock.wait(clicPeriod, process_control_events=True)
-                matrixNone = stimuli.TextBox('W', size=button_size,
-                                             position=matrixNone_position,
-                                             text_size=textSize,
-                                             text_colour=constants.C_RED,
-                                             background_colour=cardColor)
-                matrixNone.plot(bs)
-                bs.present(False, True)
-                exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
         else:
-            exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, rt])
-            exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
-            valid_response = True
-        if rt is not None and not valid_response:
-            if rt < time_left - clicPeriod:
-                time_left = time_left - clicPeriod - rt
+            position = presentationOrder[0][nCard]
+
+        if presentationOrder[1][nCard] == 0:  # Learning Matrix
+            listCards.append(learningMatrix[int(position)])
+        else:
+            listCards.append(randomMatrix[int(position)])
+
+    exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
+
+    for nCard in range(presentationOrder.shape[1]):
+        locationCard = int(presentationOrder[0][nCard])
+
+        if bool(presentationOrder[1][nCard] == 0):
+            showMatrix = 'MatrixA'
+        else:
+            showMatrix = 'MatrixRandom'
+
+        category = listCards[nCard][:2]
+        m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
+        picture = listCards[nCard].rstrip(".png")
+        m.plotCard(locationCard, True, bs, True)
+
+        exp.add_experiment_info(
+            'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
+
+        exp.clock.wait(presentationCard, process_control_events=True)
+        m.plotCard(locationCard, False, bs, True)
+        exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
+                                                                            listCards[nCard],
+                                                                            exp.clock.time)])  # Add sync info
+        ISI = design.randomize.rand_int(300, 500)
+        exp.clock.wait(ISI, process_control_events=True)
+
+        m.plotCueCard(False, bs, draw=False, nocross=True)
+        matrixA.plot(bs)
+        matrixNone.plot(bs)
+        bs.present(False, True)
+
+        time_left = responseTime
+        valid_response = False
+        rt = 0
+        while not valid_response and rt is not None:
+            mouse.show_cursor(True, True)
+
+            start = get_time()
+            rt, position = readMouse(start, mouseButton, time_left)  # time_left instead of response tine
+
+            mouse.hide_cursor(True, True)
+
+            if rt is not None:
+                if matrixA.overlapping_with_position(position):
+                    valid_response = True
+                    exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+                                  'correct', bool(presentationOrder[1][nCard] == 0), rt])
+                    matrixA = stimuli.TextBox(text='R', size=button_size,
+                                              position=matrixA_position,
+                                              text_size=textSize,
+                                              text_colour=constants.C_GREEN,
+                                              background_colour=clickColor)
+                    matrixA.plot(bs)
+                    bs.present(False, True)
+                    exp.clock.wait(clicPeriod, process_control_events=True)
+                    matrixA = stimuli.TextBox(text='R', size=button_size,
+                                              position=matrixA_position,
+                                              text_size=textSize,
+                                              text_colour=constants.C_GREEN,
+                                              background_colour=cardColor)
+                    matrixA.plot(bs)
+                    bs.present(False, True)
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
+
+                elif matrixNone.overlapping_with_position(position):
+                    valid_response = True
+                    exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+                                  'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
+                    exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
+                    matrixNone = stimuli.TextBox('W', size=button_size,
+                                                 position=matrixNone_position,
+                                                 text_size=textSize,
+                                                 text_colour=constants.C_RED,
+                                                 background_colour=clickColor)
+
+                    matrixNone.plot(bs)
+                    bs.present(False, True)
+                    exp.clock.wait(clicPeriod, process_control_events=True)
+                    matrixNone = stimuli.TextBox('W', size=button_size,
+                                                 position=matrixNone_position,
+                                                 text_size=textSize,
+                                                 text_colour=constants.C_RED,
+                                                 background_colour=cardColor)
+                    matrixNone.plot(bs)
+                    bs.present(False, True)
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
             else:
-                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, None])
+                exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, rt])
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
                 valid_response = True
-                break
+            if rt is not None and not valid_response:
+                if rt < time_left - clicPeriod:
+                    time_left = time_left - clicPeriod - rt
+                else:
+                    exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, None])
+                    exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
+                    valid_response = True
+                    break
 
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(ISI, process_control_events=True)
+        ISI = design.randomize.rand_int(300, 500)
+        exp.clock.wait(ISI, process_control_events=True)
 
-    m.plotCueCard(False, bs, draw=True)
+        m.plotCueCard(False, bs, draw=True)
 
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(ISI, process_control_events=True)
+        ISI = design.randomize.rand_int(300, 500)
+        exp.clock.wait(ISI, process_control_events=True)
 
-    bs.present(False, True)
+        bs.present(False, True)
 
-    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI, process_control_events=True)
+        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
+        exp.clock.wait(ISI, process_control_events=True)
+
+    if n_block != mvpa_number_blocks - 1:
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
+        bs.present(False, True)
+        exp.add_experiment_info(
+            ['StartShortRest_block_{}_timing_{}'.format(n_block, exp.clock.time)])  # Add sync info
+
+        exp.clock.wait(restPeriod, process_control_events=True)
+
+        exp.add_experiment_info(
+            ['EndShortRest_block_{}_timing_{}'.format(n_block, exp.clock.time)])  # Add sync info
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions_card(bs, instructions_card, draw=False)
+        bs.present(False, True)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
