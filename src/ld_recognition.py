@@ -197,7 +197,9 @@ bs.present(False, True)
 # LOG and SYNC
 exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
 
-button_size = (cardSize[0]/2 + m.gap/8, cardSize[1])
+button_size = (cardSize[0]/2 + m.gap/8, cardSize[1]*3/5)
+rectangle_size = (cardSize[0]/2 + m.gap/8, cardSize[1])
+
 matrixA_position = (cardSize[0]/4 + m.gap/4, 0)
 matrixNone_position = (-cardSize[0]/4 - m.gap/4, 0)
 
@@ -206,12 +208,14 @@ matrixA = stimuli.TextBox(text='R', size=button_size,
                           text_size=textSize,
                           text_colour=constants.C_GREEN,
                           background_colour=cardColor)
+matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position, colour=cardColor)
 
 matrixNone = stimuli.TextBox('W', size=button_size,
                              position=matrixNone_position,
                              text_size=textSize,
                              text_colour=constants.C_RED,
                              background_colour=cardColor)
+matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position, colour=cardColor)
 
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
 exp.clock.wait(ISI, process_control_events=True)
@@ -241,7 +245,9 @@ for nCard in range(presentationOrder.shape[1]):
     exp.clock.wait(ISI, process_control_events=True)
 
     m.plotCueCard(False, bs, draw=False, nocross=True)
+    matrixA_rectangle.plot(bs)
     matrixA.plot(bs)
+    matrixNone_rectangle.plot(bs)
     matrixNone.plot(bs)
     bs.present(False, True)
 
@@ -257,7 +263,7 @@ for nCard in range(presentationOrder.shape[1]):
         mouse.hide_cursor(True, True)
 
         if rt is not None:
-            if matrixA.overlapping_with_position(position):
+            if matrixA_rectangle.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
                               'correct', bool(presentationOrder[1][nCard] == 0), rt])
@@ -266,19 +272,27 @@ for nCard in range(presentationOrder.shape[1]):
                                           text_size=textSize,
                                           text_colour=constants.C_GREEN,
                                           background_colour=clickColor)
+                matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                                      colour=clickColor)
+
+                matrixA_rectangle.plot(bs)
                 matrixA.plot(bs)
                 bs.present(False, True)
+
                 exp.clock.wait(clicPeriod, process_control_events=True)
                 matrixA = stimuli.TextBox(text='R', size=button_size,
                                           position=matrixA_position,
                                           text_size=textSize,
                                           text_colour=constants.C_GREEN,
                                           background_colour=cardColor)
+                matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                                      colour=cardColor)
+                matrixA_rectangle.plot(bs)
                 matrixA.plot(bs)
                 bs.present(False, True)
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
-            elif matrixNone.overlapping_with_position(position):
+            elif matrixNone_rectangle.overlapping_with_position(position):
                 valid_response = True
                 exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
                               'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
@@ -288,15 +302,22 @@ for nCard in range(presentationOrder.shape[1]):
                                              text_size=textSize,
                                              text_colour=constants.C_RED,
                                              background_colour=clickColor)
+                matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                         colour=clickColor)
 
+                matrixNone_rectangle.plot(bs)
                 matrixNone.plot(bs)
                 bs.present(False, True)
+
                 exp.clock.wait(clicPeriod, process_control_events=True)
                 matrixNone = stimuli.TextBox('W', size=button_size,
                                              position=matrixNone_position,
                                              text_size=textSize,
                                              text_colour=constants.C_RED,
                                              background_colour=cardColor)
+                matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                         colour=cardColor)
+                matrixNone_rectangle.plot(bs)
                 matrixNone.plot(bs)
                 bs.present(False, True)
                 exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
