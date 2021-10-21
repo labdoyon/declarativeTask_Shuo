@@ -3,8 +3,10 @@ from os.path import normpath, join, dirname, basename
 # from math import ceil
 from expyriment.misc import constants
 
-rawFolder = normpath(join(dirname(__file__), '..', '..'))
+# python interpreter to be used to run the task's scripts in the OS command line
+python = 'py'
 
+rawFolder = normpath(join(dirname(__file__), '..', '..'))
 picturesFolder = normpath(join(rawFolder, 'stimulis'))
 picturesExamplesFolder = normpath(join(rawFolder, 'stimulisExample'))
 

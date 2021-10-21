@@ -10,7 +10,7 @@ from datetime import datetime
 import expyriment
 from dateutil.parser import parse
 
-from declarativeTask3.config import rawFolder, sessions
+from declarativeTask3.config import python, rawFolder
 from declarativeTask3.ld_utils import getPrevious
 
 subjectName = sys.argv[1]
@@ -23,8 +23,6 @@ language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 
 faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_by_class1_or_class2:')
 # 'None' if no choice was selected previously, said choice otherwise, e.g. 'start_with_faces'
-
-python = 'python'
 
 # Create the menu
 menu = CursesMenu(

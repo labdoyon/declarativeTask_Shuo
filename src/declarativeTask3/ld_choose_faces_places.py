@@ -5,7 +5,7 @@ from cursesmenu import *
 from cursesmenu.items import *
 
 from declarativeTask3.ld_utils import rename_output_files_to_BIDS
-from declarativeTask3.config import supported_start_by_choices, experiment_session
+from declarativeTask3.config import python, supported_start_by_choices, experiment_session
 
 sep = os.path.sep
 
@@ -15,7 +15,6 @@ subject_name = arguments[1]
 faces_places_choice = arguments[2]
 
 if faces_places_choice == 'None':
-    python = 'py'
     menu = CursesMenu(title="choose to start the experiment by class1 or class2")
 
     choose_language = []

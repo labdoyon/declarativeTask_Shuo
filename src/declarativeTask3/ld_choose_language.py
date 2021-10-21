@@ -3,7 +3,7 @@ import sys
 import expyriment
 from cursesmenu import *
 from cursesmenu.items import *
-from declarativeTask3.config import experiment_session
+from declarativeTask3.config import python, experiment_session
 from declarativeTask3.ld_utils import rename_output_files_to_BIDS
 from declarativeTask3.ld_stimuli_names import supported_languages
 
@@ -15,7 +15,6 @@ subject_name = arguments[1]
 language = arguments[2]
 
 if language == 'None':
-    python = 'py'
     menu = CursesMenu(title="choose a language")
 
     choose_language = []
