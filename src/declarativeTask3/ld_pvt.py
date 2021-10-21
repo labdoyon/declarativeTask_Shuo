@@ -1,11 +1,12 @@
 import sys
+import os
 import random
 import expyriment
 from expyriment.misc._timer import get_time
 
-from ld_matrix import LdMatrix
-from config import *
-from ld_utils import getLanguage, setCursor, rename_output_files_to_BIDS
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.config import *
+from declarativeTask3.ld_utils import getLanguage, setCursor, rename_output_files_to_BIDS
 
 
 if not windowMode:  # Check WindowMode and Resolution

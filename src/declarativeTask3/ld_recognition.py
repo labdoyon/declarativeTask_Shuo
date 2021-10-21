@@ -1,4 +1,5 @@
 import sys
+import os
 
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
@@ -6,12 +7,12 @@ from expyriment.misc._timer import get_time
 from expyriment.misc import constants
 from math import floor
 
-from ld_matrix import LdMatrix
-from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
-from ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
-from ttl_catch_keyboard import wait_for_ttl_keyboard
-from config import *
-from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
+from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.config import *
+from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -30,11 +31,8 @@ subjectName = arguments[1]
 exp = design.Experiment(experimentName)  # Save experiment name
 
 session = experiment_session[experimentName]
-session_dir = 'sourcedata' + os.path.sep +\
-             'sub-' + subjectName + os.path.sep +\
-             'ses-' + session
-output_dir = session_dir + os.path.sep +\
-             'beh'
+session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subjectName, 'ses-' + session))
+output_dir = os.path.normpath(os.path.join(session_dir, 'beh'))
 if not os.path.isdir(session_dir):
     os.mkdir(session_dir)
 io.defaults.datafile_directory = output_dir
@@ -229,7 +227,7 @@ for nCard in range(presentationOrder.shape[1]):
         showMatrix = 'MatrixRandom'
 
     category = listCards[nCard][:2]
-    m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
+    m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
     picture = listCards[nCard].rstrip(".png")
     m.plotCard(locationCard, True, bs, True)
 

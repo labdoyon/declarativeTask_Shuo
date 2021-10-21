@@ -10,53 +10,13 @@ from datetime import datetime
 import expyriment
 from dateutil.parser import parse
 
-sep = os.path.sep
+from declarativeTask3.config import rawFolder, sessions
+from declarativeTask3.ld_utils import getPrevious
 
 subjectName = sys.argv[1]
-sessions = ['presleep', 'postsleep']
-rawFolder = os.getcwd() + sep
-subject_dir = rawFolder + 'sourcedata' + sep + 'sub-' + subjectName + sep
+subject_dir = os.path.normpath(os.path.join(rawFolder, 'sourcedata', 'sub-' + subjectName))
 if not os.path.isdir(subject_dir):
     os.mkdir(subject_dir)
-
-
-def getPrevious(subjectName, daysBefore, experienceName, target):
-    currentDate = datetime.now()
-
-    output = None
-
-    data_files = []
-    for session in sessions:
-        session_dir = subject_dir + 'ses-' + session + sep + 'beh' + sep
-        if os.path.isdir(session_dir):
-            data_files = data_files + \
-                [session_dir + file for file in os.listdir(session_dir) if file.endswith('_beh.xpd')]
-    for data_file in data_files:
-        try:
-            agg = expyriment.misc.data_preprocessing.read_datafile(data_file, only_header_and_variable_names=True)
-            previousDate = parse(agg[2]['date'])
-        except TypeError:  # values missing in data file, data file corrupted
-            continue
-        try:
-            agg[3].index(experienceName)
-        except ValueError:  # value not found
-            continue
-        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
-            header = agg[3].split('\n#e ')
-
-            indexSubjectName = header.index('Subject:') + 1
-            if subjectName in header[indexSubjectName]:
-                print('File found: ' + data_file)
-                indexPositions = header.index(target) + 1
-                previousTarget = header[indexPositions].split('\n')[0].split('\n')[0]
-                try:  # dictionary or list
-                    output = literal_eval(previousTarget)
-                except:  # string
-                    output = previousTarget
-
-    # This ensures the latest language choice is used
-    return output
-
 
 language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
@@ -64,97 +24,97 @@ language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_by_class1_or_class2:')
 # 'None' if no choice was selected previously, said choice otherwise, e.g. 'start_with_faces'
 
-python = 'py'
+python = 'python'
 
 # Create the menu
 menu = CursesMenu(
     title="DECOPM", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + str(language) +
                              ' ; class1_or_class2: ' + str(faces_places_choice))
-
+print(python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"))
 dayOneChooseLanguage = CommandItem(text='choose language',
-                                   command=python + " src" + sep + "ld_choose_language.py",
+                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
                                    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu,
-                                   should_exit=False)
+                                   should_exit=True)
 
 dayOneChooseFacesPlaces = CommandItem(text='choose: start by class1 or class2?',
-                                      command=python + " src" + sep + "ld_choose_faces_places.py",
+                                      command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
                                       arguments='choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu,
                                       should_exit=False)
 
 dayOneExample = CommandItem(text='Example',
-                            command=python + " src" + sep + "ld_example.py",
+                            command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
                             arguments='Example,' + sys.argv[1],
                             menu=menu,
                             should_exit=False)
 
 # dayOneStimuliPresentation = CommandItem(text='stimuli presentation',
-#                             command=python + " src" + sep + "ld_stimuli_presentation.py",
+#                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_stimuli_presentation.py"),
 #                             arguments='stimuli-presentation, ' + sys.argv[1],
 #                             menu=menu,
 #                             should_exit=False)
 
 dayOnePrePVT = CommandItem(text='4. PrePVT',
-                           command=python + " src" + sep + "ld_pvt.py",
+                           command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
                            arguments='PrePVT, ' + sys.argv[1],
                            menu=menu,
                            should_exit=False)
 
 dayOnePreLearn = CommandItem(text='2. PreLearn',
-                             command=python + " src" + sep + "ld_encoding.py",
+                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
                              arguments='PreLearn, ' + sys.argv[1],
                              menu=menu,
                              should_exit=False)
 
 dayOnePreTest = CommandItem(text='5. PreTest',
-                                 command=python + " src" + sep + "ld_encoding.py",
+                                 command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
                                  arguments='PreTest, ' + sys.argv[1],
                                  menu=menu,
                                  should_exit=False)
 
 dayOnePostPVT1 = CommandItem(text='7. PostPVT1',
-                             command=python + " src" + sep + "ld_pvt.py",
+                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
                              arguments='PostPVT1, ' + sys.argv[1],
                              menu=menu,
                              should_exit=False)
 
 dayOnePostTest1 = CommandItem(text='8. PostTest1',
-                                   command=python + " src" + sep + "ld_encoding.py",
+                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
                                    arguments='PostTest1, ' + sys.argv[1],
                                    menu=menu,
                                    should_exit=False)
 
 dayOnePostRecog1 = CommandItem(text="9. PostRecog1",
-                                command=python + " src" + sep + "ld_recognition.py ",
+                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
                                 arguments="PostRecog1, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
 
 dayOnePostPVT2 = CommandItem(text='7. PostPVT2',
-                             command=python + " src" + sep + "ld_pvt.py",
+                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
                              arguments='PostPVT2, ' + sys.argv[1],
                              menu=menu,
                              should_exit=False)
 
 dayOnePostTest2 = CommandItem(text='12. PostTest2',
-                                   command=python + " src" + sep + "ld_encoding.py",
+                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
                                    arguments='PostTest2, ' + sys.argv[1],
                                    menu=menu,
                                    should_exit=False)
 
 dayOnePostRecog2 = CommandItem(text="13. PostRecog2",
-                                command=python + " src" + sep + "ld_recognition.py ",
+                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
                                 arguments="PostRecog2, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
 
 dayOnePostLearn = CommandItem(text="14. PostLearn",
-                                command=python + " src" + sep + "ld_encoding.py",
+                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
                                 arguments="PostLearn, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
 
 dayOneMVPA = CommandItem(text="15. MVPA",
-                                command=python + " src" + sep + "ld_mvpa.py",
+                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_mvpa.py"),
                                 arguments="MVPA, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)

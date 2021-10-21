@@ -4,8 +4,8 @@ import sys
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
 
-from ld_matrix import LdMatrix
-from config import *
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.config import *
 
 control.defaults.window_mode = windowMode
 control.defaults.window_size = windowSize

@@ -1,4 +1,5 @@
 import sys
+import os
 
 import numpy as np
 from math import floor
@@ -6,14 +7,13 @@ from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
-from ld_matrix import LdMatrix
-from ld_utils import getPreviousSoundsAllocation, getPreviousMatrixOrder, normalize_test_presentation_order
-from ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
-from ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf, readMouse
+from declarativeTask3.ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS
 # from ld_sound import create_temp_sound_files, delete_temp_files
-from config import *
-from ttl_catch_keyboard import wait_for_ttl_keyboard
-from ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \
+from declarativeTask3.config import *
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \
     ending_screen_text, choose_image_text, choose_position_text
 
 if not windowMode:  # Check WindowMode and Resolution
@@ -33,11 +33,8 @@ subjectName = arguments[1]
 
 exp = design.Experiment(experimentName)  # Save experiment name
 session = experiment_session[experimentName]
-session_dir = 'sourcedata' + os.path.sep +\
-             'sub-' + subjectName + os.path.sep +\
-             'ses-' + session
-output_dir = session_dir + os.path.sep +\
-             'beh'
+session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subjectName, 'ses-' + session))
+output_dir = os.path.normpath(os.path.join(session_dir, 'beh'))
 if not os.path.isdir(session_dir):
     os.mkdir(session_dir)
 io.defaults.datafile_directory = output_dir

@@ -3,9 +3,9 @@ import sys
 import expyriment
 from cursesmenu import *
 from cursesmenu.items import *
-from config import experiment_session
-from ld_utils import rename_output_files_to_BIDS
-from ld_stimuli_names import supported_languages
+from declarativeTask3.config import experiment_session
+from declarativeTask3.ld_utils import rename_output_files_to_BIDS
+from declarativeTask3.ld_stimuli_names import supported_languages
 
 sep = os.path.sep
 
@@ -22,7 +22,7 @@ if language == 'None':
     for i, supported_language in enumerate(supported_languages):
         choose_language.append(
             CommandItem(text='choose ' + supported_language + ' for the experiment for this participant',
-                        command=python + " src" + os.path.sep + "ld_choose_language.py",
+                        command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
                         arguments='choose-language, ' + subject_name + ', ' + supported_language,
                         menu=menu,
                         should_exit=True)
@@ -35,10 +35,8 @@ else:
     exp = expyriment.design.Experiment(experimentName)  # Save experiment name
 
     session = experiment_session[experimentName]
-    session_dir = 'sourcedata' + os.path.sep + \
-                  'sub-' + subject_name + os.path.sep + \
-                  'ses-' + session + os.path.sep
-    output_dir = session_dir + 'beh'
+    session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subject_name, 'ses-' + session))
+    output_dir = os.path.normpath(os.path.join(session_dir, 'beh'))
     if not os.path.isdir(session_dir):
         os.mkdir(session_dir)
     expyriment.io.defaults.datafile_directory = output_dir

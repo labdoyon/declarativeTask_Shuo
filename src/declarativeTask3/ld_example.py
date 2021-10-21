@@ -1,15 +1,16 @@
 import sys
+import os
 
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
-from ld_matrix import LdMatrix
-from ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, rename_output_files_to_BIDS
-from ttl_catch_keyboard import wait_for_ttl_keyboard
-from config import *
-from ld_stimuli_names import presentation_screen_text
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, rename_output_files_to_BIDS
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.config import *
+from declarativeTask3.ld_stimuli_names import presentation_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -64,7 +65,7 @@ exp.events.rename(bids_eventfile)
 
 nPict = 0
 for nCard in presentationOrder:
-    m._matrix.item(nCard).setPicture(picturesExamplesFolder + picturesExamples[nPict])
+    m._matrix.item(nCard).setPicture(os.path.join(picturesExamplesFolder, picturesExamples[nPict]))
     nPict += 1
 
 mouse = io.Mouse()  # Create Mouse instance

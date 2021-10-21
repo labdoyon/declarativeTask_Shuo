@@ -1,18 +1,18 @@
+import os
 import random
 import numpy as np
 import subprocess
 from expyriment.stimuli import Shape, FixCross, TextLine, Rectangle
 from expyriment.misc import constants, geometry
-from playsound import playsound
 from math import ceil
 
 from ld_card import LdCard
-from config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
-from config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor, textSize, textColor
+from declarativeTask3.config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
+from declarativeTask3.config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor, textSize, textColor
 
-# from config import sounds, soundsFolder, tempSounds
-from config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture, fixation_cross_thickness
-from ld_utils import vertices_frame
+# from declarativeTask3.config import sounds, soundsFolder, tempSounds
+from declarativeTask3.config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture, fixation_cross_thickness
+from declarativeTask3.ld_utils import vertices_frame
 
 
 class LdMatrix(object):
@@ -256,12 +256,12 @@ class LdMatrix(object):
         if self._override_remove_cards is not None:
             removeCards = self._override_remove_cards
         else:
-            from config import removeCards
+            from declarativeTask3.config import removeCards
         for nCard in range(self._matrix.size):
             if nCard not in removeCards:  # and nPict < 24:
                 if newMatrix[nPict][:2] in classPictures:
                     self._matrix.item(nCard).setPicture(
-                        picturesFolderClass[newMatrix[nPict][:2]] + newMatrix[nPict], False, picture=newMatrix[nPict])
+                        os.path.join(picturesFolderClass[newMatrix[nPict][:2]], newMatrix[nPict]), False, picture=newMatrix[nPict])
                 else:
                     self._matrix.item(nCard).setPicture(
                         templatePicture, False, picture=newMatrix[nPict])

@@ -1,13 +1,12 @@
 import glob
-import os
+from os.path import normpath, join, dirname, basename
 # from math import ceil
 from expyriment.misc import constants
 
-rawFolder = os.getcwd() + os.path.sep
+rawFolder = normpath(join(dirname(__file__), '..', '..'))
 
-picturesFolder = rawFolder + 'stimulis' + os.path.sep
-picturesExamplesFolder = rawFolder + 'stimulisExample' + os.path.sep
-dataFolder = rawFolder + 'data' + os.path.sep
+picturesFolder = normpath(join(rawFolder, 'stimulis'))
+picturesExamplesFolder = normpath(join(rawFolder, 'stimulisExample'))
 
 mouseButton = 1
 
@@ -18,7 +17,7 @@ picturesExamples = ['triangle.png', 'square.png', 'circle.png']
 sounds = ['shortest-1-100ms.wav', 'shortest-2-100ms.wav', 'shortest-3-100ms.wav']
 tempSounds = ['sound' + str(i) + '.wav' for i in range(len(sounds))]
 
-templatePicture = picturesFolder + 'class-faces' + os.path.sep + 'class-hf' + os.path.sep + 'hf001.png'
+templatePicture = normpath(join(picturesFolder, 'class-faces', 'class-hf', 'hf001.png'))
 
 linesThickness = 0
 colorLine = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
@@ -176,8 +175,9 @@ if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
 classPictures = ['hf', 'hm', 'am', 'af', 'bc', 'bo', 'sc', 'so']
 classPicturesAboveFolder = {'hf': 'class-faces', 'hm': 'class-faces', 'am': 'class-faces', 'af': 'class-faces',
                                    'bc': 'class-places', 'bo': 'class-places', 'sc': 'class-places', 'so': 'class-places'}
-picturesFolderClass = {category: picturesFolder + classPicturesAboveFolder[category] + os.path.sep +
-                                 'class-' + category + os.path.sep for category in classPictures}
+picturesFolderClass = {category: join(picturesFolder, classPicturesAboveFolder[category], 'class-' + category)
+                       for category in classPictures}
+
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
 # The setting below allows the experimenter to prevent a learned matrix (currentCorrectAnswers > correctAnswersMax)
@@ -188,11 +188,12 @@ ignore_learned_matrices = False
 
 listPictures = {}
 for classPicture in classPictures:
-    listPictures[classPicture] =\
-        glob.glob(picturesFolderClass[classPicture] + classPicture + '*[0-9][0-9][0-9].png')
+    listPictures[classPicture] = glob.glob(
+        join(picturesFolderClass[classPicture], classPicture + '*[0-9][0-9][0-9].png'))
 
 for category in classPictures:
-    listPictures[category] = [p.replace(picturesFolderClass[category], '') for p in listPictures[category]]
+    listPictures[category] = [basename(p) for p in listPictures[category]]
+
 
 # MVPA
 mvpa_number_blocks = 4

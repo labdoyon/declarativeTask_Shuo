@@ -15,8 +15,8 @@ from expyriment.io import Keyboard
 from expyriment.misc._timer import get_time
 from expyriment.misc.geometry import coordinates2position
 
-from config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, dataFolder, removeCards
-from config import classPictures, sounds, ignore_learned_matrices, sessions, rawFolder
+from declarativeTask3.config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, removeCards
+from declarativeTask3.config import classPictures, sounds, sessions, rawFolder
 sep = os.path.sep
 
 
@@ -64,7 +64,7 @@ def newRandomPresentation(oldPresentation=None, override_remove_cards=None, numb
     if override_remove_cards is not None:
         removeCards = override_remove_cards
     else:
-        from config import removeCards
+        from declarativeTask3.config import removeCards
 
     newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
     if len(removeCards):
@@ -122,14 +122,16 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
 
     currentDate = datetime.now()
 
-    subject_dir = rawFolder + 'sourcedata' + sep + 'sub-' + subjectName + sep
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subjectName)
     data_files = []
     for session in sessions:
-        session_dir = subject_dir + 'ses-' + session + sep + 'beh' + sep
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
         if os.path.isdir(session_dir):
             data_files = data_files + \
-                         [session_dir + file for file in os.listdir(session_dir) if file.endswith('_beh.xpd')]
+                         [os.path.join(session_dir, file) for file in os.listdir(session_dir) if file.endswith('_beh.xpd') and
+                          'task-' + experienceName in file]
 
+    data_files.sort(reverse=True)  # latest runs first
     for dataFile in data_files:
         try:
             agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
@@ -155,97 +157,59 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
     return None
 
 
-def getPreviousSoundsAllocation(subjectName, daysBefore, experienceName):
-    # Duplicate of get previous matrix but for sounds
+def getPrevious(subjectName, daysBefore, experienceName, target):
     currentDate = datetime.now()
 
-    data_files = [each for each in os.listdir(dataFolder) if each.endswith('.xpd')]
-
-    for dataFile in data_files:
-        try:
-            agg = misc.data_preprocessing.read_datafile(dataFolder + dataFile, only_header_and_variable_names=True)
-        except TypeError:
-            continue
-        previousDate = parse(agg[2]['date'])
-
-        try:
-            agg[3].index(experienceName)
-        except (ValueError):
-            continue
-
-        if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
-            header = agg[3].split('\n#e ')
-
-            indexSubjectName = header.index('Subject:') + 1
-            if subjectName in header[indexSubjectName]:
-                print('File found: ' + dataFile)
-                indexPositions = header.index('Image classes to sounds (index):') + 1
-                previousMatrix = ast.literal_eval(header[indexPositions].split('\n')[0].split('\n')[0])
-                return previousMatrix
-
-    return False
-
-
-def getPreviousMatrixOrder(subjectName, daysBefore, experienceName):
-    # Duplicate of get previous matrix but for matrix order
-    output = False
-    currentDate = datetime.now()
-
-    subject_dir = rawFolder + 'sourcedata' + sep + 'sub-' + subjectName + sep
     data_files = []
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subjectName)
     for session in sessions:
-        session_dir = subject_dir + 'ses-' + session + sep + 'beh' + sep
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
         if os.path.isdir(session_dir):
             data_files = data_files + \
-                         [session_dir + file for file in os.listdir(session_dir) if file.endswith('_beh.xpd')]
+                [os.path.join(session_dir, file) for file in os.listdir(session_dir) if file.endswith('_beh.xpd') and
+                 'task-' + experienceName in file]
 
-    for dataFile in data_files:
+    data_files.sort(reverse=True)  # latest runs first
+    for data_file in data_files:
         try:
-            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
-        except TypeError:
+            agg = misc.data_preprocessing.read_datafile(data_file, only_header_and_variable_names=True)
+            previousDate = parse(agg[2]['date'])
+        except TypeError:  # values missing in data file, data file corrupted
             continue
-        previousDate = parse(agg[2]['date'])
-
         try:
             agg[3].index(experienceName)
-        except (ValueError):
+        except ValueError:  # value not found
             continue
-
         if daysBefore == 0 or ((currentDate-previousDate).total_seconds() > 72000*daysBefore and (currentDate-previousDate).total_seconds() < 100800*daysBefore):
             header = agg[3].split('\n#e ')
 
             indexSubjectName = header.index('Subject:') + 1
             if subjectName in header[indexSubjectName]:
-                print('File found: ' + dataFile)
-                elements = [element for element in header if 'MatrixPresentationOrder_' in element]
-                target = elements[-1]
-                target = re.search('MatrixPresentationOrder_(.+?)_', target).group(0)
-                target = target.replace('MatrixPresentationOrder_', '').replace('_', '')
-                target = ast.literal_eval(target)
-                if not ignore_learned_matrices:
-                    output = target
-                else:
-                    if len(target) == len(classPictures):
-                        output = target
-                    elif not output:
-                        output = target
+                print('File found: ' + data_file)
+                indexPositions = header.index(target) + 1
+                previousTarget = header[indexPositions].split('\n')[0].split('\n')[0]
+                try:  # dictionary or list
+                    output = ast.literal_eval(previousTarget)
+                except (SyntaxError, ValueError):  # string
+                    output = previousTarget
+                return output
 
-    return output
+    return None
 
 
 def getLanguage(subjectName, daysBefore, experienceName):
     currentDate = datetime.now()
 
-    subject_dir = rawFolder + 'sourcedata' + sep + 'sub-' + subjectName + sep
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subjectName)
     data_files = []
     for session in sessions:
-        session_dir = subject_dir + 'ses-' + session + sep + 'beh' + sep
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
         if os.path.isdir(session_dir):
             data_files = data_files + \
-                         [session_dir + file for file in os.listdir(session_dir) if file.endswith('_beh.xpd')]
+                         [os.path.join(session_dir, file) for file in os.listdir(session_dir) if file.endswith('_beh.xpd') and
+                          'task-' + experienceName in file]
 
-    output = None
-
+    data_files.sort(reverse=True)  # latest runs first
     for dataFile in data_files:
         try:
             agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
@@ -266,24 +230,25 @@ def getLanguage(subjectName, daysBefore, experienceName):
                 indexPositions = header.index('language:') + 1
                 language = header[indexPositions].split('\n')[0].split('\n')[0]
                 output = language
+                return output
 
     # This ensures the latest language choice is used
-    return output
+    return None
 
 
 def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
     currentDate = datetime.now()
 
-    subject_dir = rawFolder + 'sourcedata' + sep + 'sub-' + subjectName + sep
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subjectName)
     data_files = []
     for session in sessions:
-        session_dir = subject_dir + 'ses-' + session + sep + 'beh' + sep
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
         if os.path.isdir(session_dir):
             data_files = data_files + \
-                         [session_dir + file for file in os.listdir(session_dir) if file.endswith('_beh.xpd')]
+                         [os.path.join(session_dir, file) for file in os.listdir(session_dir) if file.endswith('_beh.xpd') and
+                          'task-' + experienceName in file]
 
-    output = None
-
+    data_files.sort(reverse=True)  # latest runs first
     for dataFile in data_files:
         try:
             agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
@@ -302,11 +267,12 @@ def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
             if subjectName in header[indexSubjectName]:
                 print('File found: ' + dataFile)
                 indexPositions = header.index('start_by_class1_or_class2:') + 1
-                language = header[indexPositions].split('\n')[0].split('\n')[0]
-                output = language
+                places_or_faces_choice = header[indexPositions].split('\n')[0].split('\n')[0]
+                output = places_or_faces_choice
+                return output
 
     # This ensures the latest language choice is used
-    return output
+    return None
 
 
 def normalize_presentation_order(presentation_order, learning_matrix, random_matrix):

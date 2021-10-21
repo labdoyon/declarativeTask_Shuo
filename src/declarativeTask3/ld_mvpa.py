@@ -1,16 +1,17 @@
 import sys
+import os
 
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc._timer import get_time
 from expyriment.misc import constants
 
-from ld_matrix import LdMatrix
-from ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
-from ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
-from ttl_catch_keyboard import wait_for_ttl_keyboard
-from config import *
-from ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
+from declarativeTask3.ld_matrix import LdMatrix
+from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
+from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.config import *
+from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -96,7 +97,7 @@ ISI = design.randomize.rand_int(300, 500)
 exp.clock.wait(ISI, process_control_events=True)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions(bs, instructions_card, ' RECOGNITION ', draw=False)
+m.plot_instructions(bs, instructions_card, ' MVPA ', draw=False)
 bs.present(False, True)
 
 exp.clock.wait(shortRest, process_control_events=True)
@@ -180,7 +181,7 @@ for n_block in range(mvpa_number_blocks):
             showMatrix = 'MatrixRandom'
 
         category = listCards[nCard][:2]
-        m._matrix.item(locationCard).setPicture(picturesFolderClass[category] + listCards[nCard])
+        m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
         picture = listCards[nCard].rstrip(".png")
         m.plotCard(locationCard, True, bs, True)
 

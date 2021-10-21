@@ -1,7 +1,7 @@
 import subprocess
 import os
 import pickle
-from config import soundsFolder, dataFolder, sounds, tempSounds
+from declarativeTask3.config import soundsFolder, dataFolder, sounds, tempSounds
 
 # Documentation: https://trac.ffmpeg.org/wiki/AudioVolume
 # https://ffmpeg.org/ffmpeg.html#Main-options

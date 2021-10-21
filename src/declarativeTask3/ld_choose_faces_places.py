@@ -4,8 +4,8 @@ import expyriment
 from cursesmenu import *
 from cursesmenu.items import *
 
-from ld_utils import rename_output_files_to_BIDS
-from config import supported_start_by_choices, experiment_session
+from declarativeTask3.ld_utils import rename_output_files_to_BIDS
+from declarativeTask3.config import supported_start_by_choices, experiment_session
 
 sep = os.path.sep
 
@@ -22,7 +22,7 @@ if faces_places_choice == 'None':
     for i, supported_choice in enumerate(supported_start_by_choices):
         choose_language.append(
             CommandItem(text=supported_choice + ' for the experiment for this participant',
-                        command=python + " src" + os.path.sep + "ld_choose_faces_places.py",
+                        command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
                         arguments='choose-faces-places, ' + subject_name + ', ' + supported_choice,
                         menu=menu,
                         should_exit=True)
@@ -35,10 +35,8 @@ else:
     exp = expyriment.design.Experiment(experimentName)  # Save experiment name
 
     session = experiment_session[experimentName]
-    session_dir = 'sourcedata' + os.path.sep + \
-                  'sub-' + subject_name + os.path.sep + \
-                  'ses-' + session + os.path.sep
-    output_dir = session_dir + 'beh'
+    session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subject_name, 'ses-' + session))
+    output_dir = os.path.normpath(os.path.join(session_dir, 'beh'))
     if not os.path.isdir(session_dir):
         os.mkdir(session_dir)
     expyriment.io.defaults.datafile_directory = output_dir
