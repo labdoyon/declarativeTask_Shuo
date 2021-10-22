@@ -21,7 +21,7 @@ setup(
     keywords='memory, declarative, sleep, reactivation',
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
-    python_requires='>=3.6, <=3.9',
+    python_requires='>=3.6, <=3.9.5',
     # install_requires=[],
     # entry_points={  # Optional
     #     'console_scripts': [
