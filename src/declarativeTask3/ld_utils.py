@@ -3,6 +3,7 @@ import ntpath
 import os
 import random
 
+import keyboard
 import pygame
 from datetime import datetime
 from time import time
@@ -16,7 +17,7 @@ from expyriment.misc._timer import get_time
 from expyriment.misc.geometry import coordinates2position
 
 from declarativeTask3.config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, removeCards
-from declarativeTask3.config import classPictures, sounds, sessions, rawFolder
+from declarativeTask3.config import classPictures, sounds, sessions, rawFolder, ttl_characters
 sep = os.path.sep
 
 
@@ -465,3 +466,9 @@ def rename_output_files_to_BIDS(subject_name, session, experiment_name,
                                                    filename_extension='.xpe', run=i_string)
 
     return wouldbe_datafile, wouldbe_eventfile
+
+
+def logging_ttl_time_stamps_with_ttl_char_hotkeys(exp):
+    #  You can place this function after exp is defined, and before control.initialize and control.start
+    for ttl_char in ttl_characters:
+        keyboard.add_hotkey(ttl_char, lambda: exp.add_experiment_info('TTL_RECEIVED_timing_{}'.format(exp.clock.time)))

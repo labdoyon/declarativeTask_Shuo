@@ -1,14 +1,14 @@
 import sys
 import os
 
-import keyboard
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
 
 from declarativeTask3.ld_matrix import LdMatrix
-from declarativeTask3.ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, rename_output_files_to_BIDS
+from declarativeTask3.ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, \
+    rename_output_files_to_BIDS,logging_ttl_time_stamps_with_ttl_char_hotkeys
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import presentation_screen_text
@@ -27,7 +27,6 @@ experimentName = arguments[0]
 subjectName = arguments[1]
 
 exp = design.Experiment(experimentName)  # Save experiment name
-keyboard.add_hotkey('r', lambda: exp.add_experiment_info('TTL_RECEIVED_timing_{}'.format(exp.clock.time)))
 
 session = experiment_session[experimentName]
 session_dir = 'sourcedata' + os.path.sep +\
@@ -39,6 +38,8 @@ if not os.path.isdir(session_dir):
     os.mkdir(session_dir)
 io.defaults.datafile_directory = output_dir
 io.defaults.eventfile_directory = output_dir
+
+logging_ttl_time_stamps_with_ttl_char_hotkeys(exp)  # logging all TTL information
 
 exp.add_experiment_info(['Subject: '])  # Save Subject Code
 exp.add_experiment_info([subjectName])  # Save Subject Code

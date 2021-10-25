@@ -5,6 +5,7 @@ from expyriment.misc import constants
 
 # python interpreter to be used to run the task's scripts in the OS command line
 python = 'py'
+ttl_characters = ['5', 't', 'r']
 
 rawFolder = normpath(join(dirname(__file__), '..', '..'))
 picturesFolder = normpath(join(rawFolder, 'stimulis'))
