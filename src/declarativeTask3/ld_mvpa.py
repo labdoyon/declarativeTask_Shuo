@@ -2,6 +2,7 @@ import sys
 import os
 
 import numpy as np
+import keyboard
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc._timer import get_time
 from expyriment.misc import constants
@@ -28,6 +29,7 @@ experimentName = arguments[0]
 subjectName = arguments[1]
 
 exp = design.Experiment(experimentName)  # Save experiment name
+keyboard.add_hotkey('r', lambda: exp.add_experiment_info('TTL_RECEIVED_timing_{}'.format(exp.clock.time)))
 
 session = experiment_session[experimentName]
 session_dir = 'sourcedata' + os.path.sep +\

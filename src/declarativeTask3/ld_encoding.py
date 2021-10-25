@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 from math import floor
+import keyboard
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
@@ -39,6 +40,9 @@ if not os.path.isdir(session_dir):
     os.mkdir(session_dir)
 io.defaults.datafile_directory = output_dir
 io.defaults.eventfile_directory = output_dir
+
+keyboard.add_hotkey('r', lambda: exp.add_experiment_info('TTL_RECEIVED_timing_{}'.format(exp.clock.time)))
+# logging all TTL information
 
 exp.add_experiment_info('Subject: ')
 exp.add_experiment_info(subjectName)
