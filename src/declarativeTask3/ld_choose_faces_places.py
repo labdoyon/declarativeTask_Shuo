@@ -24,7 +24,7 @@ if faces_places_choice == 'None':
                         command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
                         arguments='choose-faces-places, ' + subject_name + ', ' + supported_choice,
                         menu=menu,
-                        should_exit=True)
+                        should_exit=False)
                                )
         menu.append_item(choose_language[i])
     menu.show()

@@ -24,7 +24,7 @@ if language == 'None':
                         command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
                         arguments='choose-language, ' + subject_name + ', ' + supported_language,
                         menu=menu,
-                        should_exit=True)
+                        should_exit=False)
                                )
         menu.append_item(choose_language[i])
     menu.show()

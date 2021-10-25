@@ -32,7 +32,7 @@ print(python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language
 dayOneChooseLanguage = CommandItem(text='choose language',
                                    command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
                                    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu,
-                                   should_exit=True)
+                                   should_exit=False)
 
 dayOneChooseFacesPlaces = CommandItem(text='choose: start by class1 or class2?',
                                       command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
