@@ -1,12 +1,18 @@
 import glob
 from os.path import normpath, join, dirname, basename
-# from math import ceil
+from math import floor
 from expyriment.misc import constants
 
 # python interpreter to be used to run the task's scripts in the OS command line
 python = 'py'
-ttl_characters = ['5', 't', 'r']
 
+# TTL signal and TR duration
+TR_duration = 2160  # in ms
+ttl_characters = ['5', 't', 'r']
+min_delay_between_two_ttls = floor(TR_duration/2)  # in milliseconds
+interval_between_ttl_checks = min(int(min_delay_between_two_ttls/10), 100)  # in milliseconds
+
+# images paths
 rawFolder = normpath(join(dirname(__file__), '..', '..'))
 picturesFolder = normpath(join(rawFolder, 'stimulis'))
 picturesExamplesFolder = normpath(join(rawFolder, 'stimulisExample'))
@@ -49,7 +55,6 @@ startSpace = cardSize[1] + 20
 
 nbBlocksMax = 10
 
-TR_duration = 2160  # in ms
 presentationCard = TR_duration
 
 responseTime = 5000

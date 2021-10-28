@@ -12,7 +12,7 @@ from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
 from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
 from declarativeTask3.ld_utils import logging_ttl_time_stamps_with_ttl_char_hotkeys
-from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text
 
@@ -120,8 +120,8 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
-wait_for_ttl_keyboard()
-exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
@@ -233,18 +233,23 @@ for nCard in range(presentationOrder.shape[1]):
     category = listCards[nCard][:2]
     m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
     picture = listCards[nCard].rstrip(".png")
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
     m.plotCard(locationCard, True, bs, True)
-
     exp.add_experiment_info(
         'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
 
-    exp.clock.wait(presentationCard, process_control_events=True)
+    # initiate mouse response block
+    time_left = responseTime
+    valid_response = False
+    rt = 0
+
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
     m.plotCard(locationCard, False, bs, True)
     exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                         listCards[nCard],
                                                                         exp.clock.time)])  # Add sync info
-    ISI = design.randomize.rand_int(300, 500)
-    exp.clock.wait(ISI, process_control_events=True)
 
     m.plotCueCard(False, bs, draw=False, nocross=True)
     matrixA_rectangle.plot(bs)
@@ -253,9 +258,6 @@ for nCard in range(presentationOrder.shape[1]):
     matrixNone.plot(bs)
     bs.present(False, True)
 
-    time_left = responseTime
-    valid_response = False
-    rt = 0
     while not valid_response and rt is not None:
         mouse.show_cursor(True, True)
 

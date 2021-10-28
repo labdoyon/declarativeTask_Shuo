@@ -9,7 +9,7 @@ from expyriment.misc._timer import get_time
 from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, newRandomPresentation, readMouse, path_leaf, getLanguage, \
     rename_output_files_to_BIDS,logging_ttl_time_stamps_with_ttl_char_hotkeys
-from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import presentation_screen_text
 
@@ -82,7 +82,7 @@ m.plotDefault(bs, True)  # Draw default grid
 
 exp.clock.wait(shortRest, process_control_events=True)
 
-wait_for_ttl_keyboard()
+wait_for_ttl_keyboard_and_log_ttl(exp)
 
 exp.add_experiment_info(['Block {} - Presentation'.format(0)])  # Add listPictures
 exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures

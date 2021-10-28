@@ -13,7 +13,7 @@ from declarativeTask3.ld_utils import setCursor, newRandomPresentation, getPrevi
 from declarativeTask3.ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS
 # from ld_sound import create_temp_sound_files, delete_temp_files
 from declarativeTask3.config import *
-from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \
     ending_screen_text, choose_image_text, choose_position_text
 
@@ -150,8 +150,8 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
-wait_for_ttl_keyboard()
-exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=True)
 ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
@@ -178,19 +178,21 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         # LOG and SYNC: Start Presentation
         exp.add_experiment_info('StartPresentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))  # Add sync info
 
+        mouse.hide_cursor(True, True)
         for nCard in presentationOrder:
-            mouse.hide_cursor(True, True)
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
             m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
             exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))
 
-            exp.clock.wait(presentationCard, process_control_events=True)
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
             m.plotCard(nCard, False, bs, True)
             exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))  # Add sync info
 
-            ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-            exp.clock.wait(ISI, process_control_events=True)
+            # custom waiting time
 
         ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
         exp.clock.wait(ISI, process_control_events=True)
@@ -232,24 +234,27 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
     exp.add_experiment_info(str(presentationOrder))
     for nCard in presentationOrder:
-
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m._cueCard.setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
-        m._cueCard.setSound(m._matrix.item(nCard).sound)  # Associate Sound to CueCard
 
         m.plotCueCard(True, bs, True)  # Show Cue
         exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}'.format(nCard,
                                                                               m.returnPicture(nCard),
                                                                               exp.clock.time))
-        exp.clock.wait(presentationCard, process_control_events=True)  # Wait presentationCard
-        m.plotCueCard(False, bs, True)  # Hide Cue
-        exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
-                                                                              exp.clock.time))
 
-        # Mouse Response Block
+        # Initiate Mouse Response Block
         time_left = responseTime
         valid_response = False
         rt = True  # Response time; equals None if participant haven't clicked within window time frame they were
         # given to answer
+
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
+        m.plotCueCard(False, bs, True)  # Hide Cue
+        exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
+                                                                              exp.clock.time))
+        # Mouse Response Block
         while not valid_response and rt is not None:
             mouse.show_cursor(True, True)
             start = get_time()
