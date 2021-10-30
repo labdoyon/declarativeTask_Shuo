@@ -471,4 +471,5 @@ def rename_output_files_to_BIDS(subject_name, session, experiment_name,
 def logging_ttl_time_stamps_with_ttl_char_hotkeys(exp):
     #  You can place this function after exp is defined, and before control.initialize and control.start
     for ttl_char in ttl_characters:
-        keyboard.add_hotkey(ttl_char, lambda: exp.add_experiment_info('TTL_RECEIVED_timing_{}'.format(exp.clock.time)))
+        keyboard.add_hotkey(ttl_char, lambda: exp.add_experiment_info(
+            'TTL_RECEIVED_timing-{}_method-{}'.format(exp.clock.time, "hotkey")))

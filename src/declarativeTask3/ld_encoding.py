@@ -1,5 +1,6 @@
 import sys
 import os
+from math import ceil
 
 import numpy as np
 from math import floor
@@ -179,6 +180,9 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info('StartPresentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))  # Add sync info
 
         mouse.hide_cursor(True, True)
+        # copy list, different object
+        number_TRs_inter_trials = presentation_block_number_TRs_to_wait_inter_trials.copy()
+        np.random.shuffle(number_TRs_inter_trials)
         for nCard in presentationOrder:
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
             exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
@@ -192,10 +196,14 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))  # Add sync info
 
-            # custom waiting time
-
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
+            # inter trial interval in TTLs
+            between_trial_interval = number_TRs_inter_trials.pop(0)
+            exp.add_experiment_info(f'wait_{between_trial_interval}_TTLs')
+            for i_ttl in range(between_trial_interval - 1):  # one TTL is already accounted for, cannot wait less than
+                # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
+                # <wait_for_ttl_keyboard_and_log_ttl> instruction
+                last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+                exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
         # REST BLOCK
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
@@ -204,13 +212,15 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         exp.add_experiment_info(
             ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-        exp.clock.wait(restPeriod, process_control_events=True)
+        exp.add_experiment_info(f'wait_{number_ttl_in_rest_period}_TTLs')
+        for i_ttl in range(number_ttl_in_rest_period - 1):  # one TTL is already accounted for, cannot wait less than
+                # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
+                # <wait_for_ttl_keyboard_and_log_ttl> instruction
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         exp.add_experiment_info(
             ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
         m.plot_instructions_rectangle(bs, instructions_card, draw=True)
-
-    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI, process_control_events=True)
 
     # TEST BLOCK
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
@@ -233,6 +243,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
     exp.add_experiment_info(['Block {} - Test'.format(nBlock)])  # Add listPictures
     exp.add_experiment_info(str(presentationOrder))
+
+    number_TRs_inter_trials = test_block_number_TRs_to_wait_inter_trials.copy()
+    probabilities_to_pick = [1/element**2 for element in number_TRs_inter_trials]  # favoring ones
+    # sum of element should be one, normalizing
+    probabilities_to_pick = np.divide(probabilities_to_pick, sum(probabilities_to_pick))
+
     for nCard in presentationOrder:
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
@@ -310,8 +326,25 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             else:
                 break
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
+        # Inter Trial Interval
+        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp)/TR_duration)
+        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
+        # removing elements which can't be selected
+        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
+        if not temp_number_TRs_inter_trials:
+            trial_iti = min_iti_in_TRs
+            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+        else:
+            temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
+            # sum of element should be one, normalizing
+            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
+
+            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
+            number_TRs_inter_trials.remove(trial_iti)
+
+        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+        for i_ttl in range(trial_iti - min_iti_in_TRs):
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
@@ -336,7 +369,10 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
     exp.add_experiment_info(
         ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    exp.clock.wait(restPeriod, process_control_events=True)
+    exp.add_experiment_info(f'wait_{number_ttl_in_rest_period}_TTLs')
+    for i_ttl in range(number_ttl_in_rest_period):
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
     exp.add_experiment_info(
         ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)

@@ -176,6 +176,16 @@ correctAnswersMax = 18
 numberBlocksLearning = 10
 numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
+
+presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
+    [1] * int(len(matrixTemplate) / 6) + [2] * int(len(matrixTemplate) / 6) + [3] * int(len(matrixTemplate) / 6)
+recognition_block_number_TRs_to_wait_inter_trials =\
+    [1] * int(len(matrixTemplate) / 3) + [2] * int(len(matrixTemplate) / 3) + [3] * int(len(matrixTemplate) / 3)
+mvpa_block_number_TRs_to_wait_inter_trials =\
+    [3] * int(len(matrixTemplate) * 2/3) + [4] * int(len(matrixTemplate) * 2/3) + [5] * int(len(matrixTemplate) * 2/3)
+
+number_ttl_in_rest_period = 6
+
 if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     raise ValueError("""the number of blocks of learning is not equal to
     its number of subUnits * the number of blocks during a subUnit""")

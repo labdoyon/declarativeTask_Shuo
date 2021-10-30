@@ -1,5 +1,6 @@
 import sys
 import os
+from math import ceil
 
 import numpy as np
 from expyriment import control, stimuli, io, design, misc
@@ -10,7 +11,7 @@ from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
 from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
 from declarativeTask3.ld_utils import logging_ttl_time_stamps_with_ttl_char_hotkeys
-from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
 
@@ -89,8 +90,8 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
-wait_for_ttl_keyboard()
-exp.add_experiment_info(['TTL_RECEIVED_timing_{}'.format(exp.clock.time)])
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
@@ -152,6 +153,10 @@ for n_block in range(mvpa_number_blocks):
     presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
 
     listCards = []
+    number_TRs_inter_trials = mvpa_block_number_TRs_to_wait_inter_trials.copy()
+    probabilities_to_pick = [1 / element ** 2 for element in number_TRs_inter_trials]  # favoring ones
+    # sum of element should be one, normalizing
+    probabilities_to_pick = np.divide(probabilities_to_pick, sum(probabilities_to_pick))
     for nCard in range(presentationOrder.shape[1]):
         if len(removeCards):
             removeCards.sort()
@@ -186,12 +191,20 @@ for n_block in range(mvpa_number_blocks):
         category = listCards[nCard][:2]
         m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
         picture = listCards[nCard].rstrip(".png")
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCard(locationCard, True, bs, True)
 
         exp.add_experiment_info(
             'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
 
-        exp.clock.wait(presentationCard, process_control_events=True)
+        # initiate mouse response block
+        time_left = responseTime
+        valid_response = False
+        rt = 0
+
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCard(locationCard, False, bs, True)
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                             listCards[nCard],
@@ -206,9 +219,6 @@ for n_block in range(mvpa_number_blocks):
         matrixNone.plot(bs)
         bs.present(False, True)
 
-        time_left = responseTime
-        valid_response = False
-        rt = 0
         while not valid_response and rt is not None:
             mouse.show_cursor(True, True)
 
@@ -287,18 +297,31 @@ for n_block in range(mvpa_number_blocks):
                     valid_response = True
                     break
 
-        ISI = design.randomize.rand_int(300, 500)
-        exp.clock.wait(ISI, process_control_events=True)
+        exp.clock.wait(300, process_control_events=True)# for comfort, for objects not to move too quickly or suddenly
+        # on screen
 
         m.plotCueCard(False, bs, draw=True)
-
-        ISI = design.randomize.rand_int(300, 500)
-        exp.clock.wait(ISI, process_control_events=True)
-
         bs.present(False, True)
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
+        # Inter Trial Interval
+        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
+        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
+        # removing elements which can't be selected
+        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
+        if not temp_number_TRs_inter_trials:
+            trial_iti = min_iti_in_TRs
+            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+        else:
+            temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
+            # sum of element should be one, normalizing
+            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
+
+            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
+            number_TRs_inter_trials.remove(trial_iti)
+
+        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+        for i_ttl in range(trial_iti - min_iti_in_TRs):
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
     if n_block != mvpa_number_blocks - 1:
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)

@@ -8,7 +8,7 @@ def wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp=None):
     else:
         # Too short amount of time between two TTLs expected
         while exp.clock.time - last_ttl_timestamp < min_delay_between_two_ttls:
-            exp.clock.wait(interval_between_ttl_checks)
+            exp.clock.wait(interval_between_ttl_checks, process_control_events=True)
 
     while True:
         if any([keyboard.is_pressed(ttl_char) for ttl_char in ttl_characters]):
@@ -16,3 +16,5 @@ def wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp=None):
             print(f'TTL received at {ttl_timestamp} ms')
             exp.add_experiment_info(f'TTL_RECEIVED_timing_{ttl_timestamp}')
             return ttl_timestamp
+        if exp.keyboard.process_control_keys():
+            exp.keyboard.process_control_keys()
