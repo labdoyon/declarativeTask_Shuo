@@ -185,6 +185,9 @@ mvpa_block_number_TRs_to_wait_inter_trials =\
     [3] * int(len(matrixTemplate) * 2/3) + [4] * int(len(matrixTemplate) * 2/3) + [5] * int(len(matrixTemplate) * 2/3)
 
 number_ttl_in_rest_period = 6
+number_ttl_before_rest_period = 4
+visual_comfort_wait_time = 300  # short wait time padding after an instruction disappears and
+# before the next one appears, for visual comfort
 
 if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
     raise ValueError("""the number of blocks of learning is not equal to

@@ -155,8 +155,7 @@ last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
 exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=True)
-ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-exp.clock.wait(ISI, process_control_events=True)
+exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
 
 while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
@@ -168,14 +167,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
         bs.present(False, True)
 
-        exp.clock.wait(shortRest, process_control_events=True)
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
-
+        exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
         # LOG and SYNC: Start Presentation
         exp.add_experiment_info('StartPresentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))  # Add sync info
 
@@ -205,6 +202,10 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
                 exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
+        # Pre-Rest Block
+        for i in range(number_ttl_before_rest_period - 1):
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
         # REST BLOCK
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
@@ -230,14 +231,13 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     # LOG and SYNC Start Test
     exp.add_experiment_info(['StartTest_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
 
-    exp.clock.wait(shortRest, process_control_events=True)  # Short Rest between presentation and cue-recall
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
 
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
     m.plot_instructions_card(bs, instructions_card, draw=False)
     bs.present(False, True)
 
-    ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-    exp.clock.wait(ISI, process_control_events=True)
+    exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
 
     ''' Cue Recall '''
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
@@ -347,6 +347,11 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
+
+    # Pre-Rest Block
+    for i in range(number_ttl_before_rest_period - 1):
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card,
