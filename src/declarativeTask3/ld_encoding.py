@@ -181,6 +181,15 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         number_TRs_inter_trials = presentation_block_number_TRs_to_wait_inter_trials.copy()
         np.random.shuffle(number_TRs_inter_trials)
         for nCard in presentationOrder:
+            # inter trial interval in TTLs
+            between_trial_interval = number_TRs_inter_trials.pop(0)
+            exp.add_experiment_info(f'wait_{between_trial_interval}_TTLs')
+            for i_ttl in range(between_trial_interval - 1):  # one TTL is already accounted for, cannot wait less than
+                # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
+                # <wait_for_ttl_keyboard_and_log_ttl> instruction
+                last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+                exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
+
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
             exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
             m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
@@ -192,15 +201,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
             m.plotCard(nCard, False, bs, True)
             exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))  # Add sync info
-
-            # inter trial interval in TTLs
-            between_trial_interval = number_TRs_inter_trials.pop(0)
-            exp.add_experiment_info(f'wait_{between_trial_interval}_TTLs')
-            for i_ttl in range(between_trial_interval - 1):  # one TTL is already accounted for, cannot wait less than
-                # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
-                # <wait_for_ttl_keyboard_and_log_ttl> instruction
-                last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-                exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
         # Pre-Rest Block
         for i in range(number_ttl_before_rest_period - 1):
@@ -245,11 +245,34 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.add_experiment_info(str(presentationOrder))
 
     number_TRs_inter_trials = test_block_number_TRs_to_wait_inter_trials.copy()
-    probabilities_to_pick = [1/element**2 for element in number_TRs_inter_trials]  # favoring ones
+    # probabilities_to_pick = [1/element**2 for element in number_TRs_inter_trials]  # favoring ones
+    probabilities_to_pick = [1] * len(number_TRs_inter_trials)
     # sum of element should be one, normalizing
     probabilities_to_pick = np.divide(probabilities_to_pick, sum(probabilities_to_pick))
 
     for nCard in presentationOrder:
+        # Inter Trial Interval
+        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
+        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
+        # removing elements which can't be selected
+        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
+        if not temp_number_TRs_inter_trials:
+            trial_iti = min_iti_in_TRs
+            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+        else:
+            # temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
+            temp_probabilities_to_pick = [1] * len(temp_number_TRs_inter_trials)
+            # sum of element should be one, normalizing
+            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
+
+            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
+            number_TRs_inter_trials.remove(trial_iti)
+
+        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+        for i_ttl in range(trial_iti - min_iti_in_TRs):
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
+        # Presentation
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m._cueCard.setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
@@ -325,26 +348,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 pass
             else:
                 break
-
-        # Inter Trial Interval
-        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp)/TR_duration)
-        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
-        # removing elements which can't be selected
-        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
-        if not temp_number_TRs_inter_trials:
-            trial_iti = min_iti_in_TRs
-            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
-        else:
-            temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
-            # sum of element should be one, normalizing
-            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
-
-            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
-            number_TRs_inter_trials.remove(trial_iti)
-
-        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
-        for i_ttl in range(trial_iti - min_iti_in_TRs):
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
 

@@ -190,7 +190,7 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ' RECOGNITION ', draw=False)
 bs.present(False, True)
 
-exp.clock.wait(shortRest, process_control_events=True)
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
@@ -228,6 +228,27 @@ probabilities_to_pick = [1/element**2 for element in number_TRs_inter_trials]  #
 probabilities_to_pick = np.divide(probabilities_to_pick, sum(probabilities_to_pick))
 
 for nCard in range(presentationOrder.shape[1]):
+    # Inter Trial Interval
+    min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
+    exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
+    # removing elements which can't be selected
+    temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
+    if not temp_number_TRs_inter_trials:
+        trial_iti = min_iti_in_TRs
+        exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+    else:
+        temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
+        # sum of element should be one, normalizing
+        temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
+
+        trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
+        number_TRs_inter_trials.remove(trial_iti)
+
+    exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+    for i_ttl in range(trial_iti - min_iti_in_TRs):
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
+    # Trial Block
     locationCard = int(presentationOrder[0][nCard])
 
     if bool(presentationOrder[1][nCard] == 0):
@@ -343,31 +364,15 @@ for nCard in range(presentationOrder.shape[1]):
                 valid_response = True
                 break
 
-    exp.clock.wait(300, process_control_events=True)  # for comfort, for objects not to move too quickly or suddenly
+    exp.clock.wait(visual_comfort_wait_time, process_control_events=True)  # for comfort, for objects not to move too quickly or suddenly
     # on screen
 
     m.plotCueCard(False, bs, draw=True)
     bs.present(False, True)
 
-    # Inter Trial Interval
-    min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
-    exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
-    # removing elements which can't be selected
-    temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
-    if not temp_number_TRs_inter_trials:
-        trial_iti = min_iti_in_TRs
-        exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
-    else:
-        temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
-        # sum of element should be one, normalizing
-        temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
-
-        trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
-        number_TRs_inter_trials.remove(trial_iti)
-
-    exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
-    for i_ttl in range(trial_iti - min_iti_in_TRs):
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+# Pre-Rest Block
+for i in range(number_ttl_before_rest_period - 1):
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
