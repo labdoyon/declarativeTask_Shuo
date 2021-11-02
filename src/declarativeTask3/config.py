@@ -177,6 +177,8 @@ numberBlocksLearning = 10
 numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
 
+presentation_possible_iti = test_possible_iti = recognition_possible_iti = [1, 2, 3]
+mvpa_possible_iti = [3, 4, 5]
 presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
     [1] * int(len(matrixTemplate) / 6) + [2] * int(len(matrixTemplate) / 6) + [3] * int(len(matrixTemplate) / 6)
 recognition_block_number_TRs_to_wait_inter_trials =\
@@ -218,8 +220,8 @@ for category in classPictures:
 
 # MVPA
 mvpa_number_blocks = 4
-mvpa_number_trials_correct_position = 32  # per block per category
-mvpa_number_trials_wrong_position = 13  # per block per category
+mvpa_number_trials_correct_position = 30  # per block per category
+mvpa_number_trials_wrong_position = 9  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
 
 feedback_frame_correct_color = constants.C_GREEN

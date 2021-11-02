@@ -164,7 +164,8 @@ for n_block in range(mvpa_number_blocks):
         # removing elements which can't be selected
         temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
         if not temp_number_TRs_inter_trials:
-            trial_iti = min_iti_in_TRs
+            trial_iti = np.random.choice(
+                [element for element in mvpa_possible_iti if element >= min_iti_in_TRs])
             exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
         else:
             temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
