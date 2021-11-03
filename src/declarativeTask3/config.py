@@ -141,6 +141,7 @@ arrow1 = (' XX                                                                  
           '                                                                                ',
           '                                                                                ')
 removeCards = []
+matrixTemplate = []
 if matrixSize == (4, 4):
     matrixTemplate = [0]*16
 elif matrixSize == (5, 5):
@@ -170,6 +171,15 @@ elif matrixSize == (7, 7):
     # if category > len(classPictures) /2
 elif matrixSize == (5, 4):
     matrixTemplate = [0] * 20
+
+if matrixTemplate:
+    center_card_position = floor(matrixSize[0] * matrixSize[1] / 2)
+    only_faces_remove_cards = [center_card_position] + \
+                              [index + 1 if index >= center_card_position else index
+                               for index, category in enumerate(matrixTemplate) if category > 3]
+    only_places_remove_cards = [center_card_position] + \
+                               [index + 1 if index >= center_card_position else index
+                                for index, category in enumerate(matrixTemplate) if category <= 3]
 
 # correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
 correctAnswersMax = 18

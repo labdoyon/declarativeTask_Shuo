@@ -55,23 +55,22 @@ exp.add_experiment_info(faces_places_choice)
 exp.add_experiment_info('start_by_faces_or_places (same as above but explicit):')
 exp.add_experiment_info(supported_start_by_choices_explicit[faces_places_choice])
 
-center = floor(matrixSize[0] * matrixSize[1] / 2)
 if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':
     only_faces = True
     only_places = False
     exp.add_experiment_info('faces_or_places_for_this_experiment:')
     exp.add_experiment_info('faces')
     exp.add_experiment_info(faces_places_choice)  # Save Subject Code
-    removeCards = [center] + \
-                  [index + 1 if index >= center else index
+    removeCards = [center_card_position] + \
+                  [index + 1 if index >= center_card_position else index
                    for index, category in enumerate(matrixTemplate) if category > 3]
 elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'places':
     only_faces = False
     only_places = True
     exp.add_experiment_info('faces_or_places_for_this_experiment:')
     exp.add_experiment_info('places')
-    removeCards = [center] + \
-                  [index + 1 if index >= center else index
+    removeCards = [center_card_position] + \
+                  [index + 1 if index >= center_card_position else index
                    for index, category in enumerate(matrixTemplate) if category <= 3]
 
 # Save time, nblocks, position, correctAnswer, RT

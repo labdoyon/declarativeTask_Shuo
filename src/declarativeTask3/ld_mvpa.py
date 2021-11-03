@@ -140,11 +140,7 @@ for n_block in range(mvpa_number_blocks):
     exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(n_block, exp.clock.time))
     exp.add_experiment_info('Presentation Order_Block_{}_'.format(n_block))  # Save Presentation Order
 
-    center_position = floor(matrixSize[0] * matrixSize[1] / 2)
     # Adding Faces Trial
-    only_faces_remove_cards = [center_position] + \
-                              [index + 1 if index >= center_position else index
-                               for index, category in enumerate(matrixTemplate) if category > 3]
     presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
                                                                   override_remove_cards=only_faces_remove_cards)
     presentationMatrixLearningOrder_faces = np.vstack((
@@ -161,9 +157,6 @@ for n_block in range(mvpa_number_blocks):
         mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
 
     # Adding Places Trial
-    only_places_remove_cards = [center_position] + \
-                               [index + 1 if index >= center_position else index
-                                for index, category in enumerate(matrixTemplate) if category <= 3]
     presentationMatrixLearningOrder_places = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
                                                                    override_remove_cards=only_places_remove_cards)
     presentationMatrixLearningOrder_places = np.vstack((
