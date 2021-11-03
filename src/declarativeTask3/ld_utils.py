@@ -67,7 +67,7 @@ def newRandomPresentation(oldPresentation=None, override_remove_cards=None, numb
     else:
         from declarativeTask3.config import removeCards
 
-    newPresentation = np.array(range(matrixSize[0]*matrixSize[1]))
+    newPresentation = np.array(range(matrixSize[0]*matrixSize[1]), dtype=int)
     if len(removeCards):
         removeCards.sort(reverse=True)
         for nCard in removeCards:

@@ -139,47 +139,65 @@ exp.clock.wait(ISI, process_control_events=True)
 for n_block in range(mvpa_number_blocks):
     exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(n_block, exp.clock.time))
     exp.add_experiment_info('Presentation Order_Block_{}_'.format(n_block))  # Save Presentation Order
-    presentationMatrixLearningOrder = newRandomPresentation(number_trials=mvpa_number_trials_correct_position)
-    presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(len(presentationMatrixLearningOrder))))
 
-    presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
-                                                          number_trials=mvpa_number_trials_wrong_position)
-    presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(len(presentationMatrixRandomOrder))))
+    center_position = floor(matrixSize[0] * matrixSize[1] / 2)
+    # Adding Faces Trial
+    only_faces_remove_cards = [center_position] + \
+                              [index + 1 if index >= center_position else index
+                               for index, category in enumerate(matrixTemplate) if category > 3]
+    presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
+                                                                  override_remove_cards=only_faces_remove_cards)
+    presentationMatrixLearningOrder_faces = np.vstack((
+        presentationMatrixLearningOrder_faces,
+        np.zeros(len(presentationMatrixLearningOrder_faces), dtype=int),
+        mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions))
 
-    presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
-                                  np.full(mvpa_number_null_events, np.nan)))
+    presentationMatrixRandomOrder_faces = newRandomPresentation(presentationMatrixLearningOrder_faces,
+                                                                number_trials=mvpa_number_trials_wrong_position,
+                                                                override_remove_cards=only_faces_remove_cards)
+    presentationMatrixRandomOrder_faces = np.vstack((
+        presentationMatrixRandomOrder_faces,
+        np.ones(len(presentationMatrixRandomOrder_faces), dtype=int),
+        mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
 
-    presentationOrder = np.hstack((presentationMatrixLearningOrder, presentationMatrixRandomOrder, presentationNull))
+    # Adding Places Trial
+    only_places_remove_cards = [center_position] + \
+                               [index + 1 if index >= center_position else index
+                                for index, category in enumerate(matrixTemplate) if category <= 3]
+    presentationMatrixLearningOrder_places = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
+                                                                   override_remove_cards=only_places_remove_cards)
+    presentationMatrixLearningOrder_places = np.vstack((
+        presentationMatrixLearningOrder_places,
+        np.zeros(len(presentationMatrixLearningOrder_places), dtype=int),
+        mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions))
+    presentationMatrixRandomOrder_places = newRandomPresentation(presentationMatrixLearningOrder_places,
+                                                                 number_trials=mvpa_number_trials_wrong_position,
+                                                                 override_remove_cards=only_places_remove_cards)
+    presentationMatrixRandomOrder_places = np.vstack((presentationMatrixRandomOrder_places,
+                                                     np.ones(len(presentationMatrixRandomOrder_places), dtype=int),
+                                                      mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
+
+    # Null
+    # presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
+    #                               np.full(mvpa_number_null_events, np.nan),
+    #                               []))  # TODO / WARNING: NULL EVENTS TO BE IMPLEMENTED
+
+    # Sum
+    trials_list_to_present = [presentationMatrixLearningOrder_faces, presentationMatrixLearningOrder_places,
+                                   presentationMatrixRandomOrder_faces, presentationMatrixRandomOrder_places]
+                                   # presentationNull]
+    # Ensuring we only use integers
+    for trial_list in trials_list_to_present:
+        trial_list.astype(int)
+
+    presentationOrder = np.hstack(tuple(trials_list_to_present))
+
     presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
 
     listCards = []
-    number_TRs_inter_trials = mvpa_block_number_TRs_to_wait_inter_trials.copy()
-    probabilities_to_pick = [1 / element ** 2 for element in number_TRs_inter_trials]  # favoring ones
-    # sum of element should be one, normalizing
-    probabilities_to_pick = np.divide(probabilities_to_pick, sum(probabilities_to_pick))
+
     for nCard in range(presentationOrder.shape[1]):
-        # Inter Trial Interval
-        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
-        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
-        # removing elements which can't be selected
-        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
-        if not temp_number_TRs_inter_trials:
-            trial_iti = np.random.choice(
-                [element for element in mvpa_possible_iti if element >= min_iti_in_TRs])
-            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
-        else:
-            temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
-            # sum of element should be one, normalizing
-            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
 
-            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
-            number_TRs_inter_trials.remove(trial_iti)
-
-        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
-        for i_ttl in range(trial_iti - min_iti_in_TRs):
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-
-        # Trial
         if len(removeCards):
             removeCards.sort()
             removeCards = np.asarray(removeCards)
@@ -203,6 +221,16 @@ for n_block in range(mvpa_number_blocks):
     exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
 
     for nCard in range(presentationOrder.shape[1]):
+
+        # Inter Trial Interval
+        trial_iti = presentationOrder[2][nCard]
+        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+        for i_ttl in range(trial_iti - 1):  # one TTL is already accounted for, cannot wait less than
+            # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
+            # <wait_for_ttl_keyboard_and_log_ttl> instruction
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
+        # Trial
         locationCard = int(presentationOrder[0][nCard])
 
         if bool(presentationOrder[1][nCard] == 0):
@@ -225,7 +253,7 @@ for n_block in range(mvpa_number_blocks):
         valid_response = False
         rt = 0
 
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCard(locationCard, False, bs, True)
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
