@@ -150,7 +150,6 @@ m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw
 bs.present(False, True)
 
 last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
-exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=True)
 exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
@@ -186,16 +185,13 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
                 # <wait_for_ttl_keyboard_and_log_ttl> instruction
                 last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-                exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
             m.plotCard(nCard, True, bs, True)  # Show Location for ( 2s )
             exp.add_experiment_info('ShowCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))
 
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
             m.plotCard(nCard, False, bs, True)
             exp.add_experiment_info('HideCard_pos_{}_card_{}_timing_{}'.format(
                 nCard, m.returnPicture(nCard), exp.clock.time))  # Add sync info
@@ -216,7 +212,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
                 # <wait_for_ttl_keyboard_and_log_ttl> instruction
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-            exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         exp.add_experiment_info(
             ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
         m.plot_instructions_rectangle(bs, instructions_card, draw=True)
@@ -273,7 +268,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         # Presentation
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m._cueCard.setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
         m.plotCueCard(True, bs, True)  # Show Cue
@@ -288,7 +282,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         # given to answer
 
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCueCard(False, bs, True)  # Hide Cue
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
                                                                               exp.clock.time))
@@ -379,7 +372,6 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     exp.add_experiment_info(f'wait_{number_ttl_in_rest_period}_TTLs')
     for i_ttl in range(number_ttl_in_rest_period):
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
     exp.add_experiment_info(
         ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)

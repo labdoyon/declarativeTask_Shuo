@@ -126,7 +126,6 @@ m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw
 bs.present(False, True)
 
 last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
-exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
@@ -301,7 +300,6 @@ for n_block in range(number_blocks):
         m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
         picture = listCards[nCard].rstrip(".png")
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCard(locationCard, True, bs, True)
         exp.add_experiment_info(
             'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
@@ -312,7 +310,6 @@ for n_block in range(number_blocks):
         rt = 0
 
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info('TTL_RECEIVED_QC_timing_{}'.format(exp.clock.time))  # for QC purposes
         m.plotCard(locationCard, False, bs, True)
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                             listCards[nCard],
