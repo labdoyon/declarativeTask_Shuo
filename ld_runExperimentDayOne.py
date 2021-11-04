@@ -112,7 +112,7 @@ dayOnePostLearn = CommandItem(text="14. PostLearn",
                                 should_exit=False)
 
 dayOneMVPA = CommandItem(text="15. MVPA",
-                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_mvpa.py"),
+                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
                                 arguments="MVPA, " + sys.argv[1],
                                 menu=menu,
                                 should_exit=False)
