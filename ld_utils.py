@@ -50,8 +50,6 @@ class Day(object):
         self.matrix_size = ()
         self.events = []
         self.classes_order = []
-        self.sounds_order = []
-        self.classes_to_sounds = []
         self.ttl_in_data = None
         self.position_response_reaction_time = []
         self.hide_card_absolute_time = []

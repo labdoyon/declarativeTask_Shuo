@@ -12,7 +12,6 @@ from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf,\
     readMouse, logging_ttl_time_stamps_with_ttl_char_hotkeys
 from declarativeTask3.ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS
-# from ld_sound import create_temp_sound_files, delete_temp_files
 from declarativeTask3.config import *
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \

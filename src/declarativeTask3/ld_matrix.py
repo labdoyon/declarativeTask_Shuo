@@ -10,7 +10,6 @@ from ld_card import LdCard
 from declarativeTask3.config import cardSize, linesThickness, cueCardColor, matrixTemplate, listPictures, removeCards, dotColor, bgColor
 from declarativeTask3.config import numberClasses, classPictures, picturesFolderClass, picturesFolder, cardColor, textSize, textColor
 
-# from declarativeTask3.config import sounds, soundsFolder, tempSounds
 from declarativeTask3.config import feedback_frame_correct_color, feedback_frame_wrong_color, templatePicture, fixation_cross_thickness
 from declarativeTask3.ld_utils import vertices_frame
 
@@ -302,17 +301,6 @@ class LdMatrix(object):
             CategoryIndexes[category].remove(category_image_index)
 
         return newMatrix
-
-    def associateSounds(self, newMatrix, soundsAllocation):
-        nPict = 0
-        for nCard in range(self._matrix.size):
-            if nCard not in removeCards:
-                picture = newMatrix[nPict].rstrip('.png')
-                for i in range(numberClasses):
-                    if classPictures[i] in picture:  # if card belongs to the the i-th class of pictures
-                        # associate this class' sound to the card
-                        self._matrix.item(nCard).setSound(soundsAllocation[i])
-                nPict += 1
 
     def checkPosition(self, position, cue_card=False):
         if self._override_remove_cards is not None:

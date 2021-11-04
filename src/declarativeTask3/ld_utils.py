@@ -17,7 +17,7 @@ from expyriment.misc._timer import get_time
 from expyriment.misc.geometry import coordinates2position
 
 from declarativeTask3.config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, removeCards
-from declarativeTask3.config import classPictures, sounds, sessions, rawFolder, ttl_characters
+from declarativeTask3.config import classPictures, sessions, rawFolder, ttl_characters
 sep = os.path.sep
 
 
@@ -407,19 +407,6 @@ def readMouse(startTime, button, duration=None):
     #
     #             ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
     #             exp.clock.wait(ISI)
-
-
-def newSoundAllocation():
-    # Random permutation to assign sounds to picture classes
-    soundToClasses = {}
-    soundToClasses_index = {}
-    sounds_index = list(range(len(classPictures)))
-    for category in classPictures:
-        soundToClasses_index[category] = np.random.choice(sounds_index)
-        soundToClasses[category] = sounds[soundToClasses_index[category]]
-        sounds_index.remove(soundToClasses_index[category])
-
-    return soundToClasses_index, soundToClasses
 
 
 def absoluteTime(firstTime):
