@@ -52,7 +52,9 @@ exp.add_experiment_info('start_by_faces_or_places (same as above but explicit):'
 exp.add_experiment_info(supported_start_by_choices_explicit[faces_places_choice])
 
 # Save time, Response, correctAnswer, RT
-exp.add_data_variable_names(['Time', 'categoryPresented', 'CorrectLocationShown',
+exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented', 'CorrectLocationShown',
+                             'start_of_image_presentation_timestamp', 'end_of_image_presentation_timestamp',
+                             'start_of_response_period_timestamp',
                              'subjectAnswered', 'subjectCorrect', 'ResponseTime'])
 
 learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
@@ -297,8 +299,9 @@ for n_block in range(number_blocks):
         picture = listCards[nCard].rstrip(".png")
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         m.plotCard(locationCard, True, bs, True)
+        start_of_image_presentation_timestamp = exp.clock.time
         exp.add_experiment_info(
-            'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], exp.clock.time))
+            'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], start_of_image_presentation_timestamp))
 
         # initiate mouse response block
         time_left = responseTime
@@ -307,9 +310,10 @@ for n_block in range(number_blocks):
 
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         m.plotCard(locationCard, False, bs, True)
+        end_of_image_presentation_timestamp = exp.clock.time
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
                                                                             listCards[nCard],
-                                                                            exp.clock.time)])  # Add sync info
+                                                                            end_of_image_presentation_timestamp)])
 
         m.plotCueCard(False, bs, draw=False, nocross=True)
         matrixA_rectangle.plot(bs)
@@ -319,21 +323,29 @@ for n_block in range(number_blocks):
         bs.present(False, True)
 
         answer = 'noResponse'
-        start_time = exp.clock.time
-        while exp.clock.time - start_time < responseTime:
+        start_of_response_period_timestamp = exp.clock.time
+        valid_answer = False
+        while exp.clock.time - start_of_response_period_timestamp < responseTime:
             if ms.is_pressed(button='left'):
                 response_timestamp = exp.clock.time
                 answer = 'matrixNone'
+                valid_answer = True
                 break
             if ms.is_pressed(button='right'):
                 response_timestamp = exp.clock.time
                 answer = 'matrixA'
+                valid_answer = True
                 break
             if exp.keyboard.process_control_keys():
                 exp.keyboard.process_control_keys()
-
+        if valid_answer:
+            rt = exp.clock.time - start_of_response_period_timestamp
+        else:
+            rt = None
         if answer == 'matrixA':
-            exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                          start_of_response_period_timestamp,
                           'correct', bool(presentationOrder[1][nCard] == 0), rt])
             matrixA = stimuli.TextBox(text='R', size=button_size,
                                       position=matrixA_position,
@@ -361,9 +373,10 @@ for n_block in range(number_blocks):
             exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
         elif answer == 'matrixNone':
-            exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA',
+            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                          start_of_response_period_timestamp,
                           'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
-            exp.data.add([exp.clock.time, category, showMatrix, bool(presentationOrder[1][nCard] == 1), rt])
             matrixNone = stimuli.TextBox('W', size=button_size,
                                          position=matrixNone_position,
                                          text_size=textSize,
@@ -389,7 +402,10 @@ for n_block in range(number_blocks):
             bs.present(False, True)
             exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
         else:
-            exp.data.add([exp.clock.time, category, showMatrix == 'MatrixA', None, False, rt])
+            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                          start_of_response_period_timestamp,
+                          None, False, rt])
             exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
             valid_response = True
 

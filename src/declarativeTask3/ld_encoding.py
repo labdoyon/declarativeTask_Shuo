@@ -73,7 +73,9 @@ elif experiment_use_faces_or_places[faces_places_choice][experimentName] == 'pla
                    for index, category in enumerate(matrixTemplate) if category <= 3]
 
 # Save time, nblocks, position, correctAnswer, RT
-exp.add_data_variable_names(['Time', 'NBlock', 'Picture', 'Answers', 'RT'])
+exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'image_presented', 'image_at_subject_response_position',
+                             'start_of_image_presentation_timestamp', 'end_of_image_presentation_timestamp',
+                             'start_of_response_period_timestamp', 'RT'])
 
 keepMatrix = True
 keepPreviousMatrix = True
@@ -271,9 +273,10 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         m._cueCard.setPicture(m._matrix.item(nCard).stimuli[0].filename)  # Associate Picture to CueCard
 
         m.plotCueCard(True, bs, True)  # Show Cue
+        show_cue_card_timestamp = exp.clock.time
         exp.add_experiment_info('ShowCueCard_pos_{}_card_{}_timing_{}'.format(nCard,
                                                                               m.returnPicture(nCard),
-                                                                              exp.clock.time))
+                                                                              show_cue_card_timestamp))
 
         # Initiate Mouse Response Block
         time_left = responseTime
@@ -283,12 +286,16 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
         m.plotCueCard(False, bs, True)  # Hide Cue
+        hide_cue_card_timestamp = exp.clock.time
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
-                                                                              exp.clock.time))
+                                                                              hide_cue_card_timestamp))
         # Mouse Response Block
+        start_of_response_period_timestamp = None
         while not valid_response and rt is not None:
             mouse.show_cursor(True, True)
             start = get_time()
+            if start_of_response_period_timestamp is None:
+                start_of_response_period_timestamp = start
             rt, position = readMouse(start, mouseButton, time_left)
             mouse.hide_cursor(True, True)
 
@@ -315,22 +322,30 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                     exp.data.add([exp.clock.time, nBlock,
                                   path_leaf(m._matrix.item(nCard).stimuli[0].filename),
                                   path_leaf(m._matrix.item(currentCard).stimuli[0].filename),
+                                  show_cue_card_timestamp, hide_cue_card_timestamp,
+                                  start_of_response_period_timestamp,
                                   rt])
 
                 elif currentCard is None:
                     exp.data.add([exp.clock.time, nBlock,
                                   path_leaf(m._matrix.item(nCard).stimuli[0].filename),
                                   None,
+                                  show_cue_card_timestamp, hide_cue_card_timestamp,
+                                  start_of_response_period_timestamp,
                                   rt])
                 else:
                     exp.data.add([exp.clock.time, nBlock,
                                   path_leaf(m._matrix.item(nCard).stimuli[0].filename),
                                   path_leaf(m._matrix.item(currentCard).stimuli[0].filename),
+                                  show_cue_card_timestamp, hide_cue_card_timestamp,
+                                  start_of_response_period_timestamp,
                                   rt])
             else:
                 exp.data.add([exp.clock.time, nBlock,
                               path_leaf(m._matrix.item(nCard).stimuli[0].filename),
                               None,
+                              show_cue_card_timestamp, hide_cue_card_timestamp,
+                              start_of_response_period_timestamp,
                               rt])
                 exp.add_experiment_info(['NoResponse'])  # Add sync info
             if valid_response or rt is None:
