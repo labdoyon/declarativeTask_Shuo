@@ -125,7 +125,7 @@ for i in range(pvt_number_trials):
     while response is None and (get_time() - start_time) * 1000 < pvt_max_trial_duration:
         time_to_present = str(int((get_time() - start_time) * 1000))  # display in ms
         number_to_display = expyriment.stimuli.TextLine(time_to_present, position=(0, 0),
-                                                        text_size=45, text_colour=textColor,
+                                                        text_size=pvt_font_size, text_colour=textColor,
                                                         background_colour=bgColor, max_width=None)
         number_to_display.plot(bs)
         bs.present(False, True)

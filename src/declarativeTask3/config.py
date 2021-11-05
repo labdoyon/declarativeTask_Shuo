@@ -43,6 +43,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 
 textSize = 50
+pvt_font_size = 40
 matrixSize = (7, 7)
 cardSize = (95, 95)
 fixation_cross_thickness = 10
