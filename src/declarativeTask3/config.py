@@ -266,7 +266,7 @@ experiment_use_faces_or_places = {
          'PreTest':     'faces',
          'PostTest1':   'faces',
          'PostRecog1':  'faces',
-         'PostTest2: ': 'faces',
+         'PostTest2': 'faces',
          'PostRecog2':  'faces',
          'PostLearn':   'places'},
     # start with places
@@ -275,7 +275,7 @@ experiment_use_faces_or_places = {
          'PreTest':     'places',
          'PostTest1':   'places',
          'PostRecog1':  'places',
-         'PostTest2: ': 'places',
+         'PostTest2': 'places',
          'PostRecog2':  'places',
          'PostLearn':   'faces'}
 }
