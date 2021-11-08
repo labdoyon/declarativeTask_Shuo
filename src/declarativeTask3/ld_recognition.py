@@ -11,6 +11,7 @@ from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
 from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
 from declarativeTask3.ld_utils import logging_ttl_time_stamps_with_ttl_char_hotkeys
+from declarativeTask3.ld_utils import getPreviouslyCorrectlyRecalledImages
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
@@ -105,6 +106,21 @@ elif experimentName == "MVPA":
     exp.add_experiment_info('faces_or_places_for_this_experiment:')
     exp.add_experiment_info(parent_category)
 
+    # get previously correctly recalled images
+    if experiment_use_faces_or_places[faces_places_choice]['PostTest2'] == 'faces' and \
+            experiment_use_faces_or_places[faces_places_choice]['PostLearn'] == 'places':
+        correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
+        correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
+    elif experiment_use_faces_or_places[faces_places_choice]['PostTest2'] == 'places' and \
+            experiment_use_faces_or_places[faces_places_choice]['PostLearn'] == 'faces':
+        correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
+        correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
+
+    not_recalled_faces = [index for (index, correctly_recalled) in correctly_recalled_faces.items()
+                          if correctly_recalled is False]
+    not_recalled_places = [index for (index, correctly_recalled) in correctly_recalled_places.items()
+                           if correctly_recalled is False]
+
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
 
@@ -186,15 +202,16 @@ for n_block in range(number_blocks):
     elif experimentName == 'MVPA':
         # Adding Faces Trial
         presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
-                                                                      override_remove_cards=only_faces_remove_cards)
+                                                                      override_remove_cards=only_faces_remove_cards +
+                                                                      not_recalled_faces)
+        presentationMatrixRandomOrder_faces = newRandomPresentation(presentationMatrixLearningOrder_faces,
+                                                                    number_trials=mvpa_number_trials_wrong_position,
+                                                                    override_remove_cards=only_faces_remove_cards +
+                                                                    not_recalled_faces)
         presentationMatrixLearningOrder_faces = np.vstack((
             presentationMatrixLearningOrder_faces,
             np.zeros(len(presentationMatrixLearningOrder_faces), dtype=int),
             mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions))
-
-        presentationMatrixRandomOrder_faces = newRandomPresentation(presentationMatrixLearningOrder_faces,
-                                                                    number_trials=mvpa_number_trials_wrong_position,
-                                                                    override_remove_cards=only_faces_remove_cards)
         presentationMatrixRandomOrder_faces = np.vstack((
             presentationMatrixRandomOrder_faces,
             np.ones(len(presentationMatrixRandomOrder_faces), dtype=int),
@@ -203,18 +220,18 @@ for n_block in range(number_blocks):
         # Adding Places Trial
         presentationMatrixLearningOrder_places = newRandomPresentation(
             number_trials=mvpa_number_trials_correct_position,
-            override_remove_cards=only_places_remove_cards)
+            override_remove_cards=only_places_remove_cards + not_recalled_places)
         presentationMatrixLearningOrder_places = np.vstack((
             presentationMatrixLearningOrder_places,
             np.zeros(len(presentationMatrixLearningOrder_places), dtype=int),
             mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions))
         presentationMatrixRandomOrder_places = newRandomPresentation(presentationMatrixLearningOrder_places,
                                                                      number_trials=mvpa_number_trials_wrong_position,
-                                                                     override_remove_cards=only_places_remove_cards)
+                                                                     override_remove_cards=only_places_remove_cards +
+                                                                     not_recalled_places)
         presentationMatrixRandomOrder_places = np.vstack((presentationMatrixRandomOrder_places,
                                                           np.ones(len(presentationMatrixRandomOrder_places), dtype=int),
                                                           mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
-
         # Null
         # presentationNull = np.vstack((np.full(mvpa_number_null_events, np.nan),
         #                               np.full(mvpa_number_null_events, np.nan),

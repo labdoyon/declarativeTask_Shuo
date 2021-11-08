@@ -99,7 +99,7 @@ def newRandomPresentation(oldPresentation=None, override_remove_cards=None, numb
     newPresentation = np.random.permutation(newPresentation)
 
     if oldPresentation is not None:
-        while len(longestSubstringFinder(str(oldPresentation), str(newPresentation)).split()) > 2:
+        while len(longestSubstringFinder(str(oldPresentation), str(newPresentation)).split()) > 3:
             newPresentation = np.random.permutation(newPresentation)
 
     return newPresentation
@@ -273,6 +273,55 @@ def getPlacesOrFacesChoice(subjectName, daysBefore, experienceName):
                 return output
 
     # This ensures the latest language choice is used
+    return None
+
+
+def getPreviouslyCorrectlyRecalledImages(subject_name, experienceName):
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subject_name)
+    data_files = []
+    for session in sessions:
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
+        if os.path.isdir(session_dir):
+            data_files = data_files + \
+                         [os.path.join(session_dir, file) for file in os.listdir(session_dir) if
+                          file.endswith('_beh.xpd') and
+                          'task-' + experienceName in file]
+
+    data_files.sort(reverse=True)  # latest runs first
+
+    for dataFile in data_files:
+        print(dataFile)
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
+        try:
+            agg[3].index(experienceName)
+        except ValueError:
+            continue
+        header = agg[3].split('\n#e ')
+        index_subject_name = header.index('Subject:') + 1
+        if subject_name not in header[index_subject_name]:
+            continue
+
+        header = [element for element in header if 'ShowCueCard' in element or 'Response' in element]
+        positions_correctly_recalled = {}
+        for event in header:
+            if 'ShowCueCard' in event:
+                position = int(re.search('pos_([0-9]+)_', event).group(1))
+                positions_correctly_recalled[position] = False
+            elif 'Response' in event:
+                if 'NoResponse' in event or 'pos_None_ERROR' in event:
+                    positions_correctly_recalled[position] = False
+                else:
+                    response_position = int(re.search('pos_([0-9]+)_', event).group(1))
+                    if response_position == position:
+                        positions_correctly_recalled[position] = True
+                    else:
+                        positions_correctly_recalled[position] = False
+
+        return positions_correctly_recalled
+
     return None
 
 
