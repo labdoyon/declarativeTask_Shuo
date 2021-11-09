@@ -28,7 +28,7 @@ faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_
 menu = CursesMenu(
     title="DECOPM", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + str(language) +
                              ' ; class1_or_class2: ' + str(faces_places_choice))
-print(python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"))
+
 dayOneChooseLanguage = CommandItem(text='choose language',
                                    command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
                                    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu,
