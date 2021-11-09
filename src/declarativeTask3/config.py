@@ -56,7 +56,7 @@ nbBlocksMax = 10
 
 presentationCard = TR_duration
 
-responseTime = 5000
+responseTime = 4000
 AssociationResponseTime = 10000
 shortRest = 2500
 thankYouRest = 5000
@@ -193,7 +193,7 @@ mvpa_number_trials_wrong_position = 9  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
 
 presentation_possible_iti = test_possible_iti = recognition_possible_iti = [1, 2, 3]
-mvpa_possible_iti = [3, 4, 5]
+mvpa_possible_iti = [2, 3, 4]
 presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
     [1] * int(len(matrixTemplate) / 6) + [2] * int(len(matrixTemplate) / 6) + [3] * int(len(matrixTemplate) / 6)
 recognition_block_number_TRs_to_wait_inter_trials =\

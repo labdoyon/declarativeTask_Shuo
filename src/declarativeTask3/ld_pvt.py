@@ -122,6 +122,8 @@ for i in range(pvt_number_trials):
     response = None
     start_time = get_time()
     exp.add_experiment_info(f'Trial_{i}_start-time_{int(start_time*1000)}')
+
+    m.plotCueCard(False, bs, draw=True, nocross=True)
     while response is None and (get_time() - start_time) * 1000 < pvt_max_trial_duration:
         time_to_present = str(int((get_time() - start_time) * 1000))  # display in ms
         number_to_display = expyriment.stimuli.TextLine(time_to_present, position=(0, 0),

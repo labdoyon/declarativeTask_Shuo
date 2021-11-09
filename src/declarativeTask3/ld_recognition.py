@@ -277,9 +277,9 @@ for n_block in range(number_blocks):
         number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
 
     for nCard in range(presentationOrder.shape[1]):
+        # Inter Trial Interval
+        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
         if experimentName == "PostRecog1" or experimentName == "PostRecog2":
-            # Inter Trial Interval
-            min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
             exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
             # removing elements which can't be selected
             temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
@@ -297,7 +297,6 @@ for n_block in range(number_blocks):
                 number_TRs_inter_trials.remove(trial_iti)
         elif experimentName == "MVPA":
             trial_iti = presentationOrder[2][nCard]
-            min_iti_in_TRs = 1
 
         exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
         for i_ttl in range(trial_iti - min_iti_in_TRs):
