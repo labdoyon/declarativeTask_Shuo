@@ -38,6 +38,8 @@ language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language:')
 exp.add_experiment_info(language)
 
+exp.add_experiment_info("PLEASE NOTE ALL TIMESTAMPS ARE IN MILLISECONDS")
+
 if not windowMode:  # Check WindowMode and Resolution
     expyriment.control.defaults.window_mode = windowMode
     expyriment.control.defaults.window_size = expyriment.misc.get_monitor_resolution()
@@ -137,15 +139,17 @@ while (get_time() - pvt_experiment_start_time) * 1000 < pvt_experiment_max_durat
 
     rt = get_time() - start_time
     isi_before_next_trial = random.randint(pvt_min_max_ISI[0], pvt_min_max_ISI[1])
-    exp.add_experiment_info(f'Trial_{trial_index}_ResponseTime_{rt}_isi-before-next-trial_isi_before_next_trial_'
+    rt_in_ms = int(rt * 1000)
+    start_time_in_ms = int(start_time * 1000)
+    exp.add_experiment_info(f'Trial_{trial_index}_ResponseTime_{rt_in_ms}_isi-before-next-trial_isi_before_next_trial_'
                             f'{isi_before_next_trial}')
-    exp.data.add([trial_index, start_time, rt, isi_before_next_trial, False])
+    exp.data.add([trial_index, start_time_in_ms, rt_in_ms, isi_before_next_trial, False])
 
     # show score as feedback
     exp.clock.wait(pvt_show_feedback_duration, process_control_events=True)
 
     m.plotCueCard(False, bs, True)  # Show Cue
-    del rt, start_time, response
+    del rt, rt_in_ms, start_time, start_time_in_ms, response
     mouse.clear()
 
     inter_trial_start_time = get_time()
