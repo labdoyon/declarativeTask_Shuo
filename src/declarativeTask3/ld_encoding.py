@@ -11,7 +11,7 @@ from expyriment.misc._timer import get_time
 from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf,\
     readMouse, logging_ttl_time_stamps_with_ttl_char_hotkeys
-from declarativeTask3.ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS
+from declarativeTask3.ld_utils import getPlacesOrFacesChoice, rename_output_files_to_BIDS, rest_function
 from declarativeTask3.config import *
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, presentation_screen_text, rest_screen_text, \
@@ -156,12 +156,14 @@ last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
 m.plot_instructions_rectangle(bs, instructions_card, draw=True)
 exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
 
+# Pre-Rest before experience in order to have 15s or more of baseline brain activity in the MRI
+rest_function(exp, last_ttl_timestamp)
+
 while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
     # PRESENTATION BLOCK
     if 1 != nbBlocksMax or experimentName == 'PreLearn':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
-
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
         bs.present(False, True)
@@ -199,24 +201,20 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                 nCard, m.returnPicture(nCard), exp.clock.time))  # Add sync info
 
         # Pre-Rest Block
-        for i in range(number_ttl_before_rest_period - 1):
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        # baseline of brain activity in the MRI
+        rest_function(exp, nBlock, last_ttl_timestamp, pre_rest=True)
 
-        # REST BLOCK
+        # Display REST instructions for one TTL
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
         bs.present(False, True)
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+        m.plot_instructions_card(bs, instructions_card, draw=False)
+        bs.present(False, True)
 
-        exp.add_experiment_info(
-            ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-        exp.add_experiment_info(f'wait_{number_ttl_in_rest_period}_TTLs')
-        for i_ttl in range(number_ttl_in_rest_period - 1):  # one TTL is already accounted for, cannot wait less than
-                # one TTL. If we put a 0 in the range above, we will wait one TTL, because of the next
-                # <wait_for_ttl_keyboard_and_log_ttl> instruction
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        exp.add_experiment_info(
-            ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-        m.plot_instructions_rectangle(bs, instructions_card, draw=True)
+        # actual rest period
+        rest_function(exp, nBlock, last_ttl_timestamp)
 
     # TEST BLOCK
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
@@ -359,8 +357,8 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     currentCorrectAnswers = correctAnswers[nBlock]  # Number of correct answers
 
     # Pre-Rest Block
-    for i in range(number_ttl_before_rest_period - 1):
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    # baseline of brain activity in the MRI
+    rest_function(exp, nBlock, last_ttl_timestamp, pre_rest=True)
 
     if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
@@ -369,29 +367,25 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
                             + str(m._matrix.size-len(removeCards)), draw=False)
         bs.present(False, True)
 
-        exp.clock.wait(shortRest, process_control_events=True)
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
 
-        ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-        exp.clock.wait(ISI, process_control_events=True)
+        exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
 
+    # Display REST instructions for one TTL
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
     m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
     bs.present(False, True)
-
-    exp.add_experiment_info(
-        ['StartShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
-    exp.add_experiment_info(f'wait_{number_ttl_in_rest_period}_TTLs')
-    for i_ttl in range(number_ttl_in_rest_period):
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-    exp.add_experiment_info(
-        ['EndShortRest_block_{}_timing_{}'.format(nBlock, exp.clock.time)])  # Add sync info
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
     m.plot_instructions_card(bs, instructions_card, draw=False)
     bs.present(False, True)
+
+    # actual rest period
+    rest_function(exp, last_ttl_timestamp)
 
     nBlock += 1
 
@@ -402,7 +396,7 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
 bs.present(False, True)
 
-exp.clock.wait(thankYouRest, process_control_events=True)
+exp.clock.wait(shortRest, process_control_events=True)
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
