@@ -11,7 +11,7 @@ from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
 from declarativeTask3.ld_utils import getLanguage, getPlacesOrFacesChoice, rename_output_files_to_BIDS
 from declarativeTask3.ld_utils import logging_ttl_time_stamps_with_ttl_char_hotkeys
-from declarativeTask3.ld_utils import getPreviouslyCorrectlyRecalledImages
+from declarativeTask3.ld_utils import getPreviouslyCorrectlyRecalledImages, rest_function
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
@@ -139,33 +139,6 @@ mouse.hide_cursor(True, True)  # Hide cursor
 setCursor(arrow)
 bs = stimuli.BlankScreen(bgColor)  # Create blank screen
 
-m.plotDefault(bs)  # Draw default grid
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
-bs.present(False, True)
-
-last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
-
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions_card(bs, instructions_card, draw=False)
-bs.present(False, True)
-
-ISI = design.randomize.rand_int(300, 500)
-exp.clock.wait(ISI, process_control_events=True)
-
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
-bs.present(False, True)
-
-last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions_card(bs, instructions_card, draw=False)
-bs.present(False, True)
-
-# LOG and SYNC
-exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
-
 button_size = (cardSize[0]/2 + m.gap/8, cardSize[1]*3/5)
 rectangle_size = (cardSize[0]/2 + m.gap/8, cardSize[1])
 
@@ -186,8 +159,32 @@ matrixNone = stimuli.TextBox('W', size=button_size,
                              background_colour=cardColor)
 matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position, colour=cardColor)
 
-ISI = design.randomize.rand_int(min_max_ISI[0], min_max_ISI[1])
-exp.clock.wait(ISI, process_control_events=True)
+m.plotDefault(bs)  # Draw default grid
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
+bs.present(False, True)
+
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
+bs.present(False, True)
+
+# Pre-Rest before experience in order to have 15s or more of baseline brain activity in the MRI
+rest_function(exp, last_ttl_timestamp)
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
+bs.present(False, True)
+
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
+bs.present(False, True)
+
+# LOG and SYNC
+exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
 
 for n_block in range(number_blocks):
     exp.add_experiment_info('Block_{}_timing_{}'.format(n_block, exp.clock.time))
@@ -431,34 +428,26 @@ for n_block in range(number_blocks):
         m.plotCueCard(False, bs, draw=True)
         bs.present(False, True)
 
-    if n_block != mvpa_number_blocks - 1:
-        # Pre-Rest Block
-        for i in range(number_ttl_before_rest_period - 1):
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    # Pre-Rest Block
+    rest_function(exp, n_block, last_ttl_timestamp, pre_rest=True)
 
-        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-        m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
-        bs.present(False, True)
-        exp.add_experiment_info(
-            ['StartShortRest_block_{}_timing_{}'.format(n_block, exp.clock.time)])  # Add sync info
-
-        exp.clock.wait(restPeriod, process_control_events=True)
-
-        exp.add_experiment_info(
-            ['EndShortRest_block_{}_timing_{}'.format(n_block, exp.clock.time)])  # Add sync info
-        m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-        m.plot_instructions_card(bs, instructions_card, draw=False)
-        bs.present(False, True)
-
-# Pre-Rest Block
-for i in range(number_ttl_before_rest_period - 1):
+    # Plot instructions
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
+    bs.present(False, True)
     last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+    m.plot_instructions_card(bs, instructions_card, draw=False)
+    bs.present(False, True)
+
+    # REST PERIOD
+    rest_function(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
 bs.present(False, True)
 
-exp.clock.wait(thankYouRest, process_control_events=True)
+exp.clock.wait(shortRest, process_control_events=True)
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)

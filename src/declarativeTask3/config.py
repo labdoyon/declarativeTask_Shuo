@@ -1,6 +1,6 @@
 import glob
 from os.path import normpath, join, dirname, basename
-from math import floor
+from math import floor, ceil
 from expyriment.misc import constants
 
 # python interpreter to be used to run the task's scripts in the OS command line
@@ -217,7 +217,7 @@ if mvpa_number_null_events:
         mvpa_block_number_TRs_to_wait_inter_trials_for_null_events +=\
             [value] * int(mvpa_number_null_events/len(mvpa_possible_iti))
 
-number_ttl_in_rest_period = 6
+number_ttl_in_rest_period = ceil(restPeriod/TR_duration)
 number_ttl_before_rest_period = 4
 visual_comfort_wait_time = 300  # short wait time padding after an instruction disappears and
 # before the next one appears, for visual comfort

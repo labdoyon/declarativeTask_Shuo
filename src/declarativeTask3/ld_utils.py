@@ -18,6 +18,8 @@ from expyriment.misc.geometry import coordinates2position
 
 from declarativeTask3.config import linesThickness, cardSize, colorLine, windowSize, bgColor, matrixSize, removeCards
 from declarativeTask3.config import classPictures, sessions, rawFolder, ttl_characters
+from declarativeTask3.config import number_ttl_in_rest_period, number_ttl_before_rest_period
+from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 sep = os.path.sep
 
 
@@ -509,3 +511,27 @@ def logging_ttl_time_stamps_with_ttl_char_hotkeys(exp):
     for ttl_char in ttl_characters:
         keyboard.add_hotkey(ttl_char, lambda: exp.add_experiment_info(
             'TTL_RECEIVED_timing-{}_method-{}'.format(exp.clock.time, "hotkey")))
+
+
+def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=False):
+    if not pre_rest:
+        number_ttl_to_wait = number_ttl_in_rest_period
+        pre_rest_text = ''
+    else:
+        number_ttl_to_wait = number_ttl_before_rest_period
+        pre_rest_text = '_preRest'
+
+    if block_index is not None:
+        block_string = f"_block_{block_index}"
+    else:
+        block_string = ""
+
+    last_ttl_timestamp = original_last_ttl_timestamp
+    exp.add_experiment_info(f'wait_{number_ttl_to_wait}_TTLs')
+    exp.add_experiment_info(f'StartShortRest' + block_string + f'_timing_{exp.clock.time}{pre_rest_text}')
+    for i in range(number_ttl_to_wait - 1):  # 1 TTL is already accounted for because of the next TTL
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    exp.add_experiment_info(f'EndShortRest' + block_string + f'_timing_{exp.clock.time}{pre_rest_text}')
+
+    return last_ttl_timestamp
+
