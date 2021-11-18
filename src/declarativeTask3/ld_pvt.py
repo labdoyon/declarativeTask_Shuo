@@ -38,6 +38,8 @@ language = str(getLanguage(subjectName, 0, 'choose-language'))
 exp.add_experiment_info('language:')
 exp.add_experiment_info(language)
 
+exp.add_experiment_info("PLEASE NOTE ALL TIMESTAMPS ARE IN MILLISECONDS")
+
 if not windowMode:  # Check WindowMode and Resolution
     expyriment.control.defaults.window_mode = windowMode
     expyriment.control.defaults.window_size = expyriment.misc.get_monitor_resolution()
@@ -79,19 +81,19 @@ exp.keyboard.clear()
 
 pvt_experiment_start_time = get_time()
 
-for i in range(pvt_number_trials):
+trial_index = 0
+while (get_time() - pvt_experiment_start_time) * 1000 < pvt_experiment_max_duration:
 
-    if (get_time() - pvt_experiment_start_time) * 1000 > pvt_experiment_max_duration:
-        exp.add_experiment_info(f'Trial_{i}_experiment-ended-due-to-lack-of-time_time_{get_time()}')
-        break
-
-    exp.add_experiment_info(f'Trial_{i}')
+    exp.add_experiment_info(f'Trial_{trial_index}')
     # Inter-Trial section
     # exp.clock.wait(isi_before_next_trial, process_control_events=True)
+    pre_trial_response = None
     while get_time() < inter_trial_start_time + isi_before_next_trial/1000:
-        if mouse.get_last_button_down_event(process_quit_event=True) is not None:
-            exp.add_experiment_info(f'Trial_{i}_clicked-before-trial-start-time_{get_time()}')
-            exp.data.add([i, None, None, None, True])
+        pre_trial_response = mouse.get_last_button_down_event(process_quit_event=False)
+        # Response == 0 means left button was clicked
+        if pre_trial_response == 0:
+            exp.add_experiment_info(f'Trial_{trial_index}_clicked-before-trial-start-time_{get_time()}')
+            exp.data.add([trial_index, None, None, None, True])
 
             isi_before_next_trial = random.randint(pvt_min_max_ISI[0], pvt_min_max_ISI[1])
 
@@ -121,10 +123,11 @@ for i in range(pvt_number_trials):
     mouse.clear()
     response = None
     start_time = get_time()
-    exp.add_experiment_info(f'Trial_{i}_start-time_{int(start_time*1000)}')
+    exp.add_experiment_info(f'Trial_{trial_index}_start-time_{int(start_time*1000)}')
 
     m.plotCueCard(False, bs, draw=True, nocross=True)
-    while response is None and (get_time() - start_time) * 1000 < pvt_max_trial_duration:
+    # Response == 0 means left button was clicked
+    while response != 0 and (get_time() - start_time) * 1000 < pvt_max_trial_duration:
         time_to_present = str(int((get_time() - start_time) * 1000))  # display in ms
         number_to_display = expyriment.stimuli.TextLine(time_to_present, position=(0, 0),
                                                         text_size=pvt_font_size, text_colour=textColor,
@@ -136,17 +139,20 @@ for i in range(pvt_number_trials):
 
     rt = get_time() - start_time
     isi_before_next_trial = random.randint(pvt_min_max_ISI[0], pvt_min_max_ISI[1])
-    exp.add_experiment_info(f'Trial_{i}_ResponseTime_{rt}_isi-before-next-trial_isi_before_next_trial_'
+    rt_in_ms = int(rt * 1000)
+    start_time_in_ms = int(start_time * 1000)
+    exp.add_experiment_info(f'Trial_{trial_index}_ResponseTime_{rt_in_ms}_isi-before-next-trial_isi_before_next_trial_'
                             f'{isi_before_next_trial}')
-    exp.data.add([i, start_time, rt, isi_before_next_trial, False])
+    exp.data.add([trial_index, start_time_in_ms, rt_in_ms, isi_before_next_trial, False])
 
     # show score as feedback
     exp.clock.wait(pvt_show_feedback_duration, process_control_events=True)
 
     m.plotCueCard(False, bs, True)  # Show Cue
-    del rt, start_time, response
+    del rt, rt_in_ms, start_time, start_time_in_ms, response
     mouse.clear()
 
     inter_trial_start_time = get_time()
+    trial_index += 1
 
 exp.add_experiment_info(f'Experiment-completed_time_{get_time()}')
