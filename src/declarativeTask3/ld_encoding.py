@@ -210,13 +210,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
         bs.present(False, True)
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        # actual rest period
+        last_ttl_timestamp = rest_function(exp, last_ttl_timestamp, block_index=nBlock)
+        #
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
-
-        # actual rest period
-        last_ttl_timestamp = rest_function(exp, last_ttl_timestamp, block_index=nBlock)
 
     # TEST BLOCK
     m.plot_instructions_rectangle(bs, instructions_card, draw=False)
