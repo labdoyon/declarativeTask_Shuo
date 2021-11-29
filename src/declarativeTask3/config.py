@@ -187,9 +187,9 @@ numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
 
 # MVPA
-mvpa_number_blocks = 4
-mvpa_number_trials_correct_position = 30  # per block per category
-mvpa_number_trials_wrong_position = 9  # per block per category
+mvpa_number_blocks = 5
+mvpa_number_trials_correct_position = 18  # per block per category
+mvpa_number_trials_wrong_position = 6  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
 
 presentation_possible_iti = test_possible_iti = recognition_possible_iti = [1, 2, 3]
