@@ -183,6 +183,8 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         # copy list, different object
         number_TRs_inter_trials = presentation_block_number_TRs_to_wait_inter_trials.copy()
         np.random.shuffle(number_TRs_inter_trials)
+        exp.add_experiment_info(f'Block-{nBlock}_Learning')
+        exp.add_experiment_info(str(presentationOrder))
         for nCard in presentationOrder:
             # inter trial interval in TTLs
             between_trial_interval = number_TRs_inter_trials.pop(0)
