@@ -62,14 +62,12 @@ learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 exp.add_experiment_info('Learning: ')
 exp.add_experiment_info(str(learningMatrix))
 
-randomMatrix = m.newRecognitionMatrix(learningMatrix)
-exp.add_experiment_info('RandomMatrix: ')
-exp.add_experiment_info(str(randomMatrix))
-
 number_blocks = 1
 intro_instruction = ' RECOGNITION '
 if experimentName == "PostRecog1" or experimentName == "PostRecog2":
-
+    randomMatrix = m.newRecognitionMatrix(learningMatrix)
+    exp.add_experiment_info('RandomMatrix: ')
+    exp.add_experiment_info(str(randomMatrix))
     if experiment_use_faces_or_places[faces_places_choice][experimentName] == 'faces':
         only_faces = True
         only_places = False
@@ -102,7 +100,6 @@ elif experimentName == "MVPA":
     only_places = False
     from config import removeCards  # default
     local_learning_matrix = learningMatrix
-    local_random_matrix = randomMatrix
     exp.add_experiment_info('faces_or_places_for_this_experiment:')
     exp.add_experiment_info(parent_category)
 
@@ -123,7 +120,6 @@ elif experimentName == "MVPA":
                                          index in not_recalled_faces_locations]
     # matrix indexes are 0 to 47
     not_recalled_faces = [learningMatrix[position] for position in not_recalled_faces_matrix_indexes]
-    not_recalled_faces_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_faces]
 
     not_recalled_places_locations = [index for (index, correctly_recalled) in correctly_recalled_places.items()
                                      if correctly_recalled is False]
@@ -132,7 +128,6 @@ elif experimentName == "MVPA":
                                           index in not_recalled_places_locations]
     # matrix indexes are 0 to 47
     not_recalled_places = [learningMatrix[position] for position in not_recalled_places_matrix_indexes]
-    not_recalled_places_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_places]
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -210,6 +205,14 @@ for n_block in range(number_blocks):
         presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(m.size[0]*m.size[1]-len(removeCards))))
         trials_list_to_present = [presentationMatrixLearningOrder, presentationMatrixRandomOrder]
     elif experimentName == 'MVPA':
+        # Generating new wrong location trials
+        randomMatrix = m.newRecognitionMatrix(learningMatrix)
+        exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
+        exp.add_experiment_info(str(randomMatrix))
+        local_random_matrix = randomMatrix
+        not_recalled_faces_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_faces]
+        not_recalled_places_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_places]
+
         # Adding Faces Trial
         presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
                                                                       override_remove_cards=only_faces_remove_cards +
