@@ -116,10 +116,23 @@ elif experimentName == "MVPA":
         correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
         correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
 
-    not_recalled_faces = [index for (index, correctly_recalled) in correctly_recalled_faces.items()
-                          if correctly_recalled is False]
-    not_recalled_places = [index for (index, correctly_recalled) in correctly_recalled_places.items()
-                           if correctly_recalled is False]
+    not_recalled_faces_locations = [index for (index, correctly_recalled) in correctly_recalled_faces.items()
+                                    if correctly_recalled is False]
+    # position indexes are 0 to 48 excluding 24
+    not_recalled_faces_matrix_indexes = [index if index < center_card_position else index - 1 for
+                                         index in not_recalled_faces_locations]
+    # matrix indexes are 0 to 47
+    not_recalled_faces = [learningMatrix[position] for position in not_recalled_faces_matrix_indexes]
+    not_recalled_faces_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_faces]
+
+    not_recalled_places_locations = [index for (index, correctly_recalled) in correctly_recalled_places.items()
+                                     if correctly_recalled is False]
+    # position indexes are 0 to 48 excluding 24
+    not_recalled_places_matrix_indexes = [index if index < center_card_position else index - 1 for
+                                          index in not_recalled_places_locations]
+    # matrix indexes are 0 to 47
+    not_recalled_places = [learningMatrix[position] for position in not_recalled_places_matrix_indexes]
+    not_recalled_places_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_places]
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -200,11 +213,11 @@ for n_block in range(number_blocks):
         # Adding Faces Trial
         presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
                                                                       override_remove_cards=only_faces_remove_cards +
-                                                                      not_recalled_faces)
+                                                                      not_recalled_faces_locations)
         presentationMatrixRandomOrder_faces = newRandomPresentation(presentationMatrixLearningOrder_faces,
                                                                     number_trials=mvpa_number_trials_wrong_position,
                                                                     override_remove_cards=only_faces_remove_cards +
-                                                                    not_recalled_faces)
+                                                                    not_recalled_faces_location_in_random_matrix)
         presentationMatrixLearningOrder_faces = np.vstack((
             presentationMatrixLearningOrder_faces,
             np.zeros(len(presentationMatrixLearningOrder_faces), dtype=int),
@@ -217,7 +230,7 @@ for n_block in range(number_blocks):
         # Adding Places Trial
         presentationMatrixLearningOrder_places = newRandomPresentation(
             number_trials=mvpa_number_trials_correct_position,
-            override_remove_cards=only_places_remove_cards + not_recalled_places)
+            override_remove_cards=only_places_remove_cards + not_recalled_places_locations)
         presentationMatrixLearningOrder_places = np.vstack((
             presentationMatrixLearningOrder_places,
             np.zeros(len(presentationMatrixLearningOrder_places), dtype=int),
@@ -225,7 +238,7 @@ for n_block in range(number_blocks):
         presentationMatrixRandomOrder_places = newRandomPresentation(presentationMatrixLearningOrder_places,
                                                                      number_trials=mvpa_number_trials_wrong_position,
                                                                      override_remove_cards=only_places_remove_cards +
-                                                                     not_recalled_places)
+                                                                     not_recalled_places_location_in_random_matrix)
         presentationMatrixRandomOrder_places = np.vstack((presentationMatrixRandomOrder_places,
                                                           np.ones(len(presentationMatrixRandomOrder_places), dtype=int),
                                                           mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
