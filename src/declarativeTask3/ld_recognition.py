@@ -199,46 +199,26 @@ bs.present(False, True)
 # Pre-Rest before experience in order to have 15s or more of baseline brain activity in the MRI
 rest_function(exp, last_ttl_timestamp)
 
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
-bs.present(False, True)
-
-last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-
-m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-m.plot_instructions_card(bs, instructions_card, draw=False)
-bs.present(False, True)
-
-# LOG and SYNC
-exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
-
+# Generate Vector of trials for the full experiment:
+presentationOrder = [None] * number_blocks
+randomMatrix = [None] * number_blocks
 for n_block in range(number_blocks):
-    exp.add_experiment_info('Block_{}_timing_{}'.format(n_block, exp.clock.time))
-    exp.add_experiment_info('Presentation Order: ')  # Save Presentation Order
-
-    if experimentName == "PostRecog1" or experimentName == "PostRecog2":
-        presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
-        presentationMatrixLearningOrder = np.vstack((presentationMatrixLearningOrder, np.zeros(m.size[0]*m.size[1]-len(removeCards))))
-        presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder, override_remove_cards=removeCards)
-        presentationMatrixRandomOrder = np.vstack((presentationMatrixRandomOrder, np.ones(m.size[0]*m.size[1]-len(removeCards))))
-        trials_list_to_present = [presentationMatrixLearningOrder, presentationMatrixRandomOrder]
-    elif experimentName == 'MVPA':
+    if experimentName == 'MVPA':
         # Generating new wrong location trials
-        randomMatrix = m.newRecognitionMatrix(learningMatrix)
+        randomMatrix[n_block] = m.newRecognitionMatrix(learningMatrix)
         exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
-        exp.add_experiment_info(str(randomMatrix))
-        local_random_matrix = randomMatrix
-        not_recalled_faces_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_faces]
-        not_recalled_places_location_in_random_matrix = [randomMatrix.index(image) for image in not_recalled_places]
+        exp.add_experiment_info(str(randomMatrix[n_block]))
+        local_random_matrix = randomMatrix[n_block]
+        not_recalled_faces_location_in_random_matrix = [local_random_matrix.index(image) for image in not_recalled_faces]
+        not_recalled_places_location_in_random_matrix = [local_random_matrix.index(image) for image in not_recalled_places]
 
         # Adding Faces Trial
-        presentationMatrixLearningOrder_faces = newRandomPresentation(number_trials=mvpa_number_trials_correct_position,
-                                                                      override_remove_cards=only_faces_remove_cards +
-                                                                      not_recalled_faces_locations)
-        presentationMatrixRandomOrder_faces = newRandomPresentation(presentationMatrixLearningOrder_faces,
-                                                                    number_trials=mvpa_number_trials_wrong_position,
-                                                                    override_remove_cards=only_faces_remove_cards +
-                                                                    not_recalled_faces_location_in_random_matrix)
+        presentationMatrixLearningOrder_faces = newRandomPresentation(
+            number_trials=mvpa_number_trials_correct_position, override_remove_cards=only_faces_remove_cards +
+                                                                                     not_recalled_faces_locations)
+        presentationMatrixRandomOrder_faces = newRandomPresentation(
+            presentationMatrixLearningOrder_faces, number_trials=mvpa_number_trials_wrong_position,
+            override_remove_cards=only_faces_remove_cards + not_recalled_faces_location_in_random_matrix)
         presentationMatrixLearningOrder_faces = np.vstack((
             presentationMatrixLearningOrder_faces,
             np.zeros(len(presentationMatrixLearningOrder_faces), dtype=int),
@@ -256,10 +236,9 @@ for n_block in range(number_blocks):
             presentationMatrixLearningOrder_places,
             np.zeros(len(presentationMatrixLearningOrder_places), dtype=int),
             mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions))
-        presentationMatrixRandomOrder_places = newRandomPresentation(presentationMatrixLearningOrder_places,
-                                                                     number_trials=mvpa_number_trials_wrong_position,
-                                                                     override_remove_cards=only_places_remove_cards +
-                                                                     not_recalled_places_location_in_random_matrix)
+        presentationMatrixRandomOrder_places = newRandomPresentation(
+            presentationMatrixLearningOrder_places, number_trials=mvpa_number_trials_wrong_position,
+            override_remove_cards=only_places_remove_cards + not_recalled_places_location_in_random_matrix)
         presentationMatrixRandomOrder_places = np.vstack((presentationMatrixRandomOrder_places,
                                                           np.ones(len(presentationMatrixRandomOrder_places), dtype=int),
                                                           mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions))
@@ -272,20 +251,55 @@ for n_block in range(number_blocks):
         trials_list_to_present = [presentationMatrixLearningOrder_faces, presentationMatrixLearningOrder_places,
                                   presentationMatrixRandomOrder_faces, presentationMatrixRandomOrder_places]
         # presentationNull]
+    elif experimentName == "PostRecog1" or experimentName == "PostRecog2":
+        presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
+        presentationMatrixLearningOrder = np.vstack(
+            (presentationMatrixLearningOrder, np.zeros(m.size[0] * m.size[1] - len(removeCards))))
+        presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
+                                                              override_remove_cards=removeCards)
+        presentationMatrixRandomOrder = np.vstack(
+            (presentationMatrixRandomOrder, np.ones(m.size[0] * m.size[1] - len(removeCards))))
+        trials_list_to_present = [presentationMatrixLearningOrder, presentationMatrixRandomOrder]
 
     # Ensuring we only use integers
     for trial_list in trials_list_to_present:
         trial_list.astype(int)
 
-    presentationOrder = np.hstack(tuple(trials_list_to_present))
-    presentationOrder = presentationOrder[:, np.random.permutation(presentationOrder.shape[1])]
+    block_presentationOrder = np.hstack(tuple(trials_list_to_present))
+    block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
+    presentationOrder[n_block] = block_presentationOrder
+
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
+bs.present(False, True)
+
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
+bs.present(False, True)
+
+# LOG and SYNC
+exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync info
+
+
+# PRESENTATION OF ALL TRIALS
+for n_block in range(number_blocks):
+    exp.add_experiment_info('Block_{}_timing_{}'.format(n_block, exp.clock.time))
+    exp.add_experiment_info(f'PresentationOrder_Block-{n_block}')  # Save Presentation Order
+    exp.add_experiment_info(str(list(presentationOrder[n_block])))
+    if experimentName == 'MVPA':
+        local_random_matrix = randomMatrix[n_block]
+        exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
+        exp.add_experiment_info(str(local_random_matrix))
 
     listCards = []
-    for nCard in range(presentationOrder.shape[1]):
+    for nCard in range(presentationOrder[n_block].shape[1]):
         if len(removeCards):
             removeCards.sort()
             removeCards = np.asarray(removeCards)
-            tempPosition = presentationOrder[0][nCard]
+            tempPosition = presentationOrder[n_block][0][nCard]
             index = 0
             try:
                 index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
@@ -295,19 +309,17 @@ for n_block in range(number_blocks):
             position = tempPosition - index
 
         else:
-            position = presentationOrder[0][nCard]
+            position = presentationOrder[n_block][0][nCard]
 
-        if presentationOrder[1][nCard] == 0:  # Learning Matrix
+        if presentationOrder[n_block][1][nCard] == 0:  # Learning Matrix
             listCards.append(local_learning_matrix[int(position)])
         else:
             listCards.append(local_random_matrix[int(position)])
 
-    exp.add_experiment_info(str(list(presentationOrder)))  # Add listPictures
-
     if experimentName == "PostRecog1" or experimentName == "PostRecog2":
         number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
 
-    for nCard in range(presentationOrder.shape[1]):
+    for nCard in range(presentationOrder[n_block].shape[1]):
         # Inter Trial Interval
         min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
         if experimentName == "PostRecog1" or experimentName == "PostRecog2":
@@ -327,16 +339,16 @@ for n_block in range(number_blocks):
                 trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
                 number_TRs_inter_trials.remove(trial_iti)
         elif experimentName == "MVPA":
-            trial_iti = presentationOrder[2][nCard]
+            trial_iti = presentationOrder[n_block][2][nCard]
 
         exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
         for i_ttl in range(trial_iti - min_iti_in_TRs):
             last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
         # Trial Block
-        locationCard = int(presentationOrder[0][nCard])
+        locationCard = int(presentationOrder[n_block][0][nCard])
 
-        if bool(presentationOrder[1][nCard] == 0):
+        if bool(presentationOrder[n_block][1][nCard] == 0):
             showMatrix = 'MatrixA'
         else:
             showMatrix = 'MatrixRandom'
@@ -393,7 +405,7 @@ for n_block in range(number_blocks):
             exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
                           start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                           start_of_response_period_timestamp,
-                          'correct', bool(presentationOrder[1][nCard] == 0), rt])
+                          'correct', bool(presentationOrder[n_block][1][nCard] == 0), rt])
             matrixA = stimuli.TextBox(text='R', size=button_size,
                                       position=matrixA_position,
                                       text_size=textSize,
@@ -423,7 +435,7 @@ for n_block in range(number_blocks):
             exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
                           start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                           start_of_response_period_timestamp,
-                          'incorrect', bool(presentationOrder[1][nCard] == 1), rt])
+                          'incorrect', bool(presentationOrder[n_block][1][nCard] == 1), rt])
             matrixNone = stimuli.TextBox('W', size=button_size,
                                          position=matrixNone_position,
                                          text_size=textSize,
