@@ -191,6 +191,7 @@ mvpa_number_blocks = 5
 mvpa_number_trials_correct_position = 18  # per block per category
 mvpa_number_trials_wrong_position = 6  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
+mvpa_equalize_number_correctly_recalled_images = True
 
 presentation_possible_iti = test_possible_iti = recognition_possible_iti = [1, 2, 3]
 mvpa_possible_iti = [2, 3, 4]

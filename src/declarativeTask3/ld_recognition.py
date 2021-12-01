@@ -115,18 +115,36 @@ elif experimentName == "MVPA":
 
     not_recalled_faces_locations = [index for (index, correctly_recalled) in correctly_recalled_faces.items()
                                     if correctly_recalled is False]
-    # position indexes are 0 to 48 excluding 24
-    not_recalled_faces_matrix_indexes = [index if index < center_card_position else index - 1 for
-                                         index in not_recalled_faces_locations]
-    # matrix indexes are 0 to 47
-    not_recalled_faces = [learningMatrix[position] for position in not_recalled_faces_matrix_indexes]
-
     not_recalled_places_locations = [index for (index, correctly_recalled) in correctly_recalled_places.items()
                                      if correctly_recalled is False]
     # position indexes are 0 to 48 excluding 24
+
+    # Equalizing number correctly remembered images to present during MVPA
+    if mvpa_equalize_number_correctly_recalled_images:
+        if len(not_recalled_faces_locations) != len(not_recalled_places_locations):
+            number_not_correctly_recalled_images = max(len(not_recalled_faces_locations),
+                                                       len(not_recalled_places_locations))
+            number_images_to_add = number_not_correctly_recalled_images - min(len(not_recalled_faces_locations),
+                                                                              len(not_recalled_places_locations))
+            if len(not_recalled_faces_locations) < number_not_correctly_recalled_images:
+                items_to_choose_among = [index for (index, correctly_recalled) in correctly_recalled_faces.items()
+                                         if correctly_recalled is True]
+                for i in range(number_images_to_add):
+                    not_recalled_faces_locations +=\
+                        [items_to_choose_among.pop(np.random.randint(len(items_to_choose_among)))]
+            elif len(not_recalled_places_locations) < number_not_correctly_recalled_images:
+                items_to_choose_among = [index for (index, correctly_recalled) in correctly_recalled_places.items()
+                                         if correctly_recalled is True]
+                for i in range(number_images_to_add):
+                    not_recalled_places_locations +=\
+                        [items_to_choose_among.pop(np.random.randint(len(items_to_choose_among)))]
+
+    not_recalled_faces_matrix_indexes = [index if index < center_card_position else index - 1 for
+                                         index in not_recalled_faces_locations]
     not_recalled_places_matrix_indexes = [index if index < center_card_position else index - 1 for
                                           index in not_recalled_places_locations]
     # matrix indexes are 0 to 47
+    not_recalled_faces = [learningMatrix[position] for position in not_recalled_faces_matrix_indexes]
     not_recalled_places = [learningMatrix[position] for position in not_recalled_places_matrix_indexes]
 
 exp.add_experiment_info('Image classes order:')
