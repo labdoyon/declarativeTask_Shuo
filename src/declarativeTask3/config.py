@@ -298,4 +298,5 @@ experiment_session = {
     'PostTest2':            'postsleep',
     'PostRecog2':           'postsleep',
     'PostLearn':            'postsleep',
+    'generate_mvpa_trials': 'postsleep',
     'MVPA':                 'postsleep'}

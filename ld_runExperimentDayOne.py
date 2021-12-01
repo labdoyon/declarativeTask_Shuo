@@ -111,6 +111,13 @@ dayOnePostLearn = CommandItem(text="14. PostLearn",
                                 menu=menu,
                                 should_exit=False)
 
+dayOnegenerate_MVPA = CommandItem(text="14.5 generate MVPA trials",
+                                  command=python + " " + os.path.join("src", "declarativeTask3",
+                                                                      "ld_generate_mvpa_trials.py"),
+                                  arguments="generate_mvpa_trials," + sys.argv[1],
+                                  menu=menu,
+                                  should_exit=False)
+
 dayOneMVPA = CommandItem(text="15. MVPA",
                                 command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
                                 arguments="MVPA, " + sys.argv[1],
@@ -131,6 +138,7 @@ menu.append_item(dayOnePostPVT2)
 menu.append_item(dayOnePostTest2)
 menu.append_item(dayOnePostRecog2)
 menu.append_item(dayOnePostLearn)
+menu.append_item(dayOnegenerate_MVPA)
 menu.append_item(dayOneMVPA)
 
 menu.show()

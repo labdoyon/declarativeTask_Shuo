@@ -292,7 +292,6 @@ def getPreviouslyCorrectlyRecalledImages(subject_name, experienceName):
     data_files.sort(reverse=True)  # latest runs first
 
     for dataFile in data_files:
-        print(dataFile)
         try:
             agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
         except TypeError:
@@ -535,3 +534,49 @@ def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=F
 
     return last_ttl_timestamp
 
+
+def load_mvpa_trials(subject_name, experienceName):
+    subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subject_name)
+    data_files = []
+    for session in sessions:
+        session_dir = os.path.join(subject_dir, 'ses-' + session, 'beh')
+        if os.path.isdir(session_dir):
+            data_files = data_files + \
+                         [os.path.join(session_dir, file) for file in os.listdir(session_dir) if
+                          file.endswith('_beh.xpd') and
+                          'task-' + experienceName in file]
+
+    data_files.sort(reverse=True)  # latest runs first
+
+    for dataFile in data_files:
+        try:
+            agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
+        except TypeError:
+            continue
+        try:
+            agg[3].index(experienceName)
+        except ValueError:
+            continue
+        header = agg[3].split('\n#e ')
+        index_subject_name = header.index('Subject:') + 1
+        if subject_name not in header[index_subject_name]:
+            continue
+
+        index_random_matrices = header.index('RandomMatrix') + 1
+        random_matrices = ast.literal_eval(header[index_random_matrices].split('\n')[0].split('\n')[0])
+        presentation_order = header[header.index('PresentationOrder')+1:header.index('RandomMatrix')]
+        presentation_order = ''.join(presentation_order)
+        presentation_order = presentation_order.split('array')
+        presentation_order = [element for element in presentation_order if len(element) > 2]
+        for index in range(len(presentation_order)):
+            presentation_order[index] = presentation_order[index].replace('(', '')
+            presentation_order[index] = presentation_order[index].replace('),', '')
+            presentation_order[index] = presentation_order[index].replace(')]', '')
+            presentation_order[index] = np.array(ast.literal_eval(presentation_order[index]), dtype=int)
+
+        print(random_matrices)
+        exit()
+
+        return presentation_order, random_matrices
+
+    return None
