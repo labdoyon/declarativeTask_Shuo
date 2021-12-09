@@ -547,7 +547,6 @@ def load_mvpa_trials(subject_name, experienceName):
                           'task-' + experienceName in file]
 
     data_files.sort(reverse=True)  # latest runs first
-
     for dataFile in data_files:
         try:
             agg = misc.data_preprocessing.read_datafile(dataFile, only_header_and_variable_names=True)
@@ -562,9 +561,9 @@ def load_mvpa_trials(subject_name, experienceName):
         if subject_name not in header[index_subject_name]:
             continue
 
-        index_random_matrices = header.index('RandomMatrix') + 1
-        random_matrices = ast.literal_eval(header[index_random_matrices].split('\n')[0].split('\n')[0])
-        presentation_order = header[header.index('PresentationOrder')+1:header.index('RandomMatrix')]
+        # index_random_matrices = header.index('RandomMatrix') + 1
+        # random_matrices = ast.literal_eval(header[index_random_matrices].split('\n')[0].split('\n')[0])
+        presentation_order = header[header.index('PresentationOrder')+1:header.index('PresentationOrderEndOf')]
         presentation_order = ''.join(presentation_order)
         presentation_order = presentation_order.split('array')
         presentation_order = [element for element in presentation_order if len(element) > 2]
@@ -572,11 +571,10 @@ def load_mvpa_trials(subject_name, experienceName):
             presentation_order[index] = presentation_order[index].replace('(', '')
             presentation_order[index] = presentation_order[index].replace('),', '')
             presentation_order[index] = presentation_order[index].replace(')]', '')
-            presentation_order[index] = np.array(ast.literal_eval(presentation_order[index]), dtype=int)
+            presentation_order[index] = presentation_order[index].replace(', dtype=object', '')
+            presentation_order[index] = presentation_order[index].replace('\'', '"')
+            presentation_order[index] = np.array(ast.literal_eval(presentation_order[index]), dtype=object)
 
-        print(random_matrices)
-        exit()
-
-        return presentation_order, random_matrices
+        return presentation_order
 
     return None
