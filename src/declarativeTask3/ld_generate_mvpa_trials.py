@@ -24,14 +24,14 @@ subjectName = arguments[1]
 learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
 
-if experiment_use_faces_or_places[faces_places_choice]['PreTest'] == 'faces' and \
+if experiment_use_faces_or_places[faces_places_choice]['PostTest2'] == 'faces' and \
         experiment_use_faces_or_places[faces_places_choice]['PostLearn'] == 'places':
-    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PreTest')
+    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
     correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
-elif experiment_use_faces_or_places[faces_places_choice]['PreTest'] == 'places' and \
+elif experiment_use_faces_or_places[faces_places_choice]['PostTest2'] == 'places' and \
         experiment_use_faces_or_places[faces_places_choice]['PostLearn'] == 'faces':
-    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PreTest')
-    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
+    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
+    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
 
 FACEs_c_rem = [learningMatrix[position_index] if position_index < center_card_position
                else learningMatrix[position_index - 1]
