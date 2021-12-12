@@ -293,33 +293,32 @@ for n_block in range(number_blocks):
     exp.add_experiment_info(f'PresentationOrder_Block-{n_block}')  # Save Presentation Order
     exp.add_experiment_info(str(list(presentationOrder[n_block])))
     if experimentName == 'MVPA':
-        pass
+        listCards = presentationOrder[n_block][3]
         # local_random_matrix = randomMatrix[n_block]
         # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
         # exp.add_experiment_info(str(local_random_matrix))
+    elif experimentName == "PostRecog1" or experimentName == "PostRecog2":
+        listCards = []
+        for nCard in range(presentationOrder[n_block].shape[1]):
+            if len(removeCards):
+                removeCards.sort()
+                removeCards = np.asarray(removeCards)
+                tempPosition = presentationOrder[n_block][0][nCard]
+                index = 0
+                try:
+                    index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
+                except:
+                    pass
 
-    listCards = presentationOrder[n_block][3]
-    # listCards = []
-    # for nCard in range(presentationOrder[n_block].shape[1]):
-    #     if len(removeCards):
-    #         removeCards.sort()
-    #         removeCards = np.asarray(removeCards)
-    #         tempPosition = presentationOrder[n_block][0][nCard]
-    #         index = 0
-    #         try:
-    #             index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
-    #         except:
-    #             pass
-    #
-    #         position = tempPosition - index
-    #
-    #     else:
-    #         position = presentationOrder[n_block][0][nCard]
-    #
-    #     if presentationOrder[n_block][1][nCard] == 0:  # Learning Matrix
-    #         listCards.append(local_learning_matrix[int(position)])
-    #     else:
-    #         listCards.append(local_random_matrix[int(position)])
+                position = tempPosition - index
+
+            else:
+                position = presentationOrder[n_block][0][nCard]
+
+            if presentationOrder[n_block][1][nCard] == 0:  # Learning Matrix
+                listCards.append(local_learning_matrix[int(position)])
+            else:
+                listCards.append(local_random_matrix[int(position)])
 
     if experimentName == "PostRecog1" or experimentName == "PostRecog2":
         number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
