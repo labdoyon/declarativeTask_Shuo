@@ -81,7 +81,7 @@ keepMatrix = True
 keepPreviousMatrix = True
 if experimentName == 'PreLearn':
     keepPreviousMatrix = True
-elif 'PreTest' in experimentName or 'PostTest' in experimentName:
+elif 'PreTest' in experimentName or 'PostTest' in experimentName or 'Test-2ndClassLearned' in experimentName:
     keepPreviousMatrix = True
     nbBlocksMax = 1
 elif 'PostLearn' in experimentName:

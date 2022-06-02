@@ -263,40 +263,46 @@ supported_start_by_choices_explicit = {'start_with_class1': 'start_with_faces',
 experiment_use_faces_or_places = {
     # start with faces
     'start_with_class1':
-        {'PreLearn':    'faces',
-         'PreTest':     'faces',
-         'PostTest1':   'faces',
-         'PostRecog1':  'faces',
-         'PostTest2': 'faces',
-         'PostRecog2':  'faces',
-         'PostLearn':   'places'},
+        {'PreLearn':                'faces',
+         'PreTest':                 'faces',
+         'PostTest1':               'faces',
+         'Recognition':             'faces',
+         'PostTest2':               'faces',
+         'PostLearn':               'places',
+         'Test-2ndClassLearned':    'places',
+         'PostTest3':               'faces'},
     # start with places
     'start_with_class2':
-        {'PreLearn':    'places',
-         'PreTest':     'places',
-         'PostTest1':   'places',
-         'PostRecog1':  'places',
-         'PostTest2': 'places',
-         'PostRecog2':  'places',
-         'PostLearn':   'faces'}
+        {'PreLearn':                'places',
+         'PreTest':                 'places',
+         'PostTest1':               'places',
+         'Recognition':             'places',
+         'PostTest2':               'places',
+         'PostLearn':               'faces',
+         'Test-2ndClassLearned':    'faces',
+         'PostTest3':               'places'}
 }
 
-sessions = ['presleep', 'postsleep']
+sessions = ['ExpD1', 'ExpSleep', 'ExpTest', 'ExpD2', 'ExpMVPA']
 experiment_session = {
-    'choose-language':      'presleep',
-    'choose-faces-places':  'presleep',
-    'Example':              'presleep',
-    'PrePVT':               'presleep',
+    'choose-language':      'ExpD1',
+    'choose-faces-places':  'ExpD1',
 
-    'PreLearn':             'presleep',
-    'PreTest':              'presleep',
+    'Example':              'ExpD1',
+    'PreLearn':             'ExpD1',
+    'PrePVT':               'ExpD1',
+    'PreTest':              'ExpD1',
 
-    'PostPVT1':             'postsleep',
-    'PostTest1':            'postsleep',
-    'PostRecog1':           'postsleep',
-    'PostPVT2':             'postsleep',
-    'PostTest2':            'postsleep',
-    'PostRecog2':           'postsleep',
-    'PostLearn':            'postsleep',
-    'generate_mvpa_trials': 'postsleep',
-    'MVPA':                 'postsleep'}
+    'PostPVT1':             'ExpTest',
+    'PostTest1':            'ExpTest',
+    'Recognition':          'ExpTest',
+
+    'PostPVT2':             'ExpD2',
+    'PostTest2':            'ExpD2',
+    'PostLearn':            'ExpD2',
+
+    'PostPVT3':             'ExpMVPA',
+    'Test-2ndClassLearned': 'ExpMVPA',
+    'PostTest3':            'ExpMVPA',
+    'generate_mvpa_trials': 'ExpMVPA',
+    'MVPA':                 'ExpMVPA'}

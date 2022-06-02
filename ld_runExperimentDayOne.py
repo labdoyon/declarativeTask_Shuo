@@ -2,13 +2,6 @@ from cursesmenu import *
 from cursesmenu.items import *
 import sys
 import os
-import glob
-import numpy as np
-from ast import literal_eval
-
-from datetime import datetime
-import expyriment
-from dateutil.parser import parse
 
 from declarativeTask3.config import python, rawFolder
 from declarativeTask3.ld_utils import getPrevious
@@ -25,120 +18,120 @@ faces_places_choice = getPrevious(subjectName, 0, 'choose-faces-places', 'start_
 # 'None' if no choice was selected previously, said choice otherwise, e.g. 'start_with_faces'
 
 # Create the menu
-menu = CursesMenu(
-    title="DECOPM", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + str(language) +
-                             ' ; class1_or_class2: ' + str(faces_places_choice))
+menu = CursesMenu(title="DeMo", subtitle='Subject: ' + sys.argv[1] + ' ; language: ' + str(language) +
+                                         ' ; class1_or_class2: ' + str(faces_places_choice))
 
-dayOneChooseLanguage = CommandItem(text='choose language',
-                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
-                                   arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu,
-                                   should_exit=False)
+ChooseLanguage = CommandItem(
+    text='choose language', command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
+    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
 
-dayOneChooseFacesPlaces = CommandItem(text='choose: start by class1 or class2?',
-                                      command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
-                                      arguments='choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu,
-                                      should_exit=False)
+ChooseFacesPlaces = CommandItem(
+    text='choose: start by class1 or class2?',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
+    arguments='choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
 
-dayOneExample = CommandItem(text='Example',
-                            command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
-                            arguments='Example,' + sys.argv[1],
-                            menu=menu,
-                            should_exit=False)
+ses_ExpD1__task_Example = CommandItem(
+    text='ses-ExpD1_task-Example', command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
+    arguments='Example,' + sys.argv[1], menu=menu, should_exit=False)
 
-# dayOneStimuliPresentation = CommandItem(text='stimuli presentation',
-#                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_stimuli_presentation.py"),
-#                             arguments='stimuli-presentation, ' + sys.argv[1],
-#                             menu=menu,
-#                             should_exit=False)
+ses_ExpD1__task_Learn_1stClass = CommandItem(
+    text='ses-ExpD1_task-Learn-1stClass',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='PreLearn, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePrePVT = CommandItem(text='4. PrePVT',
-                           command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-                           arguments='PrePVT, ' + sys.argv[1],
-                           menu=menu,
-                           should_exit=False)
+ses_ExpD1__task_PVT = CommandItem(
+    text='ses-ExpD1_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='PrePVT, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePreLearn = CommandItem(text='2. PreLearn',
-                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-                             arguments='PreLearn, ' + sys.argv[1],
-                             menu=menu,
-                             should_exit=False)
+ses_ExpD1__task_Test_1stClass = CommandItem(
+    text='ses-ExpD1_task-Test-1stClass',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='PreTest, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePreTest = CommandItem(text='5. PreTest',
-                                 command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-                                 arguments='PreTest, ' + sys.argv[1],
-                                 menu=menu,
-                                 should_exit=False)
+# ### SLEEP IN THE SCANNER ###
 
-dayOnePostPVT1 = CommandItem(text='7. PostPVT1',
-                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-                             arguments='PostPVT1, ' + sys.argv[1],
-                             menu=menu,
-                             should_exit=False)
+ses_ExpTest__task_PVT = CommandItem(
+    text='ses-ExpTest_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='PostPVT1, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePostTest1 = CommandItem(text='8. PostTest1',
-                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-                                   arguments='PostTest1, ' + sys.argv[1],
-                                   menu=menu,
-                                   should_exit=False)
+ses_ExpTest__task_Test_1stClass = CommandItem(
+    text='ses-ExpTest_task-Test-1stClass',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='PostTest1, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePostRecog1 = CommandItem(text="9. PostRecog1",
-                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-                                arguments="PostRecog1, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+ses_ExpTest__task_Recognition = CommandItem(
+    text="ses-ExpTest_task-Recognition",
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="Recognition, " + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePostPVT2 = CommandItem(text='7. PostPVT2',
-                             command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-                             arguments='PostPVT2, ' + sys.argv[1],
-                             menu=menu,
-                             should_exit=False)
+# ### SLEEP IN THE LAB (no recording) ###
 
-dayOnePostTest2 = CommandItem(text='12. PostTest2',
-                                   command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-                                   arguments='PostTest2, ' + sys.argv[1],
-                                   menu=menu,
-                                   should_exit=False)
+ses_ExpD2__task_PVT = CommandItem(
+    text='ses-ExpD2_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='PostPVT2, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePostRecog2 = CommandItem(text="13. PostRecog2",
-                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-                                arguments="PostRecog2, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+ses_ExpD2__task_Test_1stClass = CommandItem(
+    text='ses-ExpD2_task-Test-1stClass',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='PostTest2, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnePostLearn = CommandItem(text="14. PostLearn",
-                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-                                arguments="PostLearn, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+ses_ExpD2__task_Learn_2ndClass = CommandItem(
+    text="ses-ExpD2_task-Learn-2ndClass",
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments="PostLearn, " + sys.argv[1], menu=menu, should_exit=False)
 
-dayOnegenerate_MVPA = CommandItem(text="14.5 generate MVPA trials",
-                                  command=python + " " + os.path.join("src", "declarativeTask3",
-                                                                      "ld_generate_mvpa_trials.py"),
-                                  arguments="generate_mvpa_trials," + sys.argv[1],
-                                  menu=menu,
-                                  should_exit=False)
+ses_ExpMVPA__task_PVT = CommandItem(
+    text='ses-ExpMVPA_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='PostPVT3, ' + sys.argv[1], menu=menu, should_exit=False)
 
-dayOneMVPA = CommandItem(text="15. MVPA",
-                                command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-                                arguments="MVPA, " + sys.argv[1],
-                                menu=menu,
-                                should_exit=False)
+ses_ExpMVPA__task_Test_2ndClass = CommandItem(
+    text='ses-ExpMVPA_task-Test-2ndClass',
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='Test-2ndClassLearned, ' + sys.argv[1], menu=menu, should_exit=False)
 
-menu.append_item(dayOneChooseLanguage)
-menu.append_item(dayOneChooseFacesPlaces)
-menu.append_item(dayOneExample)
-# menu.append_item(dayOneStimuliPresentation)
-menu.append_item(dayOnePrePVT)
-menu.append_item(dayOnePreLearn)
-menu.append_item(dayOnePreTest)
-menu.append_item(dayOnePostPVT1)
-menu.append_item(dayOnePostTest1)
-menu.append_item(dayOnePostRecog1)
-menu.append_item(dayOnePostPVT2)
-menu.append_item(dayOnePostTest2)
-menu.append_item(dayOnePostRecog2)
-menu.append_item(dayOnePostLearn)
-menu.append_item(dayOnegenerate_MVPA)
-menu.append_item(dayOneMVPA)
+ses_ExpMVPA__task_Test_1stClass = CommandItem(
+    text='PostTest3', command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='PostTest3, ' + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_generate_MVPA_trials = CommandItem(
+    text="generate MVPA trials",
+    command=python + " " + os.path.join("src", "declarativeTask3", "ld_generate_mvpa_trials.py"),
+    arguments="generate_mvpa_trials," + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_MVPA = CommandItem(
+    text="MVPA", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="MVPA, " + sys.argv[1], menu=menu, should_exit=False)
+
+menu.append_item(ChooseLanguage)
+menu.append_item(ChooseFacesPlaces)
+
+# ###  EXPERIMENTAL NIGHT ###
+# Set Up
+# Rest
+menu.append_item(ses_ExpD1__task_Example)
+menu.append_item(ses_ExpD1__task_Learn_1stClass)
+# Rest
+menu.append_item(ses_ExpD1__task_PVT)  # PrePVT # The first PVT is _after_ learning, not before, correct?
+menu.append_item(ses_ExpD1__task_Test_1stClass)  # PreTest# EEG SetUp Wear Cap
+# ### SLEEP IN THE SCANNER ###
+# Remove Cap
+# Rest
+menu.append_item(ses_ExpTest__task_PVT)
+menu.append_item(ses_ExpTest__task_Test_1stClass)
+menu.append_item(ses_ExpTest__task_Recognition)
+
+# ### SLEEP IN THE LAB (no recording) ###
+# Set Up
+# Rest
+menu.append_item(ses_ExpD2__task_PVT)
+menu.append_item(ses_ExpD2__task_Test_1stClass)
+menu.append_item(ses_ExpD2__task_Learn_2ndClass)
+# Rest
+menu.append_item(ses_ExpMVPA__task_PVT)
+menu.append_item(ses_ExpMVPA__task_Test_2ndClass)
+menu.append_item(ses_ExpMVPA__task_Test_1stClass)
+
+menu.append_item(ses_ExpMVPA__task_generate_MVPA_trials)
+menu.append_item(ses_ExpMVPA__task_MVPA)
 
 menu.show()
