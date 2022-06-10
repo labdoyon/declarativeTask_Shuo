@@ -37,70 +37,86 @@ ses_ExpD1__task_Example = CommandItem(
 ses_ExpD1__task_Learn_1stClass = CommandItem(
     text='ses-ExpD1_task-Learn-1stClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='PreLearn, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-Learn-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD1__task_PVT = CommandItem(
     text='ses-ExpD1_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='PrePVT, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD1__task_Test_1stClass = CommandItem(
     text='ses-ExpD1_task-Test-1stClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='PreTest, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 # ### SLEEP IN THE SCANNER ###
 
 ses_ExpTest__task_PVT = CommandItem(
     text='ses-ExpTest_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='PostPVT1, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpTest_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpTest__task_Test_1stClass = CommandItem(
     text='ses-ExpTest_task-Test-1stClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='PostTest1, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpTest_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpTest__task_Recognition = CommandItem(
     text="ses-ExpTest_task-Recognition",
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="Recognition, " + sys.argv[1], menu=menu, should_exit=False)
+    arguments="ses-ExpTest_task-Recognition, " + sys.argv[1], menu=menu, should_exit=False)
 
 # ### SLEEP IN THE LAB (no recording) ###
 
 ses_ExpD2__task_PVT = CommandItem(
     text='ses-ExpD2_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='PostPVT2, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD2_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD2__task_Test_1stClass = CommandItem(
     text='ses-ExpD2_task-Test-1stClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='PostTest2, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD2_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD2__task_Learn_2ndClass = CommandItem(
     text="ses-ExpD2_task-Learn-2ndClass",
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments="PostLearn, " + sys.argv[1], menu=menu, should_exit=False)
+    arguments="ses-ExpD2_task-Learn-2ndClass, " + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpMVPA__task_PVT = CommandItem(
     text='ses-ExpMVPA_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='PostPVT3, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpMVPA_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpMVPA__task_Test_2ndClass = CommandItem(
     text='ses-ExpMVPA_task-Test-2ndClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='Test-2ndClassLearned, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpMVPA_task-Test-2ndClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpMVPA__task_Test_1stClass = CommandItem(
-    text='PostTest3', command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='PostTest3, ' + sys.argv[1], menu=menu, should_exit=False)
+    text='ses-ExpMVPA_task-Test-1stClass', command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+    arguments='ses-ExpMVPA_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpMVPA__task_generate_MVPA_trials = CommandItem(
-    text="generate MVPA trials",
+    text="ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials",
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_generate_mvpa_trials.py"),
-    arguments="generate_mvpa_trials," + sys.argv[1], menu=menu, should_exit=False)
+    arguments="ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials," + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA = CommandItem(
-    text="MVPA", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="MVPA, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_MVPA_Block_1 = CommandItem(
+    text="ses-ExpMVPA_task-MVPA-Block-1", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-MVPA-Block-1, " + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_MVPA_Block_2 = CommandItem(
+    text="ses-ExpMVPA_task-MVPA-Block-2", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-MVPA-Block-2, " + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_MVPA_Block_3 = CommandItem(
+    text="ses-ExpMVPA_task-MVPA-Block-3", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-MVPA-Block-3, " + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_MVPA_Block_4 = CommandItem(
+    text="ses-ExpMVPA_task-MVPA-Block-4", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-MVPA-Block-4, " + sys.argv[1], menu=menu, should_exit=False)
+
+ses_ExpMVPA__task_MVPA_Block_5 = CommandItem(
+    text="ses-ExpMVPA_task-MVPA-Block-5", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-MVPA-Block-5, " + sys.argv[1], menu=menu, should_exit=False)
 
 menu.append_item(ChooseLanguage)
 menu.append_item(ChooseFacesPlaces)
@@ -132,6 +148,10 @@ menu.append_item(ses_ExpMVPA__task_Test_2ndClass)
 menu.append_item(ses_ExpMVPA__task_Test_1stClass)
 
 menu.append_item(ses_ExpMVPA__task_generate_MVPA_trials)
-menu.append_item(ses_ExpMVPA__task_MVPA)
+menu.append_item(ses_ExpMVPA__task_MVPA_Block_1)
+menu.append_item(ses_ExpMVPA__task_MVPA_Block_2)
+menu.append_item(ses_ExpMVPA__task_MVPA_Block_3)
+menu.append_item(ses_ExpMVPA__task_MVPA_Block_4)
+menu.append_item(ses_ExpMVPA__task_MVPA_Block_5)
 
 menu.show()

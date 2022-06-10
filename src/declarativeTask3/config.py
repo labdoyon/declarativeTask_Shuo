@@ -7,7 +7,7 @@ from expyriment.misc import constants
 python = 'py'
 
 # TTL signal and TR duration
-TR_duration = 2160  # in ms
+TR_duration = 1591   # in ms
 ttl_characters = ['5', 't', 'r']
 min_delay_between_two_ttls = floor(TR_duration/2)  # in milliseconds
 interval_between_ttl_checks = min(int(min_delay_between_two_ttls/10), 100)  # in milliseconds
@@ -193,8 +193,8 @@ mvpa_number_trials_wrong_position = 6  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented
 mvpa_equalize_number_correctly_recalled_images = True
 
-presentation_possible_iti = test_possible_iti = recognition_possible_iti = [1, 2, 3]
-mvpa_possible_iti = [2, 3, 4]
+presentation_possible_iti = test_possible_iti = recognition_possible_iti = [2, 3, 4]
+mvpa_possible_iti = [3, 4, 5]
 presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
     [1] * int(len(matrixTemplate) / 6) + [2] * int(len(matrixTemplate) / 6) + [3] * int(len(matrixTemplate) / 6)
 recognition_block_number_TRs_to_wait_inter_trials =\
@@ -263,46 +263,58 @@ supported_start_by_choices_explicit = {'start_with_class1': 'start_with_faces',
 experiment_use_faces_or_places = {
     # start with faces
     'start_with_class1':
-        {'PreLearn':                'faces',
-         'PreTest':                 'faces',
-         'PostTest1':               'faces',
-         'Recognition':             'faces',
-         'PostTest2':               'faces',
-         'PostLearn':               'places',
-         'Test-2ndClassLearned':    'places',
-         'PostTest3':               'faces'},
+        {'ses-ExpD1_task-Learn-1stClass':               'faces',
+         'ses-ExpD1_task-Test-1stClass':                'faces',
+
+         'ses-ExpTest_task-Test-1stClass':              'faces',
+         'ses-ExpTest_task-Recognition':                'faces',
+
+         'ses-ExpD2_task-Test-1stClass':                'faces',
+         'ses-ExpD2_task-Learn-2ndClass':               'places',
+
+         'ses-ExpMVPA_task-Test-2ndClass':              'places',
+         'ses-ExpMVPA_task-Test-1stClass':              'faces'},
+
     # start with places
     'start_with_class2':
-        {'PreLearn':                'places',
-         'PreTest':                 'places',
-         'PostTest1':               'places',
-         'Recognition':             'places',
-         'PostTest2':               'places',
-         'PostLearn':               'faces',
-         'Test-2ndClassLearned':    'faces',
-         'PostTest3':               'places'}
+        {'ses-ExpD1_task-Learn-1stClass':               'places',
+         'ses-ExpD1_task-Test-1stClass':                'places',
+
+         'ses-ExpTest_task-Test-1stClass':              'places',
+         'ses-ExpTest_task-Recognition':                'places',
+
+         'ses-ExpD2_task-Test-1stClass':                'places',
+         'ses-ExpD2_task-Learn-2ndClass':               'faces',
+
+         'ses-ExpMVPA_task-Test-2ndClass':              'faces',
+         'ses-ExpMVPA_task-Test-1stClass':              'places'}
 }
 
 sessions = ['ExpD1', 'ExpSleep', 'ExpTest', 'ExpD2', 'ExpMVPA']
+
 experiment_session = {
-    'choose-language':      'ExpD1',
-    'choose-faces-places':  'ExpD1',
+    'choose-language':                              'ExpD1',
+    'choose-faces-places':                          'ExpD1',
 
-    'Example':              'ExpD1',
-    'PreLearn':             'ExpD1',
-    'PrePVT':               'ExpD1',
-    'PreTest':              'ExpD1',
+    'ses-ExpD1_task-Example':                       'ExpD1',
+    'ses-ExpD1_task-Learn-1stClass':                'ExpD1',
+    'ses-ExpD1_task-PVT':                           'ExpD1',
+    'ses-ExpD1_task-Test-1stClass':                 'ExpD1',
 
-    'PostPVT1':             'ExpTest',
-    'PostTest1':            'ExpTest',
-    'Recognition':          'ExpTest',
+    'ses-ExpTest_task-PVT':                         'ExpTest',
+    'ses-ExpTest_task-Test-1stClass':               'ExpTest',
+    'ses-ExpTest_task-Recognition':                 'ExpTest',
 
-    'PostPVT2':             'ExpD2',
-    'PostTest2':            'ExpD2',
-    'PostLearn':            'ExpD2',
+    'ses-ExpD2_task-PVT':                           'ExpD2',
+    'ses-ExpD2_task-Test-1stClass':                 'ExpD2',
+    'ses-ExpD2_task-Learn-2ndClass':                'ExpD2',
 
-    'PostPVT3':             'ExpMVPA',
-    'Test-2ndClassLearned': 'ExpMVPA',
-    'PostTest3':            'ExpMVPA',
-    'generate_mvpa_trials': 'ExpMVPA',
-    'MVPA':                 'ExpMVPA'}
+    'ses-ExpMVPA_task-PVT':                         'ExpMVPA',
+    'ses-ExpMVPA_task-Test-2ndClass':               'ExpMVPA',
+    'ses-ExpMVPA_task-Test-1stClass':               'ExpMVPA',
+    'ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials':  'ExpMVPA',
+    'ses-ExpMVPA_task-MVPA-Block-1':                'ExpMVPA',
+    'ses-ExpMVPA_task-MVPA-Block-2':                'ExpMVPA',
+    'ses-ExpMVPA_task-MVPA-Block-3':                'ExpMVPA',
+    'ses-ExpMVPA_task-MVPA-Block-4':                'ExpMVPA',
+    'ses-ExpMVPA_task-MVPA-Block-5':                'ExpMVPA'}

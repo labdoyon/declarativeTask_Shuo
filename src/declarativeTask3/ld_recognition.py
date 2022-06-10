@@ -294,6 +294,7 @@ for n_block in range(number_blocks):
         answer = 'noResponse'
         start_of_response_period_timestamp = exp.clock.time
         valid_answer = False
+
         while exp.clock.time - start_of_response_period_timestamp < responseTime:
             if ms.is_pressed(button='left'):
                 response_timestamp = exp.clock.time
@@ -305,8 +306,7 @@ for n_block in range(number_blocks):
                 answer = 'matrixA'
                 valid_answer = True
                 break
-            if exp.keyboard.process_control_keys():
-                exp.keyboard.process_control_keys()
+            exp.keyboard.process_control_keys()
         if valid_answer:
             rt = exp.clock.time - start_of_response_period_timestamp
         else:

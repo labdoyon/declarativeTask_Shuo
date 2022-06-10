@@ -24,14 +24,18 @@ subjectName = arguments[1]
 learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
 faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
 
-if experiment_use_faces_or_places[faces_places_choice]['PostTest3'] == 'faces' and \
-        experiment_use_faces_or_places[faces_places_choice]['Test-2ndClassLearned'] == 'places':
-    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
-    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
-elif experiment_use_faces_or_places[faces_places_choice]['PostTest3'] == 'places' and \
-        experiment_use_faces_or_places[faces_places_choice]['Test-2ndClassLearned'] == 'faces':
-    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostLearn')
-    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName, experienceName='PostTest2')
+if experiment_use_faces_or_places[faces_places_choice]['ses-ExpMVPA_task-Test-1stClass'] == 'faces' and \
+        experiment_use_faces_or_places[faces_places_choice]['ses-ExpMVPA_task-Test-2ndClass'] == 'places':
+    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                    experienceName='ses-ExpMVPA_task-Test-1stClass')
+    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                     experienceName='ses-ExpMVPA_task-Test-2ndClass')
+elif experiment_use_faces_or_places[faces_places_choice]['ses-ExpMVPA_task-Test-1stClass'] == 'places' and \
+        experiment_use_faces_or_places[faces_places_choice]['ses-ExpMVPA_task-Test-2ndClass'] == 'faces':
+    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                    experienceName='ses-ExpMVPA_task-Test-2ndClass')
+    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                     experienceName='ses-ExpMVPA_task-Test-1stClass')
 
 FACEs_c_rem = [learningMatrix[position_index] if position_index < center_card_position
                else learningMatrix[position_index - 1]
