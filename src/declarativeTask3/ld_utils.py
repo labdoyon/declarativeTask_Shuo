@@ -535,7 +535,7 @@ def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=F
     return last_ttl_timestamp
 
 
-def load_mvpa_trials(subject_name, experienceName):
+def load_mvpa_trials(subject_name, experienceName, mvpa_task_block_number=None):
     subject_dir = os.path.join(rawFolder, 'sourcedata', 'sub-' + subject_name)
     data_files = []
     for session in sessions:
@@ -575,6 +575,9 @@ def load_mvpa_trials(subject_name, experienceName):
             presentation_order[index] = presentation_order[index].replace('\'', '"')
             presentation_order[index] = np.array(ast.literal_eval(presentation_order[index]), dtype=object)
 
-        return presentation_order
+        if mvpa_task_block_number is None:
+            return presentation_order
+        else:
+            return [presentation_order[mvpa_task_block_number]]
 
     return None

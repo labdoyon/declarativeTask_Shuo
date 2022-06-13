@@ -187,7 +187,7 @@ numberBlocksSubUnit = 2
 numberLearningSubUnits = 5
 
 # MVPA
-mvpa_number_blocks = 5
+mvpa_number_blocks = 1
 mvpa_number_trials_correct_position = 18  # per block per category
 mvpa_number_trials_wrong_position = 6  # per block per category
 mvpa_number_null_events = 0  # per block  #  WARNNG: Feature has yet to be implemented

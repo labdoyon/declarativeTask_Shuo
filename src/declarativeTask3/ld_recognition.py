@@ -92,7 +92,7 @@ if experimentName == "Recognition":
     exp.add_experiment_info(parent_category + '_only_random_matrix:')
     exp.add_experiment_info(str(local_random_matrix))
 
-elif experimentName == "MVPA":
+elif 'task-MVPA' in experimentName:
     intro_instruction = ' MVPA '
     number_blocks = mvpa_number_blocks
     parent_category = 'both'
@@ -102,6 +102,8 @@ elif experimentName == "MVPA":
     local_learning_matrix = learningMatrix
     exp.add_experiment_info('faces_or_places_for_this_experiment:')
     exp.add_experiment_info(parent_category)
+
+    mvpa_task_block_number = int(experimentName[-1])-1
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -176,8 +178,9 @@ for n_block in range(number_blocks):
         block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
         presentationOrder[n_block] = block_presentationOrder
 
-if experimentName == 'MVPA':
-    presentationOrder = load_mvpa_trials(subjectName, "generate_mvpa_trials")
+if 'task-MVPA' in experimentName:
+    presentationOrder = load_mvpa_trials(subjectName, "generate_mvpa_trials",
+                                         mvpa_task_block_number=mvpa_task_block_number)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
@@ -198,7 +201,7 @@ for n_block in range(number_blocks):
     exp.add_experiment_info('Block_{}_timing_{}'.format(n_block, exp.clock.time))
     exp.add_experiment_info(f'PresentationOrder_Block-{n_block}')  # Save Presentation Order
     exp.add_experiment_info(str(list(presentationOrder[n_block])))
-    if experimentName == 'MVPA':
+    if 'task-MVPA' in experimentName:
         listCards = presentationOrder[n_block][3]
         # local_random_matrix = randomMatrix[n_block]
         # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
@@ -248,7 +251,7 @@ for n_block in range(number_blocks):
 
                 trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
                 number_TRs_inter_trials.remove(trial_iti)
-        elif experimentName == "MVPA":
+        elif 'task-MVPA' in experimentName:
             trial_iti = presentationOrder[n_block][2][nCard]
 
         exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
