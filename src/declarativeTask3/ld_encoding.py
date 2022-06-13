@@ -285,7 +285,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         rt = True  # Response time; equals None if participant haven't clicked within window time frame they were
         # given to answer
 
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.clock.wait(presentationCard, process_control_events=True)
         m.plotCueCard(False, bs, True)  # Hide Cue
         hide_cue_card_timestamp = exp.clock.time
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),
