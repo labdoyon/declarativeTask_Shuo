@@ -22,3 +22,7 @@ A subject must go through all phases for the experiment to be complete
 # Installation
 Please use  python3.8.1
 install requirements with pip: <pip install -r requirements.txt>
+
+# Show Matrix:
+python src\declarativeTask3\ld_show_matrix.py "show_matrix,<subject_id>"
+(replace python by the relevant python interpreter if necessary)
