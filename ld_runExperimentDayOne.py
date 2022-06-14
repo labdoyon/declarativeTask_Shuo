@@ -32,7 +32,7 @@ ChooseFacesPlaces = CommandItem(
 
 ses_ExpD1__task_Example = CommandItem(
     text='ses-ExpD1_task-Example', command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
-    arguments='Example,' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-Example,' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD1__task_Learn_1stClass = CommandItem(
     text='ses-ExpD1_task-Learn-1stClass',
