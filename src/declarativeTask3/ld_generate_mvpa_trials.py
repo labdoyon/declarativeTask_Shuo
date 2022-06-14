@@ -21,7 +21,7 @@ arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment 
 experimentName = arguments[0]
 subjectName = arguments[1]
 
-learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
+learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
 faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
 
 if experiment_use_faces_or_places[faces_places_choice]['ses-ExpMVPA_task-Test-1stClass'] == 'faces' and \
