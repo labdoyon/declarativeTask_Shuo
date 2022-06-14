@@ -59,7 +59,7 @@ exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented',
                              'start_of_response_period_timestamp',
                              'subjectAnswered', 'subjectCorrect', 'ResponseTime'])
 
-learningMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
+learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
 exp.add_experiment_info('Learning: ')
 exp.add_experiment_info(str(learningMatrix))
 
