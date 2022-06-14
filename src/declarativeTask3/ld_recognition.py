@@ -65,7 +65,7 @@ exp.add_experiment_info(str(learningMatrix))
 
 number_blocks = 1
 intro_instruction = ' RECOGNITION '
-if experimentName == "Recognition":
+if experimentName == "ses-ExpTest_task-Recognition":
     randomMatrix = m.newRecognitionMatrix(learningMatrix)
     exp.add_experiment_info('RandomMatrix: ')
     exp.add_experiment_info(str(randomMatrix))
@@ -162,7 +162,7 @@ exp.clock.wait(restPeriod, process_control_events=True)
 # Generate Vector of trials for the full experiment:
 presentationOrder = [None] * number_blocks
 for n_block in range(number_blocks):
-    if experimentName == "Recognition":
+    if experimentName == "ses-ExpTest_task-Recognition":
         presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
         presentationMatrixLearningOrder = np.vstack(
             (presentationMatrixLearningOrder, np.zeros(m.size[0] * m.size[1] - len(removeCards))))
@@ -208,7 +208,7 @@ for n_block in range(number_blocks):
         # local_random_matrix = randomMatrix[n_block]
         # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
         # exp.add_experiment_info(str(local_random_matrix))
-    elif experimentName == "Recognition":
+    elif experimentName == "ses-ExpTest_task-Recognition":
         listCards = []
         for nCard in range(presentationOrder[n_block].shape[1]):
             if len(removeCards):
@@ -231,13 +231,13 @@ for n_block in range(number_blocks):
             else:
                 listCards.append(local_random_matrix[int(position)])
 
-    if experimentName == "Recognition":
+    if experimentName == "ses-ExpTest_task-Recognition":
         number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
 
     for nCard in range(presentationOrder[n_block].shape[1]):
         # Inter Trial Interval
         min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
-        if experimentName == "Recognition":
+        if experimentName == "ses-ExpTest_task-Recognition":
             exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
             # removing elements which can't be selected
             temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
