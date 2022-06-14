@@ -56,8 +56,8 @@ nbBlocksMax = 10
 
 presentationCard = 2000
 
-responseTime = 4300
-AssociationResponseTime = 10000
+responseTime = 5000
+mvpa_recognition_response_time = 4000
 shortRest = 2500
 thankYouRest = 5000
 restPeriod = 15000
@@ -196,9 +196,13 @@ mvpa_equalize_number_correctly_recalled_images = True
 presentation_possible_iti = test_possible_iti = recognition_possible_iti = [2, 3, 4]
 mvpa_possible_iti = [3, 4, 5]
 presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
-    [1] * int(len(matrixTemplate) / 6) + [2] * int(len(matrixTemplate) / 6) + [3] * int(len(matrixTemplate) / 6)
+    [presentation_possible_iti[0]] * int(len(matrixTemplate) / 6) + \
+    [presentation_possible_iti[1]] * int(len(matrixTemplate) / 6) + \
+    [presentation_possible_iti[2]] * int(len(matrixTemplate) / 6)
 recognition_block_number_TRs_to_wait_inter_trials =\
-    [1] * int(len(matrixTemplate) / 3) + [2] * int(len(matrixTemplate) / 3) + [3] * int(len(matrixTemplate) / 3)
+    [recognition_possible_iti[0]] * int(len(matrixTemplate) / 3) + \
+    [recognition_possible_iti[1]] * int(len(matrixTemplate) / 3) + \
+    [recognition_possible_iti[2]] * int(len(matrixTemplate) / 3)
 
 mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions = []
 if mvpa_number_trials_correct_position:
@@ -219,7 +223,8 @@ if mvpa_number_null_events:
             [value] * int(mvpa_number_null_events/len(mvpa_possible_iti))
 
 number_ttl_in_rest_period = ceil(restPeriod/TR_duration)
-number_ttl_before_rest_period = 4
+number_ttl_before_rest_period = 6
+instructions_time_displayed_in_TRs = 2
 visual_comfort_wait_time = 300  # short wait time padding after an instruction disappears and
 # before the next one appears, for visual comfort
 

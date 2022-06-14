@@ -148,14 +148,15 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
-last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp)
+for i_ttl in range(instructions_time_displayed_in_TRs):  # wait two TTLs
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 # Pre-Rest before experience in order to have 15s or more of baseline brain activity in the MRI
-rest_function(exp, last_ttl_timestamp)
+exp.clock.wait(restPeriod, process_control_events=True)
 
 # Generate Vector of trials for the full experiment:
 presentationOrder = [None] * number_blocks
@@ -276,11 +277,11 @@ for n_block in range(number_blocks):
             'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], start_of_image_presentation_timestamp))
 
         # initiate mouse response block
-        time_left = responseTime
+        time_left = mvpa_recognition_response_time
         valid_response = False
         rt = 0
 
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        exp.clock.wait(presentationCard, process_control_events=True)
         m.plotCard(locationCard, False, bs, True)
         end_of_image_presentation_timestamp = exp.clock.time
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
@@ -298,7 +299,7 @@ for n_block in range(number_blocks):
         start_of_response_period_timestamp = exp.clock.time
         valid_answer = False
 
-        while exp.clock.time - start_of_response_period_timestamp < responseTime:
+        while exp.clock.time - start_of_response_period_timestamp < mvpa_recognition_response_time:
             if ms.is_pressed(button='left'):
                 response_timestamp = exp.clock.time
                 answer = 'matrixNone'
