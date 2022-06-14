@@ -181,7 +181,7 @@ for n_block in range(number_blocks):
         presentationOrder[n_block] = block_presentationOrder
 
 if 'task-MVPA' in experimentName:
-    presentationOrder = load_mvpa_trials(subjectName, "generate_mvpa_trials",
+    presentationOrder = load_mvpa_trials(subjectName, "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials",
                                          mvpa_task_block_number=mvpa_task_block_number)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
