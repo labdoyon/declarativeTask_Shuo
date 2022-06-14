@@ -260,10 +260,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
         # removing elements which can't be selected
         temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
-        if not temp_number_TRs_inter_trials:
+        if not temp_number_TRs_inter_trials and min_iti_in_TRs <= max(test_possible_iti):
             trial_iti = np.random.choice(
                 [element for element in test_possible_iti if element >= min_iti_in_TRs])
             exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+        elif not temp_number_TRs_inter_trials and test_possible_iti > max(test_possible_iti):
+            trial_iti = min_iti_in_TRs
         else:
             # temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
             temp_probabilities_to_pick = [1] * len(temp_number_TRs_inter_trials)
