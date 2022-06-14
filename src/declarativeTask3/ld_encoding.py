@@ -80,18 +80,18 @@ exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'image_presented', '
 
 keepMatrix = True
 keepPreviousMatrix = True
-if experimentName == 'PreLearn':
-    keepPreviousMatrix = True
-elif 'PreTest' in experimentName or 'PostTest' in experimentName or 'Test-2ndClassLearned' in experimentName:
-    keepPreviousMatrix = True
+if 'task-Test' in experimentName:
     nbBlocksMax = 1
-elif 'PostLearn' in experimentName:
-    keepPreviousMatrix = True
 
 m = LdMatrix(matrixSize, windowSize, override_remove_cards=removeCards)  # Create Matrix
 
 if keepPreviousMatrix:
-    previousMatrix = getPreviousMatrix(subjectName, 0, 'PreLearn')
+    previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
+    if previousMatrix is None and experimentName != 'ses-ExpD1_task-Learn-1stClass':
+        control.end()
+        print("Error, was matrix correctly generated during the first learning?")
+        import time; time.sleep(5)
+        exit()
 else:
     previousMatrix = None
 newMatrix = m.findMatrix(previousMatrix, keepMatrix)  # Find newMatrix
