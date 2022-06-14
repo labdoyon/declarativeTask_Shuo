@@ -7,6 +7,7 @@ from math import floor
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc import constants
 from expyriment.misc._timer import get_time
+import keyboard
 
 from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, newRandomPresentation, getPreviousMatrix, getLanguage, path_leaf,\
@@ -149,6 +150,8 @@ m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
 
+last_ttl_timestamp = None
+
 for i_ttl in range(instructions_time_displayed_in_TRs):  # wait two TTLs
     last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
@@ -168,7 +171,9 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
         bs.present(False, True)
 
-        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+        for i_ttl in range(instructions_time_displayed_in_TRs):  # wait two TTLs
+            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions_card(bs, instructions_card, draw=False)
         bs.present(False, True)
@@ -283,7 +288,12 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         rt = True  # Response time; equals None if participant haven't clicked within window time frame they were
         # given to answer
 
-        exp.clock.wait(presentationCard, process_control_events=True)
+        start_presentation_time = exp.clock.time
+        while exp.clock.time - start_presentation_time < presentationCard:
+            if any([keyboard.is_pressed(ttl_char) for ttl_char in ttl_characters]):
+                last_ttl_timestamp = exp.clock.time
+            exp.keyboard.process_control_keys()
+
         m.plotCueCard(False, bs, True)  # Hide Cue
         hide_cue_card_timestamp = exp.clock.time
         exp.add_experiment_info('HideCueCard_pos_{}_card_{}_timing_{}'.format(nCard, m.returnPicture(nCard),

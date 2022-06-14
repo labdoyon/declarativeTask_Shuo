@@ -6,6 +6,7 @@ import numpy as np
 from expyriment import control, stimuli, io, design, misc
 from expyriment.misc._timer import get_time
 import mouse as ms
+import keyboard
 
 from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import setCursor, getPreviousMatrix, newRandomPresentation, readMouse
@@ -147,7 +148,7 @@ m.plotDefault(bs)  # Draw default grid
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ttl_instructions_text[language], draw=False)
 bs.present(False, True)
-
+last_ttl_timestamp = None
 for i_ttl in range(instructions_time_displayed_in_TRs):  # wait two TTLs
     last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
@@ -281,7 +282,12 @@ for n_block in range(number_blocks):
         valid_response = False
         rt = 0
 
-        exp.clock.wait(presentationCard, process_control_events=True)
+        start_presentation_time = exp.clock.time
+        while exp.clock.time - start_presentation_time < presentationCard:
+            if any([keyboard.is_pressed(ttl_char) for ttl_char in ttl_characters]):
+                last_ttl_timestamp = exp.clock.time
+            exp.keyboard.process_control_keys()
+
         m.plotCard(locationCard, False, bs, True)
         end_of_image_presentation_timestamp = exp.clock.time
         exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
@@ -402,6 +408,9 @@ for n_block in range(number_blocks):
 
     # REST PERIOD
     rest_function(exp, last_ttl_timestamp)
+
+for i in range(mvpa_final_rest_in_trs):
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
