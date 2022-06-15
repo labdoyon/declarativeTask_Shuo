@@ -411,8 +411,9 @@ for n_block in range(number_blocks):
     # REST PERIOD
     rest_function(exp, last_ttl_timestamp)
 
-for i in range(mvpa_final_rest_in_trs):
-    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+if 'task-MVPA' in experimentName:
+    for i in range(mvpa_final_rest_in_trs):
+        last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)
