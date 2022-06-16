@@ -161,28 +161,27 @@ exp.clock.wait(restPeriod, process_control_events=True)
 
 # Generate Vector of trials for the full experiment:
 presentationOrder = [None] * number_blocks
-for n_block in range(number_blocks):
-    if experimentName == "ses-ExpTest_task-Recognition":
-        presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
-        presentationMatrixLearningOrder = np.vstack(
-            (presentationMatrixLearningOrder, np.zeros(m.size[0] * m.size[1] - len(removeCards))))
-        presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
-                                                              override_remove_cards=removeCards)
-        presentationMatrixRandomOrder = np.vstack(
-            (presentationMatrixRandomOrder, np.ones(m.size[0] * m.size[1] - len(removeCards))))
-        trials_list_to_present = [presentationMatrixLearningOrder, presentationMatrixRandomOrder]
 
-        # Ensuring we only use integers
-        for trial_list in trials_list_to_present:
-            trial_list.astype(int)
+if experimentName == "ses-ExpTest_task-Recognition":
+    presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
+    presentationMatrixLearningOrder = np.vstack(
+        (presentationMatrixLearningOrder, np.zeros(m.size[0] * m.size[1] - len(removeCards))))
+    presentationMatrixRandomOrder = newRandomPresentation(presentationMatrixLearningOrder,
+                                                          override_remove_cards=removeCards)
+    presentationMatrixRandomOrder = np.vstack(
+        (presentationMatrixRandomOrder, np.ones(m.size[0] * m.size[1] - len(removeCards))))
+    trials_list_to_present = [presentationMatrixLearningOrder, presentationMatrixRandomOrder]
 
-        block_presentationOrder = np.hstack(tuple(trials_list_to_present))
-        block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
-        presentationOrder[n_block] = block_presentationOrder
+    # Ensuring we only use integers
+    for trial_list in trials_list_to_present:
+        trial_list.astype(int)
+
+    block_presentationOrder = np.hstack(tuple(trials_list_to_present))
+    block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
+    presentationOrder[0] = block_presentationOrder
 
 if 'task-MVPA' in experimentName:
-    presentationOrder = load_mvpa_trials(subjectName, "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials",
-                                         mvpa_task_block_number=mvpa_task_block_number)
+    presentationOrder = load_mvpa_trials(subjectName, "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials")
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
@@ -199,217 +198,221 @@ exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync inf
 
 
 # PRESENTATION OF ALL TRIALS
-for n_block in range(number_blocks):
-    exp.add_experiment_info('Block_{}_timing_{}'.format(n_block, exp.clock.time))
-    exp.add_experiment_info(f'PresentationOrder_Block-{n_block}')  # Save Presentation Order
-    exp.add_experiment_info(str(list(presentationOrder[n_block])))
-    if 'task-MVPA' in experimentName:
-        listCards = presentationOrder[n_block][3]
-        # local_random_matrix = randomMatrix[n_block]
-        # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
-        # exp.add_experiment_info(str(local_random_matrix))
-    elif experimentName == "ses-ExpTest_task-Recognition":
-        listCards = []
-        for nCard in range(presentationOrder[n_block].shape[1]):
-            if len(removeCards):
-                removeCards.sort()
-                removeCards = np.asarray(removeCards)
-                tempPosition = presentationOrder[n_block][0][nCard]
-                index = 0
-                try:
-                    index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
-                except:
-                    pass
+exp.add_experiment_info('Block_{}_timing_{}'.format(0, exp.clock.time))
+exp.add_experiment_info(f'PresentationOrder_Block-{0}')  # Save Presentation Order
+exp.add_experiment_info(str(list(presentationOrder[mvpa_task_block_number])))
+if 'task-MVPA' in experimentName:
+    listCards = presentationOrder[mvpa_task_block_number][3]
+    # local_random_matrix = randomMatrix[n_block]
+    # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
+    # exp.add_experiment_info(str(local_random_matrix))
+elif experimentName == "ses-ExpTest_task-Recognition":
+    listCards = []
+    for nCard in range(presentationOrder[0].shape[1]):
+        if len(removeCards):
+            removeCards.sort()
+            removeCards = np.asarray(removeCards)
+            tempPosition = presentationOrder[0][0][nCard]
+            index = 0
+            try:
+                index = int(np.where(removeCards == max(removeCards[removeCards < tempPosition]))[0]) + 1
+            except:
+                pass
 
-                position = tempPosition - index
+            position = tempPosition - index
 
-            else:
-                position = presentationOrder[n_block][0][nCard]
-
-            if presentationOrder[n_block][1][nCard] == 0:  # Learning Matrix
-                listCards.append(local_learning_matrix[int(position)])
-            else:
-                listCards.append(local_random_matrix[int(position)])
-
-    if experimentName == "ses-ExpTest_task-Recognition":
-        number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
-
-    for nCard in range(presentationOrder[n_block].shape[1]):
-        # Inter Trial Interval
-        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
-        if experimentName == "ses-ExpTest_task-Recognition":
-            exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
-            # removing elements which can't be selected
-            temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
-            if not temp_number_TRs_inter_trials and min_iti_in_TRs <= max(test_possible_iti):
-                trial_iti = np.random.choice(
-                        [element for element in recognition_possible_iti if element >= min_iti_in_TRs])
-                exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
-            elif not temp_number_TRs_inter_trials and test_possible_iti > max(test_possible_iti):
-                trial_iti = min_iti_in_TRs
-            else:
-                # temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
-                temp_probabilities_to_pick = [1 for element in temp_number_TRs_inter_trials]  # favoring ones
-                # sum of element should be one, normalizing
-                temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
-
-                trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
-                number_TRs_inter_trials.remove(trial_iti)
-        elif 'task-MVPA' in experimentName:
-            trial_iti = presentationOrder[n_block][2][nCard]
-
-        exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
-        for i_ttl in range(trial_iti - min_iti_in_TRs):
-            last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-
-        # Trial Block
-        locationCard = int(presentationOrder[n_block][0][nCard])
-
-        if bool(presentationOrder[n_block][1][nCard] == 0):
-            showMatrix = 'MatrixA'
         else:
-            showMatrix = 'MatrixRandom'
+            position = presentationOrder[0][0][nCard]
 
-        category = listCards[nCard][:2]
-        m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
-        picture = listCards[nCard].rstrip(".png")
+        if presentationOrder[0][1][nCard] == 0:  # Learning Matrix
+            listCards.append(local_learning_matrix[int(position)])
+        else:
+            listCards.append(local_random_matrix[int(position)])
+
+if experimentName == "ses-ExpTest_task-Recognition":
+    number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
+
+if experimentName == "ses-ExpTest_task-Recognition":
+    n_block = 0
+elif "task-MVPA" in experimentName:
+    n_block = mvpa_task_block_number
+
+for nCard in range(presentationOrder[n_block].shape[1]):
+    # Inter Trial Interval
+    min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
+    if experimentName == "ses-ExpTest_task-Recognition":
+        exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
+        # removing elements which can't be selected
+        temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
+        if not temp_number_TRs_inter_trials and min_iti_in_TRs <= max(test_possible_iti):
+            trial_iti = np.random.choice(
+                    [element for element in recognition_possible_iti if element >= min_iti_in_TRs])
+            exp.add_experiment_info(f"ran_out_of_ITI_{trial_iti}_in_list")
+        elif not temp_number_TRs_inter_trials and test_possible_iti > max(test_possible_iti):
+            trial_iti = min_iti_in_TRs
+        else:
+            # temp_probabilities_to_pick = [1 / element ** 2 for element in temp_number_TRs_inter_trials]  # favoring ones
+            temp_probabilities_to_pick = [1 for element in temp_number_TRs_inter_trials]  # favoring ones
+            # sum of element should be one, normalizing
+            temp_probabilities_to_pick = np.divide(temp_probabilities_to_pick, sum(temp_probabilities_to_pick))
+
+            trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
+            number_TRs_inter_trials.remove(trial_iti)
+    elif 'task-MVPA' in experimentName:
+        trial_iti = presentationOrder[n_block][2][nCard]
+
+    exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
+    for i_ttl in range(trial_iti - min_iti_in_TRs):
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-        m.plotCard(locationCard, True, bs, True)
-        start_of_image_presentation_timestamp = exp.clock.time
-        exp.add_experiment_info(
-            'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], start_of_image_presentation_timestamp))
 
-        # initiate mouse response block
-        time_left = mvpa_recognition_response_time
-        valid_response = False
-        rt = 0
+    # Trial Block
+    locationCard = int(presentationOrder[n_block][0][nCard])
 
-        start_presentation_time = exp.clock.time
-        while exp.clock.time - start_presentation_time < presentationCard:
-            if any([keyboard.is_pressed(ttl_char) for ttl_char in ttl_characters]):
-                last_ttl_timestamp = exp.clock.time
-            exp.keyboard.process_control_keys()
+    if bool(presentationOrder[n_block][1][nCard] == 0):
+        showMatrix = 'MatrixA'
+    else:
+        showMatrix = 'MatrixRandom'
 
-        m.plotCard(locationCard, False, bs, True)
-        end_of_image_presentation_timestamp = exp.clock.time
-        exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
-                                                                            listCards[nCard],
-                                                                            end_of_image_presentation_timestamp)])
+    category = listCards[nCard][:2]
+    m._matrix.item(locationCard).setPicture(os.path.join(picturesFolderClass[category], listCards[nCard]))
+    picture = listCards[nCard].rstrip(".png")
+    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+    m.plotCard(locationCard, True, bs, True)
+    start_of_image_presentation_timestamp = exp.clock.time
+    exp.add_experiment_info(
+        'ShowCard_pos_{}_card_{}_timing_{}'.format(locationCard, listCards[nCard], start_of_image_presentation_timestamp))
 
-        m.plotCueCard(False, bs, draw=False, nocross=True)
+    # initiate mouse response block
+    time_left = mvpa_recognition_response_time
+    valid_response = False
+    rt = 0
+
+    start_presentation_time = exp.clock.time
+    while exp.clock.time - start_presentation_time < presentationCard:
+        if any([keyboard.is_pressed(ttl_char) for ttl_char in ttl_characters]):
+            last_ttl_timestamp = exp.clock.time
+        exp.keyboard.process_control_keys()
+
+    m.plotCard(locationCard, False, bs, True)
+    end_of_image_presentation_timestamp = exp.clock.time
+    exp.add_experiment_info(['HideCard_pos_{}_card_{}_timing_{}'.format(locationCard,
+                                                                        listCards[nCard],
+                                                                        end_of_image_presentation_timestamp)])
+
+    m.plotCueCard(False, bs, draw=False, nocross=True)
+    matrixA_rectangle.plot(bs)
+    matrixA.plot(bs)
+    matrixNone_rectangle.plot(bs)
+    matrixNone.plot(bs)
+    bs.present(False, True)
+
+    answer = 'noResponse'
+    start_of_response_period_timestamp = exp.clock.time
+    valid_answer = False
+
+    while exp.clock.time - start_of_response_period_timestamp < mvpa_recognition_response_time:
+        if ms.is_pressed(button='left'):
+            response_timestamp = exp.clock.time
+            answer = 'matrixNone'
+            valid_answer = True
+            break
+        if ms.is_pressed(button='right'):
+            response_timestamp = exp.clock.time
+            answer = 'matrixA'
+            valid_answer = True
+            break
+        exp.keyboard.process_control_keys()
+    if valid_answer:
+        rt = exp.clock.time - start_of_response_period_timestamp
+    else:
+        rt = None
+    if answer == 'matrixA':
+        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                      start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                      start_of_response_period_timestamp,
+                      'correct', bool(presentationOrder[n_block][1][nCard] == 0), rt])
+        matrixA = stimuli.TextBox(text='R', size=button_size,
+                                  position=matrixA_position,
+                                  text_size=textSize,
+                                  text_colour=constants.C_GREEN,
+                                  background_colour=clickColor)
+        matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                              colour=clickColor)
+
         matrixA_rectangle.plot(bs)
         matrixA.plot(bs)
+        bs.present(False, True)
+
+        exp.clock.wait(clicPeriod, process_control_events=True)
+        matrixA = stimuli.TextBox(text='R', size=button_size,
+                                  position=matrixA_position,
+                                  text_size=textSize,
+                                  text_colour=constants.C_GREEN,
+                                  background_colour=cardColor)
+        matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                              colour=cardColor)
+        matrixA_rectangle.plot(bs)
+        matrixA.plot(bs)
+        bs.present(False, True)
+        exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
+
+    elif answer == 'matrixNone':
+        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                      start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                      start_of_response_period_timestamp,
+                      'incorrect', bool(presentationOrder[n_block][1][nCard] == 1), rt])
+        matrixNone = stimuli.TextBox('W', size=button_size,
+                                     position=matrixNone_position,
+                                     text_size=textSize,
+                                     text_colour=constants.C_RED,
+                                     background_colour=clickColor)
+        matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                 colour=clickColor)
+
         matrixNone_rectangle.plot(bs)
         matrixNone.plot(bs)
         bs.present(False, True)
 
-        answer = 'noResponse'
-        start_of_response_period_timestamp = exp.clock.time
-        valid_answer = False
-
-        while exp.clock.time - start_of_response_period_timestamp < mvpa_recognition_response_time:
-            if ms.is_pressed(button='left'):
-                response_timestamp = exp.clock.time
-                answer = 'matrixNone'
-                valid_answer = True
-                break
-            if ms.is_pressed(button='right'):
-                response_timestamp = exp.clock.time
-                answer = 'matrixA'
-                valid_answer = True
-                break
-            exp.keyboard.process_control_keys()
-        if valid_answer:
-            rt = exp.clock.time - start_of_response_period_timestamp
-        else:
-            rt = None
-        if answer == 'matrixA':
-            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
-                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
-                          start_of_response_period_timestamp,
-                          'correct', bool(presentationOrder[n_block][1][nCard] == 0), rt])
-            matrixA = stimuli.TextBox(text='R', size=button_size,
-                                      position=matrixA_position,
-                                      text_size=textSize,
-                                      text_colour=constants.C_GREEN,
-                                      background_colour=clickColor)
-            matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
-                                                  colour=clickColor)
-
-            matrixA_rectangle.plot(bs)
-            matrixA.plot(bs)
-            bs.present(False, True)
-
-            exp.clock.wait(clicPeriod, process_control_events=True)
-            matrixA = stimuli.TextBox(text='R', size=button_size,
-                                      position=matrixA_position,
-                                      text_size=textSize,
-                                      text_colour=constants.C_GREEN,
-                                      background_colour=cardColor)
-            matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
-                                                  colour=cardColor)
-            matrixA_rectangle.plot(bs)
-            matrixA.plot(bs)
-            bs.present(False, True)
-            exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
-
-        elif answer == 'matrixNone':
-            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
-                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
-                          start_of_response_period_timestamp,
-                          'incorrect', bool(presentationOrder[n_block][1][nCard] == 1), rt])
-            matrixNone = stimuli.TextBox('W', size=button_size,
-                                         position=matrixNone_position,
-                                         text_size=textSize,
-                                         text_colour=constants.C_RED,
-                                         background_colour=clickColor)
-            matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
-                                                     colour=clickColor)
-
-            matrixNone_rectangle.plot(bs)
-            matrixNone.plot(bs)
-            bs.present(False, True)
-
-            exp.clock.wait(clicPeriod, process_control_events=True)
-            matrixNone = stimuli.TextBox('W', size=button_size,
-                                         position=matrixNone_position,
-                                         text_size=textSize,
-                                         text_colour=constants.C_RED,
-                                         background_colour=cardColor)
-            matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
-                                                     colour=cardColor)
-            matrixNone_rectangle.plot(bs)
-            matrixNone.plot(bs)
-            bs.present(False, True)
-            exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
-        else:
-            exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
-                          start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
-                          start_of_response_period_timestamp,
-                          None, False, rt])
-            exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
-            valid_response = True
-
-        exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
-        # for comfort, for objects not to move too quickly or suddenly on screen
-
-        m.plotCueCard(False, bs, draw=True)
+        exp.clock.wait(clicPeriod, process_control_events=True)
+        matrixNone = stimuli.TextBox('W', size=button_size,
+                                     position=matrixNone_position,
+                                     text_size=textSize,
+                                     text_colour=constants.C_RED,
+                                     background_colour=cardColor)
+        matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                 colour=cardColor)
+        matrixNone_rectangle.plot(bs)
+        matrixNone.plot(bs)
         bs.present(False, True)
+        exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
+    else:
+        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+                      start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
+                      start_of_response_period_timestamp,
+                      None, False, rt])
+        exp.add_experiment_info(['Response_{}_timing_{}'.format('NoRT', exp.clock.time)])  # Add sync info
+        valid_response = True
 
-    # Pre-Rest Block
-    rest_function(exp, n_block, last_ttl_timestamp, pre_rest=True)
+    exp.clock.wait(visual_comfort_wait_time, process_control_events=True)
+    # for comfort, for objects not to move too quickly or suddenly on screen
 
-    # Plot instructions
-    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-    m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
+    m.plotCueCard(False, bs, draw=True)
     bs.present(False, True)
-    last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
-    m.plot_instructions_rectangle(bs, instructions_card, draw=False)
-    m.plot_instructions_card(bs, instructions_card, draw=False)
-    bs.present(False, True)
 
-    # REST PERIOD
-    rest_function(exp, last_ttl_timestamp)
+# Pre-Rest Block
+rest_function(exp, n_block, last_ttl_timestamp, pre_rest=True)
+
+# Plot instructions
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions(bs, instructions_card, rest_screen_text[language], draw=False)
+bs.present(False, True)
+last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+m.plot_instructions_rectangle(bs, instructions_card, draw=False)
+m.plot_instructions_card(bs, instructions_card, draw=False)
+bs.present(False, True)
+
+# REST PERIOD
+rest_function(exp, last_ttl_timestamp)
 
 if 'task-MVPA' in experimentName:
     for i in range(mvpa_final_rest_in_trs):

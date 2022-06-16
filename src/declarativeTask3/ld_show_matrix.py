@@ -21,7 +21,6 @@ previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClas
 
 exp = design.Experiment(experimentName)  # Save experiment name
 
-session = experiment_session[experimentName]
 session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subjectName))
 output_dir = session_dir
 io.defaults.datafile_directory = output_dir
