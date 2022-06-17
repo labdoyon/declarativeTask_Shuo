@@ -95,7 +95,6 @@ if experimentName == "ses-ExpTest_task-Recognition":
 
 elif 'task-MVPA' in experimentName:
     intro_instruction = ' MVPA '
-    number_blocks = mvpa_number_blocks
     parent_category = 'both'
     only_faces = False
     only_places = False
@@ -105,6 +104,11 @@ elif 'task-MVPA' in experimentName:
     exp.add_experiment_info(parent_category)
 
     mvpa_task_block_number = int(experimentName[-1])-1
+
+if experimentName == "ses-ExpTest_task-Recognition":
+    n_block = 0
+elif "task-MVPA" in experimentName:
+    n_block = mvpa_task_block_number
 
 exp.add_experiment_info('Image classes order:')
 exp.add_experiment_info(str(classPictures))
@@ -200,7 +204,7 @@ exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync inf
 # PRESENTATION OF ALL TRIALS
 exp.add_experiment_info('Block_{}_timing_{}'.format(0, exp.clock.time))
 exp.add_experiment_info(f'PresentationOrder_Block-{0}')  # Save Presentation Order
-exp.add_experiment_info(str(list(presentationOrder[mvpa_task_block_number])))
+exp.add_experiment_info(str(list(presentationOrder[n_block])))
 if 'task-MVPA' in experimentName:
     listCards = presentationOrder[mvpa_task_block_number][3]
     # local_random_matrix = randomMatrix[n_block]
@@ -231,11 +235,6 @@ elif experimentName == "ses-ExpTest_task-Recognition":
 
 if experimentName == "ses-ExpTest_task-Recognition":
     number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
-
-if experimentName == "ses-ExpTest_task-Recognition":
-    n_block = 0
-elif "task-MVPA" in experimentName:
-    n_block = mvpa_task_block_number
 
 for nCard in range(presentationOrder[n_block].shape[1]):
     # Inter Trial Interval
