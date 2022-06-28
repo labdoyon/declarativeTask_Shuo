@@ -512,7 +512,7 @@ def logging_ttl_time_stamps_with_ttl_char_hotkeys(exp):
             'TTL_RECEIVED_timing-{}_method-{}'.format(exp.clock.time, "hotkey")))
 
 
-def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=False):
+def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=False, end_of_experiment=False):
     if not pre_rest:
         number_ttl_to_wait = number_ttl_in_rest_period
         pre_rest_text = ''
@@ -528,7 +528,13 @@ def rest_function(exp, original_last_ttl_timestamp, block_index=None, pre_rest=F
     last_ttl_timestamp = original_last_ttl_timestamp
     exp.add_experiment_info(f'wait_{number_ttl_to_wait}_TTLs')
     exp.add_experiment_info(f'StartShortRest' + block_string + f'_timing_{exp.clock.time}{pre_rest_text}')
-    for i in range(number_ttl_to_wait - 1):  # 1 TTL is already accounted for because of the next TTL
+
+    if end_of_experiment:
+        next_TTL_to_substract = 0
+    else:
+        next_TTL_to_substract = 1
+
+    for i in range(number_ttl_to_wait - next_TTL_to_substract):  # 1 TTL is already accounted for because of the next TTL
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
     exp.add_experiment_info(f'EndShortRest' + block_string + f'_timing_{exp.clock.time}{pre_rest_text}')
 

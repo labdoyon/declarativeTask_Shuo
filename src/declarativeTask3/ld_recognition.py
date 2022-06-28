@@ -54,7 +54,9 @@ exp.add_experiment_info('start_by_faces_or_places (same as above but explicit):'
 exp.add_experiment_info(supported_start_by_choices_explicit[faces_places_choice])
 
 # Save time, Response, correctAnswer, RT
-exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented', 'CorrectLocationShown',
+exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented', 'FilenameOfImageShown',
+                             'FilenameOfMatrixAImageInLocationPresented'
+                             'CorrectLocationShown',
                              'start_of_image_presentation_timestamp', 'end_of_image_presentation_timestamp',
                              'start_of_response_period_timestamp',
                              'subjectAnswered', 'subjectCorrect', 'ResponseTime'])
@@ -326,7 +328,8 @@ for nCard in range(presentationOrder[n_block].shape[1]):
     else:
         rt = None
     if answer == 'matrixA':
-        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+                      showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
                       'correct', bool(presentationOrder[n_block][1][nCard] == 0), rt])
@@ -356,7 +359,8 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
     elif answer == 'matrixNone':
-        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+                      showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
                       'incorrect', bool(presentationOrder[n_block][1][nCard] == 1), rt])
@@ -385,7 +389,8 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         bs.present(False, True)
         exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
     else:
-        exp.data.add([exp.clock.time, n_block, category, showMatrix == 'MatrixA',
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+                      showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
                       None, False, rt])
@@ -411,11 +416,11 @@ m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 # REST PERIOD
-rest_function(exp, last_ttl_timestamp)
-
 if 'task-MVPA' in experimentName:
     for i in range(mvpa_final_rest_in_trs):
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
+else:
+    rest_function(exp, last_ttl_timestamp, end_of_experiment=True)
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, ending_screen_text[language], draw=False)

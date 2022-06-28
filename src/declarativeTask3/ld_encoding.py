@@ -256,7 +256,9 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
 
     for nCard in presentationOrder:
         # Inter Trial Interval
-        min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
+        min_iti_in_TRs = max(
+            ceil((exp.clock.time - last_ttl_timestamp) / TR_duration),
+            min(test_possible_iti))
         exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
         # removing elements which can't be selected
         temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
@@ -406,7 +408,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     bs.present(False, True)
 
     # actual rest period
-    last_ttl_timestamp = rest_function(exp, last_ttl_timestamp, block_index=nBlock)
+    last_ttl_timestamp = rest_function(exp, last_ttl_timestamp, block_index=nBlock, end_of_experiment=True)
 
     nBlock += 1
 

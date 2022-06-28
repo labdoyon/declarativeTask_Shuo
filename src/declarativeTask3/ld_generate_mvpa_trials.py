@@ -11,7 +11,7 @@ from declarativeTask3.config import experiment_session, \
     mvpa_number_trials_wrong_position, only_faces_remove_cards, only_places_remove_cards, \
     mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions, \
     mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions, \
-    matrixSize, windowSize
+    matrixSize, windowSize, mvpa_possible_iti
 from declarativeTask3.ld_matrix import LdMatrix
 from declarativeTask3.ld_utils import getPreviousMatrix, getPlacesOrFacesChoice, \
     getPreviouslyCorrectlyRecalledImages, newRandomPresentation, rename_output_files_to_BIDS
@@ -227,7 +227,7 @@ for blk in range(0,blk_n):
     v_imgID = V_imgID[blk]
     v_CorW = ['c'] * int(trials_n*ratio_correct) + ['w'] * (trials_n-int(trials_n*ratio_correct))
     v_ForP = ['f','p'] * int(trials_n/2)
-    v_TR_ITI = [2,2,3,3,4,4] * int(trials_n/6)
+    v_TR_ITI = sorted(mvpa_possible_iti * 2) * int(trials_n/6)
 
 
     # fill in wrong images ID, also may complete some un-filled correct images ID too, if needed
