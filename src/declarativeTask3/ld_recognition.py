@@ -55,7 +55,7 @@ exp.add_experiment_info(supported_start_by_choices_explicit[faces_places_choice]
 
 # Save time, Response, correctAnswer, RT
 exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented', 'FilenameOfImageShown',
-                             'FilenameOfMatrixAImageInLocationPresented'
+                             'FilenameOfMatrixAImageInLocationPresented',
                              'CorrectLocationShown',
                              'start_of_image_presentation_timestamp', 'end_of_image_presentation_timestamp',
                              'start_of_response_period_timestamp',
@@ -328,7 +328,12 @@ for nCard in range(presentationOrder[n_block].shape[1]):
     else:
         rt = None
     if answer == 'matrixA':
-        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+        if len(removeCards) == 1:
+            if locationCard >= removeCards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+            else:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard])
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
                       showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
@@ -359,7 +364,12 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
     elif answer == 'matrixNone':
-        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+        if len(removeCards) == 1:
+            if locationCard >= removeCards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+            else:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard])
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
                       showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
@@ -389,7 +399,12 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         bs.present(False, True)
         exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
     else:
-        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], str(learningMatrix[locationCard]),
+        if len(removeCards) == 1:
+            if locationCard >= removeCards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+            else:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard])
+        exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
                       showMatrix == 'MatrixA',
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
