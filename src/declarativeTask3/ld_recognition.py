@@ -16,6 +16,7 @@ from declarativeTask3.ld_utils import getPreviouslyCorrectlyRecalledImages, rest
 from declarativeTask3.ttl_catch_keyboard import wait_for_ttl_keyboard_and_log_ttl
 from declarativeTask3.config import *
 from declarativeTask3.ld_stimuli_names import classNames, ttl_instructions_text, ending_screen_text, rest_screen_text
+from declarativeTask3.config import removeCards as defaut_remove_cards
 
 if not windowMode:  # Check WindowMode and Resolution
     control.defaults.window_mode = windowMode
@@ -328,9 +329,9 @@ for nCard in range(presentationOrder[n_block].shape[1]):
     else:
         rt = None
     if answer == 'matrixA':
-        if len(removeCards) == 1:
-            if locationCard >= removeCards[0]:
-                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+        if len(defaut_remove_cards) == 1:
+            if locationCard >= defaut_remove_cards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(defaut_remove_cards)])
             else:
                 matrixA_image_in_location_presented = str(learningMatrix[locationCard])
         exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
@@ -364,9 +365,9 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
     elif answer == 'matrixNone':
-        if len(removeCards) == 1:
-            if locationCard >= removeCards[0]:
-                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+        if len(defaut_remove_cards) == 1:
+            if locationCard >= defaut_remove_cards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(defaut_remove_cards)])
             else:
                 matrixA_image_in_location_presented = str(learningMatrix[locationCard])
         exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
@@ -399,9 +400,9 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         bs.present(False, True)
         exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
     else:
-        if len(removeCards) == 1:
-            if locationCard >= removeCards[0]:
-                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(removeCards)])
+        if len(defaut_remove_cards) == 1:
+            if locationCard >= defaut_remove_cards[0]:
+                matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(defaut_remove_cards)])
             else:
                 matrixA_image_in_location_presented = str(learningMatrix[locationCard])
         exp.data.add([exp.clock.time, n_block, category, listCards[nCard], matrixA_image_in_location_presented,
