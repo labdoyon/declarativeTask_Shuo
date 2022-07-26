@@ -287,7 +287,6 @@ for nCard in range(presentationOrder[n_block].shape[1]):
     # initiate mouse response block
     time_left = mvpa_recognition_response_time
     valid_response = False
-    rt = 0
 
     start_presentation_time = exp.clock.time
     while exp.clock.time - start_presentation_time < presentationCard:
@@ -329,6 +328,7 @@ for nCard in range(presentationOrder[n_block].shape[1]):
     else:
         rt = None
     if answer == 'matrixA':
+        exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
         if len(defaut_remove_cards) == 1:
             if locationCard >= defaut_remove_cards[0]:
                 matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(defaut_remove_cards)])
@@ -344,8 +344,12 @@ for nCard in range(presentationOrder[n_block].shape[1]):
                                   text_size=textSize,
                                   text_colour=constants.C_GREEN,
                                   background_colour=clickColor)
-        matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
-                                              colour=clickColor)
+        if rt <= false_alert_minimal_threshold_response_time:
+            matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                                  colour=constants.C_YELLOW)
+        else:
+            matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
+                                                  colour=clickColor)
 
         matrixA_rectangle.plot(bs)
         matrixA.plot(bs)
@@ -362,9 +366,9 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         matrixA_rectangle.plot(bs)
         matrixA.plot(bs)
         bs.present(False, True)
-        exp.add_experiment_info(['Response_{}_timing_{}'.format('MatrixA', exp.clock.time)])  # Add sync info
 
     elif answer == 'matrixNone':
+        exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
         if len(defaut_remove_cards) == 1:
             if locationCard >= defaut_remove_cards[0]:
                 matrixA_image_in_location_presented = str(learningMatrix[locationCard-len(defaut_remove_cards)])
@@ -380,8 +384,12 @@ for nCard in range(presentationOrder[n_block].shape[1]):
                                      text_size=textSize,
                                      text_colour=constants.C_RED,
                                      background_colour=clickColor)
-        matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
-                                                 colour=clickColor)
+        if rt <= false_alert_minimal_threshold_response_time:
+            matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                     colour=constants.C_YELLOW)
+        else:
+            matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
+                                                     colour=clickColor)
 
         matrixNone_rectangle.plot(bs)
         matrixNone.plot(bs)
@@ -398,7 +406,6 @@ for nCard in range(presentationOrder[n_block].shape[1]):
         matrixNone_rectangle.plot(bs)
         matrixNone.plot(bs)
         bs.present(False, True)
-        exp.add_experiment_info(['Response_{}_timing_{}'.format('None', exp.clock.time)])  # Add sync info
     else:
         if len(defaut_remove_cards) == 1:
             if locationCard >= defaut_remove_cards[0]:

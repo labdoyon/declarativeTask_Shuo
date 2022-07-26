@@ -58,6 +58,7 @@ presentationCard = 2000
 
 responseTime = 5000
 mvpa_recognition_response_time = 4000
+false_alert_minimal_threshold_response_time = 0  # if rt==0, your participant
 shortRest = 2500
 thankYouRest = 5000
 restPeriod = 15000
