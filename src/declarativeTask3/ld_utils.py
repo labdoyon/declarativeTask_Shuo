@@ -478,9 +478,9 @@ def vertices_frame(size, frame_thickness):
 def generate_bids_filename(subject_id, session, task, filename_suffix='_beh', filename_extension='.xpd',
                            run=None):
     if run is None:
-        return 'sub-' + subject_id + '_ses-' + session + '_task-' + task + filename_suffix + filename_extension
+        return 'sub-' + subject_id + '_' + task + filename_suffix + filename_extension
     else:
-        return 'sub-' + subject_id + '_ses-' + session + '_task-' + task +\
+        return 'sub-' + subject_id + '_' + task +\
                '_run-' + str(run) +\
                filename_suffix + filename_extension
 

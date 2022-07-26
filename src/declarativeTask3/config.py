@@ -301,8 +301,8 @@ experiment_use_faces_or_places = {
 sessions = ['ExpD1', 'ExpSleep', 'ExpTest', 'ExpD2', 'ExpMVPA']
 
 experiment_session = {
-    'choose-language':                              'ExpD1',
-    'choose-faces-places':                          'ExpD1',
+    'ses-ExpD1_task-choose-language':               'ExpD1',
+    'ses-ExpD1_task-choose-faces-places':           'ExpD1',
 
     'ses-ExpD1_task-Example':                       'ExpD1',
     'ses-ExpD1_task-Learn-1stClass':                'ExpD1',

@@ -11,6 +11,17 @@ subject_dir = os.path.normpath(os.path.join(rawFolder, 'sourcedata', 'sub-' + su
 if not os.path.isdir(subject_dir):
     os.mkdir(subject_dir)
 
+# DEBUGGING
+# take a menu element (say Example, 'ses_ExpD1__task_Example = CommandItem()')
+# take the 'command' and 'arguments' element of the menu element
+# e.g.
+# command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
+#     arguments='ses-ExpD1_task-Example,' + sys.argv[1]
+#
+# run the following in the command line
+# py src\declarativeTask3\ld_example.py 'ses-ExpD1_task-Example,<subject_id>'
+# You will see any error the program generates much faster
+
 language = getPrevious(subjectName, 0, 'choose-language', 'language:')
 # 'None' if no languages were chosen previously, said language otherwise, e.g. 'french'
 
@@ -23,12 +34,12 @@ menu = CursesMenu(title="DeMo", subtitle='Subject: ' + sys.argv[1] + ' ; languag
 
 ChooseLanguage = CommandItem(
     text='choose language', command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
-    arguments='choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-choose-language, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
 
 ChooseFacesPlaces = CommandItem(
     text='choose: start by class1 or class2?',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
-    arguments='choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
+    arguments='ses-ExpD1_task-choose-faces-places, ' + sys.argv[1] + ', ' + 'None', menu=menu, should_exit=False)
 
 ses_ExpD1__task_Example = CommandItem(
     text='ses-ExpD1_task-Example', command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),

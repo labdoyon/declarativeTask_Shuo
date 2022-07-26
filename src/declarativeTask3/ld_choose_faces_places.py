@@ -22,7 +22,7 @@ if faces_places_choice == 'None':
         choose_language.append(
             CommandItem(text=supported_choice + ' for the experiment for this participant',
                         command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_faces_places.py"),
-                        arguments='choose-faces-places, ' + subject_name + ', ' + supported_choice,
+                        arguments='ses-ExpD1_task-choose-faces-places, ' + subject_name + ', ' + supported_choice,
                         menu=menu,
                         should_exit=False)
                                )
