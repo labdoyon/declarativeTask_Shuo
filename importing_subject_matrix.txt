@@ -1,0 +1,10 @@
+ANY STEP OF THE EXPERIMENT THAT USES THE MATRIX (ESSENTIALLY ALL OF THEM)
+WILL IMPORT THE MATRIX FROM THE LEARNING (PRELEARN, ses-ExpD1_task-Learn-1stClass)
+
+IF THERE ARE SEVERAL PRELEARN FILES, THE PROGRAM USES THE LATEST ONE
+
+All prelearn files will use the matrix generated in the first prelearn file
+if you have prelearn run 02 03 04, they all used the matrix generated in run-01
+
+If you want to generate a new matrix
+You have to delete (or move to a different directory) all the previous prelearn files

@@ -17,6 +17,13 @@ rawFolder = normpath(join(dirname(__file__), '..', '..'))
 picturesFolder = normpath(join(rawFolder, 'stimulis'))
 picturesExamplesFolder = normpath(join(rawFolder, 'stimulisExample'))
 
+# PVT settings
+pvt_min_max_ISI = (1000, 4000)
+pvt_show_feedback_duration = 1000
+pvt_number_trials = 15
+pvt_max_trial_duration = 5000
+pvt_experiment_max_duration = 3 * 60 * 1000  # 3 minutes
+
 mouseButton = 1
 
 windowMode = False  # if False use FullScreen
@@ -44,6 +51,7 @@ textColor = (0, 0, 0)  # expyriment.misc.constants.C_BLACK
 
 textSize = 50
 pvt_font_size = 40
+# WARNING: IF YOU CHANGE THIS MAKE SURE TO CHANGE MATRIX TEMPLATE ACCORDINGLY (below)
 matrixSize = (7, 7)
 cardSize = (95, 95)
 fixation_cross_thickness = 10
@@ -52,22 +60,26 @@ fixation_cross_thickness = 10
 
 startSpace = cardSize[1] + 20
 
+# Criteria for training: minimum number correct responses before learning is complete
+correctAnswersMax = 18
 nbBlocksMax = 10
 
-presentationCard = 2000
-
-responseTime = 5000
-mvpa_recognition_response_time = 4000
+# time durations for the experiment, in ms
+presentationCard = 2000  # time taken to present an image
+responseTime = 5000  # time a subject has to respond
+mvpa_recognition_response_time = 4000  # time a subject has to respond (MVPA)
 false_alert_minimal_threshold_response_time = 0  # if rt==0, your participant
 shortRest = 2500
 thankYouRest = 5000
 restPeriod = 15000
 clicPeriod = 200
-pvt_min_max_ISI = (1000, 4000)
-pvt_show_feedback_duration = 1000
-pvt_number_trials = 15
-pvt_max_trial_duration = 5000
-pvt_experiment_max_duration = 3 * 60 * 1000  # 3 minutes
+
+# time durations for the experiment, in TRs
+number_ttl_in_rest_period = ceil(restPeriod/TR_duration)
+number_ttl_before_rest_period = 6
+instructions_time_displayed_in_TRs = 2
+visual_comfort_wait_time = 300  # short wait time padding after an instruction disappears and
+# before the next one appears, for visual comfort
 
 min_max_ISI = [500, 1500]  # [min, max] inter_stimulus interval
 
@@ -140,21 +152,8 @@ arrow1 = (' XX                                                                  
           '                                                                                ',
           '                                                                                ',
           '                                                                                ')
-removeCards = []
-matrixTemplate = []
-if matrixSize == (4, 4):
-    matrixTemplate = [0]*16
-elif matrixSize == (5, 5):
-    matrixTemplate = [2,0,2,1,1,1,1,0,2,0,2,2,0,1,2,1,2,2,0,0,0,1,0,1]
-    removeCards = [12]
-elif matrixSize == (6, 6):
-    matrixTemplate = [0, 1, 1, 2, 0, 2,
-                      2, 0, 0, 2, 1, 1,
-                      1, 0, 2, 1, 2, 0,
-                      0, 2, 1, 0, 1, 2,
-                      1, 2, 1, 2, 0, 1,
-                      0, 1, 0, 2, 2, 0]
-elif matrixSize == (7, 7):
+
+if matrixSize == (7, 7):
     matrixTemplate = [7, 0, 4, 3, 6, 1, 5,
                       3, 2, 6, 5, 0, 7, 2,
                       1, 5, 1, 2, 6, 4, 3,
@@ -169,8 +168,8 @@ elif matrixSize == (7, 7):
     instructions_card = [24 + 1 + i*7 for i in range(-2, 3)]
     # removeCards = [index for index, category in enumerate(matrixTemplate) if category > 3]
     # if category > len(classPictures) /2
-elif matrixSize == (5, 4):
-    matrixTemplate = [0] * 20
+else:
+    raise ValueError("""The size of the matrix was changed. Please update matrix template for the new matrix size""")
 
 if matrixTemplate:
     center_card_position = floor(matrixSize[0] * matrixSize[1] / 2)
@@ -181,12 +180,6 @@ if matrixTemplate:
                                [index + 1 if index >= center_card_position else index
                                 for index, category in enumerate(matrixTemplate) if category <= 3]
 
-# correctAnswersMax = int(ceil((matrixSize[0]*matrixSize[0] - len(removeCards))*7./10))
-correctAnswersMax = 18
-numberBlocksLearning = 10
-numberBlocksSubUnit = 2
-numberLearningSubUnits = 5
-
 # MVPA
 mvpa_number_blocks = 5
 mvpa_number_trials_correct_position = 18  # per block per category
@@ -196,8 +189,10 @@ mvpa_equalize_number_correctly_recalled_images = True
 
 mvpa_final_rest_in_trs = 40
 
-presentation_possible_iti = test_possible_iti = recognition_possible_iti = [2, 3, 4]
-mvpa_possible_iti = [3, 4, 5]
+presentation_possible_iti = test_possible_iti = recognition_possible_iti = [2, 3, 4]  # in TRs
+mvpa_possible_iti = [3, 4, 5]  # in TRs
+
+#  creating arrays of ITI for presentation/test/recognition
 presentation_block_number_TRs_to_wait_inter_trials = test_block_number_TRs_to_wait_inter_trials = \
     [presentation_possible_iti[0]] * int(len(matrixTemplate) / 6) + \
     [presentation_possible_iti[1]] * int(len(matrixTemplate) / 6) + \
@@ -207,35 +202,27 @@ recognition_block_number_TRs_to_wait_inter_trials =\
     [recognition_possible_iti[1]] * int(len(matrixTemplate) / 3) + \
     [recognition_possible_iti[2]] * int(len(matrixTemplate) / 3)
 
+# creating array of possible ITIs value for MVPA before shuffling
+# CHECK: MAY BE UNUSED, SHOULD BE USED IN src/declarativeTask3/ld_generate_mvpa_trials.py
 mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions = []
 if mvpa_number_trials_correct_position:
     for value in mvpa_possible_iti:
         mvpa_block_number_TRs_to_wait_inter_trials_for_correct_positions +=\
             [value] * int(mvpa_number_trials_correct_position/len(mvpa_possible_iti))
-
 mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions = []
 if mvpa_number_trials_wrong_position:
     for value in mvpa_possible_iti:
         mvpa_block_number_TRs_to_wait_inter_trials_for_wrong_positions +=\
             [value] * int(mvpa_number_trials_wrong_position/len(mvpa_possible_iti))
-
 mvpa_block_number_TRs_to_wait_inter_trials_for_null_events = []
 if mvpa_number_null_events:
     for value in mvpa_possible_iti:
         mvpa_block_number_TRs_to_wait_inter_trials_for_null_events +=\
             [value] * int(mvpa_number_null_events/len(mvpa_possible_iti))
 
-number_ttl_in_rest_period = ceil(restPeriod/TR_duration)
-number_ttl_before_rest_period = 6
-instructions_time_displayed_in_TRs = 2
-visual_comfort_wait_time = 300  # short wait time padding after an instruction disappears and
-# before the next one appears, for visual comfort
-
-if numberBlocksSubUnit * numberLearningSubUnits != numberBlocksLearning:
-    raise ValueError("""the number of blocks of learning is not equal to
-    its number of subUnits * the number of blocks during a subUnit""")
-
+# Names of the categories
 classPictures = ['hf', 'hm', 'am', 'af', 'bc', 'bo', 'sc', 'so']
+# names of the containing folders in stimuli/ where the images are stored
 classPicturesAboveFolder = {'hf': 'class-faces', 'hm': 'class-faces', 'am': 'class-faces', 'af': 'class-faces',
                                    'bc': 'class-places', 'bo': 'class-places', 'sc': 'class-places', 'so': 'class-places'}
 picturesFolderClass = {category: join(picturesFolder, classPicturesAboveFolder[category], 'class-' + category)
@@ -243,12 +230,9 @@ picturesFolderClass = {category: join(picturesFolder, classPicturesAboveFolder[c
 
 # one category (as we'll later rename (refactor) classes) should always be a single lowercase letter
 numberClasses = len(classPictures)
-# The setting below allows the experimenter to prevent a learned matrix (currentCorrectAnswers > correctAnswersMax)
-# from appearing again during the Encoding Phase. In other words, as soon as this matrix is learned, during the encoding
-# phase, it won't appear again, during the encoding phase, again. The Encoding phase will continue, using only unlearned
-# matrices during the Encoding phase
-ignore_learned_matrices = False
 
+# technical: this is how the images filenames are generated & how the images are retrieved by the program
+# Assumption the name of the file ends with 3 digits and '.png'
 listPictures = {}
 for classPicture in classPictures:
     listPictures[classPicture] = glob.glob(
@@ -257,6 +241,7 @@ for classPicture in classPictures:
 for category in classPictures:
     listPictures[category] = [basename(p) for p in listPictures[category]]
 
+# MIGHT NOT BE RELEVANT TO THIS EXPERIMENT
 feedback_frame_correct_color = constants.C_GREEN
 feedback_frame_wrong_color = constants.C_RED
 feedback_time = 1000
