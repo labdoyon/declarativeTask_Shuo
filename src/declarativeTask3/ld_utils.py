@@ -132,7 +132,7 @@ def getPreviousMatrix(subjectName, daysBefore, experienceName):
         if os.path.isdir(session_dir):
             data_files = data_files + \
                          [os.path.join(session_dir, file) for file in os.listdir(session_dir) if file.endswith('_beh.xpd') and
-                          'task-' + experienceName in file]
+                          experienceName in file]
 
     data_files.sort(reverse=True)  # latest runs first
     for dataFile in data_files:
@@ -287,7 +287,7 @@ def getPreviouslyCorrectlyRecalledImages(subject_name, experienceName):
             data_files = data_files + \
                          [os.path.join(session_dir, file) for file in os.listdir(session_dir) if
                           file.endswith('_beh.xpd') and
-                          'task-' + experienceName in file]
+                          experienceName in file]
 
     data_files.sort(reverse=True)  # latest runs first
 
