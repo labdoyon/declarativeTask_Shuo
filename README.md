@@ -44,3 +44,31 @@ command=python + " " + os.path.join("src", "declarativeTask3", "ld_example.py"),
 You may now run the following in the command line, to run this step of the experiment without the menu provided in ld_runExperimentDayOne.py
 py src\declarativeTask3\ld_example.py 'ses-ExpD1_task-Example,<subject_id>'
 You will see any error the program generates much faster
+
+# Code examples for installation, initiation and testing:
+
+python -m pip install -e .
+% code to install a new version of DeMo task
+
+python -m pip install -r requirements.txt
+% code to install the required version of different libaries.
+
+pip install -e .
+% initialize the set-up script
+
+python tests\monitor_ttl_interval.py
+% code to calibrate a proper TTL interval
+
+python src\declarativeTask3\ld_show_matrix.py "show_matrix,BEPI_001" 
+% code to calibrate a proper TTL interval
+
+python ld_runExperimentDayOne.py "SUBJ_ID"
+% code to initiate the navigation panel
+
+change 1024 x 768 
+% change display setting before running the task
+
+python src\declarativeTask3\ld_encoding.py 'ses-ExpD2_task-Test-2ndClass,BEPI_001'
+python src\declarativeTask3\ld_generate_mvpa_trials.py "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials,BEPI_001" 
+% debug on particular task and subject
+
