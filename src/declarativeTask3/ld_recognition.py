@@ -96,7 +96,7 @@ if experimentName == "ses-ExpTest_task-Recognition":
     exp.add_experiment_info(parent_category + '_only_random_matrix:')
     exp.add_experiment_info(str(local_random_matrix))
 
-elif 'task-MVPA' in experimentName:
+elif 'task-Block' in experimentName:
     intro_instruction = ' MVPA '
     parent_category = 'both'
     only_faces = False
@@ -110,7 +110,7 @@ elif 'task-MVPA' in experimentName:
 
 if experimentName == "ses-ExpTest_task-Recognition":
     n_block = 0
-elif "task-MVPA" in experimentName:
+elif "task-Block" in experimentName:
     n_block = mvpa_task_block_number
 
 exp.add_experiment_info('Image classes order:')
@@ -187,7 +187,7 @@ if experimentName == "ses-ExpTest_task-Recognition":
     block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
     presentationOrder[0] = block_presentationOrder
 
-if 'task-MVPA' in experimentName:
+if 'task-Block' in experimentName:
     presentationOrder = load_mvpa_trials(subjectName, "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials")
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
@@ -208,7 +208,7 @@ exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync inf
 exp.add_experiment_info('Block_{}_timing_{}'.format(0, exp.clock.time))
 exp.add_experiment_info(f'PresentationOrder_Block-{0}')  # Save Presentation Order
 exp.add_experiment_info(str(list(presentationOrder[n_block])))
-if 'task-MVPA' in experimentName:
+if 'task-Block' in experimentName:
     listCards = presentationOrder[mvpa_task_block_number][3]
     # local_random_matrix = randomMatrix[n_block]
     # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
@@ -260,7 +260,7 @@ for nCard in range(presentationOrder[n_block].shape[1]):
 
             trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
             number_TRs_inter_trials.remove(trial_iti)
-    elif 'task-MVPA' in experimentName:
+    elif 'task-Block' in experimentName:
         trial_iti = presentationOrder[n_block][2][nCard]
 
     exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
@@ -324,7 +324,7 @@ for nCard in range(presentationOrder[n_block].shape[1]):
             break
         exp.keyboard.process_control_keys()
     if valid_answer:
-        rt = exp.clock.time - start_of_response_period_timestamp
+        rt = response_timestamp - start_of_response_period_timestamp
     else:
         rt = None
     if answer == 'matrixA':
@@ -339,15 +339,27 @@ for nCard in range(presentationOrder[n_block].shape[1]):
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
                       'correct', bool(presentationOrder[n_block][1][nCard] == 0), rt])
-        matrixA = stimuli.TextBox(text='R', size=button_size,
-                                  position=matrixA_position,
-                                  text_size=textSize,
-                                  text_colour=constants.C_GREEN,
-                                  background_colour=clickColor)
+
+
+        # matrixA = stimuli.TextBox(text='R', size=button_size,
+        #                           position=matrixA_position,
+        #                           text_size=textSize,
+        #                           text_colour=constants.C_GREEN,
+        #                           background_colour=clickColor)
         if rt <= false_alert_minimal_threshold_response_time:
+            matrixA = stimuli.TextBox(text='R', size=button_size,
+                                      position=matrixA_position,
+                                      text_size=textSize,
+                                      text_colour=constants.C_GREEN,
+                                      background_colour=constants.C_YELLOW)
             matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
                                                   colour=constants.C_YELLOW)
         else:
+            matrixA = stimuli.TextBox(text='R', size=button_size,
+                                      position=matrixA_position,
+                                      text_size=textSize,
+                                      text_colour=constants.C_GREEN,
+                                      background_colour=clickColor)
             matrixA_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixA_position,
                                                   colour=clickColor)
 
@@ -379,17 +391,24 @@ for nCard in range(presentationOrder[n_block].shape[1]):
                       start_of_image_presentation_timestamp, end_of_image_presentation_timestamp,
                       start_of_response_period_timestamp,
                       'incorrect', bool(presentationOrder[n_block][1][nCard] == 1), rt])
-        matrixNone = stimuli.TextBox('W', size=button_size,
-                                     position=matrixNone_position,
-                                     text_size=textSize,
-                                     text_colour=constants.C_RED,
-                                     background_colour=clickColor)
+
         if rt <= false_alert_minimal_threshold_response_time:
+            matrixNone = stimuli.TextBox('W', size=button_size,
+                                      position=matrixNone_position,
+                                      text_size=textSize,
+                                      text_colour=constants.C_RED,
+                                      background_colour=constants.C_YELLOW)
             matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
                                                      colour=constants.C_YELLOW)
         else:
+            matrixNone = stimuli.TextBox('W', size=button_size,
+                                      position=matrixNone_position,
+                                      text_size=textSize,
+                                      text_colour=constants.C_RED,
+                                      background_colour=clickColor)
             matrixNone_rectangle = stimuli.Rectangle(size=rectangle_size, position=matrixNone_position,
                                                      colour=clickColor)
+
 
         matrixNone_rectangle.plot(bs)
         matrixNone.plot(bs)
@@ -439,7 +458,7 @@ m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 # REST PERIOD
-if 'task-MVPA' in experimentName:
+if 'task-Block' in experimentName:
     for i in range(mvpa_final_rest_in_trs):
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 else:

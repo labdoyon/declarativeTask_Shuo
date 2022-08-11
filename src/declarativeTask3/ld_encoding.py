@@ -34,6 +34,7 @@ experimentName = arguments[0]
 subjectName = arguments[1]
 
 exp = design.Experiment(experimentName)  # Save experiment name
+print(experimentName)
 session = experiment_session[experimentName]
 session_dir = os.path.normpath(os.path.join('sourcedata', 'sub-' + subjectName, 'ses-' + session))
 output_dir = os.path.normpath(os.path.join(session_dir, 'beh'))

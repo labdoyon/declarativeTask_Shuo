@@ -7,7 +7,7 @@ from expyriment.misc import constants
 python = 'py'
 
 # TTL signal and TR duration
-TR_duration = 1591   # in ms
+TR_duration = 1500   # in ms
 ttl_characters = ['5', 't', 'r']
 min_delay_between_two_ttls = floor(TR_duration/2)  # in milliseconds
 interval_between_ttl_checks = min(int(min_delay_between_two_ttls/10), 100)  # in milliseconds
@@ -264,9 +264,7 @@ experiment_use_faces_or_places = {
 
          'ses-ExpD2_task-Test-1stClass':                'faces',
          'ses-ExpD2_task-Learn-2ndClass':               'places',
-
-         'ses-ExpMVPA_task-Test-2ndClass':              'places',
-         'ses-ExpMVPA_task-Test-1stClass':              'faces'},
+         'ses-ExpD2_task-Test-2ndClass':                'places'},
 
     # start with places
     'start_with_class2':
@@ -278,9 +276,7 @@ experiment_use_faces_or_places = {
 
          'ses-ExpD2_task-Test-1stClass':                'places',
          'ses-ExpD2_task-Learn-2ndClass':               'faces',
-
-         'ses-ExpMVPA_task-Test-2ndClass':              'faces',
-         'ses-ExpMVPA_task-Test-1stClass':              'places'}
+         'ses-ExpD2_task-Test-2ndClass':                'faces'}
 }
 
 sessions = ['ExpD1', 'ExpSleep', 'ExpTest', 'ExpD2', 'ExpMVPA']
@@ -298,16 +294,15 @@ experiment_session = {
     'ses-ExpTest_task-Test-1stClass':               'ExpTest',
     'ses-ExpTest_task-Recognition':                 'ExpTest',
 
-    'ses-ExpD2_task-PVT':                           'ExpD2',
+    'ses-ExpD2_task-PVT1':                          'ExpD2',
     'ses-ExpD2_task-Test-1stClass':                 'ExpD2',
     'ses-ExpD2_task-Learn-2ndClass':                'ExpD2',
+    'ses-ExpD2_task-PVT2':                          'ExpD2',
+    'ses-ExpD2_task-Test-2ndClass':                 'ExpD2',
 
-    'ses-ExpMVPA_task-PVT':                         'ExpMVPA',
-    'ses-ExpMVPA_task-Test-2ndClass':               'ExpMVPA',
-    'ses-ExpMVPA_task-Test-1stClass':               'ExpMVPA',
     'ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials':  'ExpMVPA',
-    'ses-ExpMVPA_task-MVPA-Block-1':                'ExpMVPA',
-    'ses-ExpMVPA_task-MVPA-Block-2':                'ExpMVPA',
-    'ses-ExpMVPA_task-MVPA-Block-3':                'ExpMVPA',
-    'ses-ExpMVPA_task-MVPA-Block-4':                'ExpMVPA',
-    'ses-ExpMVPA_task-MVPA-Block-5':                'ExpMVPA'}
+    'ses-ExpMVPA_task-Block-1':                'ExpMVPA',
+    'ses-ExpMVPA_task-Block-2':                'ExpMVPA',
+    'ses-ExpMVPA_task-Block-3':                'ExpMVPA',
+    'ses-ExpMVPA_task-Block-4':                'ExpMVPA',
+    'ses-ExpMVPA_task-Block-5':                'ExpMVPA'}

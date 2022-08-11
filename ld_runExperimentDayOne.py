@@ -77,9 +77,9 @@ ses_ExpTest__task_Recognition = CommandItem(
 
 # ### SLEEP IN THE LAB (no recording) ###
 
-ses_ExpD2__task_PVT = CommandItem(
-    text='ses-ExpD2_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='ses-ExpD2_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpD2__task_PVT1 = CommandItem(
+    text='ses-ExpD2_task-PVT1', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='ses-ExpD2_task-PVT1, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpD2__task_Test_1stClass = CommandItem(
     text='ses-ExpD2_task-Test-1stClass',
@@ -91,43 +91,43 @@ ses_ExpD2__task_Learn_2ndClass = CommandItem(
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
     arguments="ses-ExpD2_task-Learn-2ndClass, " + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_PVT = CommandItem(
-    text='ses-ExpMVPA_task-PVT', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
-    arguments='ses-ExpMVPA_task-PVT, ' + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpD2__task_PVT2 = CommandItem(
+    text='ses-ExpD2_task-PVT2', command=python + " " + os.path.join("src", "declarativeTask3", "ld_pvt.py"),
+    arguments='ses-ExpD2_task-PVT2, ' + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_Test_2ndClass = CommandItem(
-    text='ses-ExpMVPA_task-Test-2ndClass',
+ses_ExpD2__task_Test_2ndClass = CommandItem(
+    text='ses-ExpD2_task-Test-2ndClass',
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='ses-ExpMVPA_task-Test-2ndClass, ' + sys.argv[1], menu=menu, should_exit=False)
+    arguments='ses-ExpD2_task-Test-2ndClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_Test_1stClass = CommandItem(
-    text='ses-ExpMVPA_task-Test-1stClass', command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
-    arguments='ses-ExpMVPA_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
+# ses_ExpMVPA__task_Test_1stClass = CommandItem(
+#     text='ses-ExpMVPA_task-Test-1stClass', command=python + " " + os.path.join("src", "declarativeTask3", "ld_encoding.py"),
+#     arguments='ses-ExpMVPA_task-Test-1stClass, ' + sys.argv[1], menu=menu, should_exit=False)
 
 ses_ExpMVPA__task_generate_MVPA_trials = CommandItem(
     text="ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials",
     command=python + " " + os.path.join("src", "declarativeTask3", "ld_generate_mvpa_trials.py"),
     arguments="ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials," + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA_Block_1 = CommandItem(
-    text="ses-ExpMVPA_task-MVPA-Block-1", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="ses-ExpMVPA_task-MVPA-Block-1, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_Block_1 = CommandItem(
+    text="ses-ExpMVPA_task-Block-1", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-Block-1, " + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA_Block_2 = CommandItem(
-    text="ses-ExpMVPA_task-MVPA-Block-2", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="ses-ExpMVPA_task-MVPA-Block-2, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_Block_2 = CommandItem(
+    text="ses-ExpMVPA_task-Block-2", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-Block-2, " + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA_Block_3 = CommandItem(
-    text="ses-ExpMVPA_task-MVPA-Block-3", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="ses-ExpMVPA_task-MVPA-Block-3, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_Block_3 = CommandItem(
+    text="ses-ExpMVPA_task-Block-3", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-Block-3, " + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA_Block_4 = CommandItem(
-    text="ses-ExpMVPA_task-MVPA-Block-4", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="ses-ExpMVPA_task-MVPA-Block-4, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_Block_4 = CommandItem(
+    text="ses-ExpMVPA_task-Block-4", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-Block-4, " + sys.argv[1], menu=menu, should_exit=False)
 
-ses_ExpMVPA__task_MVPA_Block_5 = CommandItem(
-    text="ses-ExpMVPA_task-MVPA-Block-5", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
-    arguments="ses-ExpMVPA_task-MVPA-Block-5, " + sys.argv[1], menu=menu, should_exit=False)
+ses_ExpMVPA__task_Block_5 = CommandItem(
+    text="ses-ExpMVPA_task-Block-5", command=python + " " + os.path.join("src", "declarativeTask3", "ld_recognition.py"),
+    arguments="ses-ExpMVPA_task-Block-5, " + sys.argv[1], menu=menu, should_exit=False)
 
 menu.append_item(ChooseLanguage)
 menu.append_item(ChooseFacesPlaces)
@@ -150,19 +150,19 @@ menu.append_item(ses_ExpTest__task_Recognition)
 # ### SLEEP IN THE LAB (no recording) ###
 # Set Up
 # Rest
-menu.append_item(ses_ExpD2__task_PVT)
+menu.append_item(ses_ExpD2__task_PVT1)
 menu.append_item(ses_ExpD2__task_Test_1stClass)
 menu.append_item(ses_ExpD2__task_Learn_2ndClass)
 # Rest
-menu.append_item(ses_ExpMVPA__task_PVT)
-menu.append_item(ses_ExpMVPA__task_Test_2ndClass)
-menu.append_item(ses_ExpMVPA__task_Test_1stClass)
+menu.append_item(ses_ExpD2__task_PVT2)
+menu.append_item(ses_ExpD2__task_Test_2ndClass)
+# menu.append_item(ses_ExpMVPA__task_Test_1stClass)
 
 menu.append_item(ses_ExpMVPA__task_generate_MVPA_trials)
-menu.append_item(ses_ExpMVPA__task_MVPA_Block_1)
-menu.append_item(ses_ExpMVPA__task_MVPA_Block_2)
-menu.append_item(ses_ExpMVPA__task_MVPA_Block_3)
-menu.append_item(ses_ExpMVPA__task_MVPA_Block_4)
-menu.append_item(ses_ExpMVPA__task_MVPA_Block_5)
+menu.append_item(ses_ExpMVPA__task_Block_1)
+menu.append_item(ses_ExpMVPA__task_Block_2)
+menu.append_item(ses_ExpMVPA__task_Block_3)
+menu.append_item(ses_ExpMVPA__task_Block_4)
+menu.append_item(ses_ExpMVPA__task_Block_5)
 
 menu.show()
