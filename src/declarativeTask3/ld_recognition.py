@@ -62,13 +62,13 @@ exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'categoryPresented',
                              'start_of_response_period_timestamp',
                              'subjectAnswered', 'subjectCorrect', 'ResponseTime'])
 
-learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
+learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-D1_task-learnA')
 exp.add_experiment_info('Learning: ')
 exp.add_experiment_info(str(learningMatrix))
 
 number_blocks = 1
 intro_instruction = ' RECOGNITION '
-if experimentName == "ses-ExpTest_task-Recognition":
+if experimentName == "ses-Test_task-recognition":
     randomMatrix = m.newRecognitionMatrix(learningMatrix)
     exp.add_experiment_info('RandomMatrix: ')
     exp.add_experiment_info(str(randomMatrix))
@@ -96,7 +96,7 @@ if experimentName == "ses-ExpTest_task-Recognition":
     exp.add_experiment_info(parent_category + '_only_random_matrix:')
     exp.add_experiment_info(str(local_random_matrix))
 
-elif 'task-Block' in experimentName:
+elif 'task-block' in experimentName:
     intro_instruction = ' MVPA '
     parent_category = 'both'
     only_faces = False
@@ -108,9 +108,9 @@ elif 'task-Block' in experimentName:
 
     mvpa_task_block_number = int(experimentName[-1])-1
 
-if experimentName == "ses-ExpTest_task-Recognition":
+if experimentName == "ses-Test_task-recognition":
     n_block = 0
-elif "task-Block" in experimentName:
+elif "task-block" in experimentName:
     n_block = mvpa_task_block_number
 
 exp.add_experiment_info('Image classes order:')
@@ -169,7 +169,7 @@ exp.clock.wait(restPeriod, process_control_events=True)
 # Generate Vector of trials for the full experiment:
 presentationOrder = [None] * number_blocks
 
-if experimentName == "ses-ExpTest_task-Recognition":
+if experimentName == "ses-Test_task-recognition":
     presentationMatrixLearningOrder = newRandomPresentation(override_remove_cards=removeCards)
     presentationMatrixLearningOrder = np.vstack(
         (presentationMatrixLearningOrder, np.zeros(m.size[0] * m.size[1] - len(removeCards))))
@@ -187,8 +187,8 @@ if experimentName == "ses-ExpTest_task-Recognition":
     block_presentationOrder = block_presentationOrder[:, np.random.permutation(block_presentationOrder.shape[1])]
     presentationOrder[0] = block_presentationOrder
 
-if 'task-Block' in experimentName:
-    presentationOrder = load_mvpa_trials(subjectName, "ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials")
+if 'task-block' in experimentName:
+    presentationOrder = load_mvpa_trials(subjectName, "ses-MVPA_NOT-A-TASK-generate-mvpa-trials")
 
 m.plot_instructions_rectangle(bs, instructions_card, draw=False)
 m.plot_instructions(bs, instructions_card, intro_instruction, draw=False)
@@ -208,12 +208,12 @@ exp.add_experiment_info(['StartExp: {}'.format(exp.clock.time)])  # Add sync inf
 exp.add_experiment_info('Block_{}_timing_{}'.format(0, exp.clock.time))
 exp.add_experiment_info(f'PresentationOrder_Block-{0}')  # Save Presentation Order
 exp.add_experiment_info(str(list(presentationOrder[n_block])))
-if 'task-Block' in experimentName:
+if 'task-block' in experimentName:
     listCards = presentationOrder[mvpa_task_block_number][3]
     # local_random_matrix = randomMatrix[n_block]
     # exp.add_experiment_info(f'RandomMatrix_Block-{n_block}')
     # exp.add_experiment_info(str(local_random_matrix))
-elif experimentName == "ses-ExpTest_task-Recognition":
+elif experimentName == "ses-Test_task-recognition":
     listCards = []
     for nCard in range(presentationOrder[0].shape[1]):
         if len(removeCards):
@@ -236,13 +236,13 @@ elif experimentName == "ses-ExpTest_task-Recognition":
         else:
             listCards.append(local_random_matrix[int(position)])
 
-if experimentName == "ses-ExpTest_task-Recognition":
+if experimentName == "ses-Test_task-recognition":
     number_TRs_inter_trials = recognition_block_number_TRs_to_wait_inter_trials.copy()
 
 for nCard in range(presentationOrder[n_block].shape[1]):
     # Inter Trial Interval
     min_iti_in_TRs = ceil((exp.clock.time - last_ttl_timestamp) / TR_duration)
-    if experimentName == "ses-ExpTest_task-Recognition":
+    if experimentName == "ses-Test_task-recognition":
         exp.add_experiment_info(f"min_iti_in_TRs_{min_iti_in_TRs}")
         # removing elements which can't be selected
         temp_number_TRs_inter_trials = [element for element in number_TRs_inter_trials if element >= min_iti_in_TRs]
@@ -260,7 +260,7 @@ for nCard in range(presentationOrder[n_block].shape[1]):
 
             trial_iti = np.random.choice(temp_number_TRs_inter_trials, p=temp_probabilities_to_pick)
             number_TRs_inter_trials.remove(trial_iti)
-    elif 'task-Block' in experimentName:
+    elif 'task-block' in experimentName:
         trial_iti = presentationOrder[n_block][2][nCard]
 
     exp.add_experiment_info(f'wait_{trial_iti}_TTLs')
@@ -458,7 +458,7 @@ m.plot_instructions_card(bs, instructions_card, draw=False)
 bs.present(False, True)
 
 # REST PERIOD
-if 'task-Block' in experimentName:
+if 'task-block' in experimentName:
     for i in range(mvpa_final_rest_in_trs):
         last_ttl_timestamp = wait_for_ttl_keyboard_and_log_ttl(exp, last_ttl_timestamp)
 else:

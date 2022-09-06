@@ -81,14 +81,14 @@ exp.add_data_variable_names(['logging_timestamp', 'NBlock', 'image_presented', '
 
 keepMatrix = True
 keepPreviousMatrix = True
-if 'task-Test' in experimentName:
+if 'task-test' in experimentName:
     nbBlocksMax = 1
 
 m = LdMatrix(matrixSize, windowSize, override_remove_cards=removeCards)  # Create Matrix
 
 if keepPreviousMatrix:
-    previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
-    if previousMatrix is None and experimentName != 'ses-ExpD1_task-Learn-1stClass':
+    previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-D1_task-learnA')
+    if previousMatrix is None and experimentName != 'ses-D1_task-learnA':
         control.end()
         print("Error, was matrix correctly generated during the first learning?")
         import time; time.sleep(5)
@@ -166,7 +166,7 @@ exp.clock.wait(restPeriod, process_control_events=True)
 while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     presentationOrder = newRandomPresentation(presentationOrder, override_remove_cards=removeCards)
     # PRESENTATION BLOCK
-    if 1 != nbBlocksMax or experimentName == 'PreLearn':
+    if 1 != nbBlocksMax or experimentName == 'ses-D1_task-learnA':
         exp.add_experiment_info('Presentation_Block_{}_timing_{}'.format(nBlock, exp.clock.time))
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card, presentation_screen_text[language], draw=False)
@@ -381,7 +381,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
     # baseline of brain activity in the MRI
     last_ttl_timestamp = rest_function(exp, last_ttl_timestamp, block_index=nBlock, pre_rest=True)
 
-    if nbBlocksMax != 1 or experimentName == 'DayOne-PreLearning':
+    if nbBlocksMax != 1 or experimentName == 'ses-D1_task-learnA':
         m.plot_instructions_rectangle(bs, instructions_card, draw=False)
         m.plot_instructions(bs, instructions_card,
                             'You got ' + str(int(correctAnswers[nBlock])) + ' out of '

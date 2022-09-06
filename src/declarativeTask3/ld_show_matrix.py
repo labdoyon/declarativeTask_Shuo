@@ -16,7 +16,7 @@ arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment 
 experimentName = arguments[0]
 subjectName = arguments[1]
 
-previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
+previousMatrix = getPreviousMatrix(subjectName, 0, 'ses-D1_task-learnA')
 
 
 exp = design.Experiment(experimentName)  # Save experiment name

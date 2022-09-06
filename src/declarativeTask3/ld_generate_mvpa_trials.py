@@ -21,47 +21,64 @@ arguments = str(''.join(sys.argv[1:])).split(',')  # Get arguments - experiment 
 experimentName = arguments[0]
 subjectName = arguments[1]
 
-learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-ExpD1_task-Learn-1stClass')
+learningMatrix = getPreviousMatrix(subjectName, 0, 'ses-D1_task-learnA')
 faces_places_choice = getPlacesOrFacesChoice(subjectName, 0, 'choose-faces-places')
 
- # Shuo's modification: decide to use the intersetion set of the mid-night test and D2 first test, as the inclusion critiria
-correctly_recalled_faces_set1 = getPreviouslyCorrectlyRecalledImages(subjectName,
-                                                                experienceName='ses-ExpTest_task-Test-1stClass')
+ # Shuo's modification: decide to use the intersection set of the mid-night test and D2 first test, as the inclusion critiria for MVPA
 
-if experiment_use_faces_or_places[faces_places_choice]['ses-ExpD2_task-Test-1stClass'] == 'faces' and \
-        experiment_use_faces_or_places[faces_places_choice]['ses-ExpD2_task-Test-2ndClass'] == 'places':
+
+if experiment_use_faces_or_places[faces_places_choice]['ses-D2_task-testA'] == 'faces' and \
+        experiment_use_faces_or_places[faces_places_choice]['ses-D2_task-testB'] == 'places':
+    correctly_recalled_faces_set1 = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                    experienceName='ses-Test_task-testA')
     correctly_recalled_faces_set2 = getPreviouslyCorrectlyRecalledImages(subjectName,
-                                                                    experienceName='ses-ExpD2_task-Test-1stClass')
+                                                                    experienceName='ses-D2_task-testA')
     correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName,
-                                                                     experienceName='ses-ExpD2_task-Test-2ndClass')
-elif experiment_use_faces_or_places[faces_places_choice]['ses-ExpD2_task-Test-1stClass'] == 'places' and \
-        experiment_use_faces_or_places[faces_places_choice]['ses-ExpD2_task-Test-2ndClass'] == 'faces':
-    correctly_recalled_faces_set2 = getPreviouslyCorrectlyRecalledImages(subjectName,
-                                                                    experienceName='ses-ExpD2_task-Test-2ndClass')
-    correctly_recalled_places = getPreviouslyCorrectlyRecalledImages(subjectName,
-                                                                     experienceName='ses-ExpD2_task-Test-1stClass')
+                                                                     experienceName='ses-D2_task-testB')
+    FACEs_c_rem_set1 = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_faces_set1.items() if correct_remembered is True]
+    FACEs_c_rem_set2 = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_faces_set2.items() if correct_remembered is True]
+    print(FACEs_c_rem_set1)
+    print(len(FACEs_c_rem_set1))
+    print(FACEs_c_rem_set2)
+    print(len(FACEs_c_rem_set2))
+    FACEs_c_rem = list(set(FACEs_c_rem_set1) & set(FACEs_c_rem_set2))
+    print(FACEs_c_rem)
+    print(len(FACEs_c_rem))
 
-FACEs_c_rem_set1 = [learningMatrix[position_index] if position_index < center_card_position
-               else learningMatrix[position_index - 1]
-               for position_index, correct_remembered in correctly_recalled_faces_set1.items() if correct_remembered is True]
-FACEs_c_rem_set2 = [learningMatrix[position_index] if position_index < center_card_position
-               else learningMatrix[position_index - 1]
-               for position_index, correct_remembered in correctly_recalled_faces_set2.items() if correct_remembered is True]
+    PLACEs_c_rem = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_places.items() if correct_remembered is True]
+    print(PLACEs_c_rem)
+    print(len(PLACEs_c_rem))
 
-print(FACEs_c_rem_set1)
-print(len(FACEs_c_rem_set1))
-print(FACEs_c_rem_set2)
-print(len(FACEs_c_rem_set2))
-FACEs_c_rem = list(set(FACEs_c_rem_set1) & set(FACEs_c_rem_set2))
-print(FACEs_c_rem)
-print(len(FACEs_c_rem))
+elif experiment_use_faces_or_places[faces_places_choice]['ses-D2_task-testA'] == 'places' and \
+        experiment_use_faces_or_places[faces_places_choice]['ses-D2_task-testB'] == 'faces':
+    correctly_recalled_faces = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                    experienceName='ses-D2_task-testB')
+    correctly_recalled_places_set1 = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                    experienceName='ses-Test_task-testA')
+    correctly_recalled_places_set2 = getPreviouslyCorrectlyRecalledImages(subjectName,
+                                                                     experienceName='ses-D2_task-testA')
 
-PLACEs_c_rem = [learningMatrix[position_index] if position_index < center_card_position
-                else learningMatrix[position_index - 1]
-                for position_index, correct_remembered in correctly_recalled_places.items() if correct_remembered is True]
-print(PLACEs_c_rem)
-print(len(PLACEs_c_rem))
+    PLACEs_c_rem_set1 = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_places_set1.items() if correct_remembered is True]
+    PLACEs_c_rem_set2 = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_places_set2.items() if correct_remembered is True]
+    PLACEs_c_rem = list(set(PLACEs_c_rem_set1) & set(PLACEs_c_rem_set2))
 
+    FACEs_c_rem = [learningMatrix[position_index] if position_index < center_card_position
+                    else learningMatrix[position_index - 1]
+                    for position_index, correct_remembered in correctly_recalled_faces.items() if correct_remembered is True]
+
+
+
+# equalize number of inclusion for two classes
 if len(FACEs_c_rem) > len(PLACEs_c_rem):
    FACEs_c_rem = random.sample(FACEs_c_rem, len(PLACEs_c_rem))
 elif len(FACEs_c_rem) < len(PLACEs_c_rem):

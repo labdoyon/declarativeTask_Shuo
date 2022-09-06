@@ -22,7 +22,7 @@ if language == 'None':
         choose_language.append(
             CommandItem(text='choose ' + supported_language + ' for the experiment for this participant',
                         command=python + " " + os.path.join("src", "declarativeTask3", "ld_choose_language.py"),
-                        arguments='ses-ExpD1_task-choose-language, ' + subject_name + ', ' + supported_language,
+                        arguments='ses-D1_task-choose-language, ' + subject_name + ', ' + supported_language,
                         menu=menu,
                         should_exit=False)
                                )

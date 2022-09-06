@@ -95,7 +95,7 @@ BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 
 
-arrow = ("xX                      ",
+arrow = ("XX                      ",
          "X.X                     ",
          "X..X                    ",
          "X...X                   ",
@@ -256,53 +256,53 @@ supported_start_by_choices_explicit = {'start_with_class1': 'start_with_faces',
 experiment_use_faces_or_places = {
     # start with faces
     'start_with_class1':
-        {'ses-ExpD1_task-Learn-1stClass':               'faces',
-         'ses-ExpD1_task-Test-1stClass':                'faces',
+        {'ses-D1_task-learnA':               'faces',
+         'ses-D1_task-testA':                'faces',
 
-         'ses-ExpTest_task-Test-1stClass':              'faces',
-         'ses-ExpTest_task-Recognition':                'faces',
+         'ses-Test_task-testA':              'faces',
+         'ses-Test_task-recognition':        'faces',
 
-         'ses-ExpD2_task-Test-1stClass':                'faces',
-         'ses-ExpD2_task-Learn-2ndClass':               'places',
-         'ses-ExpD2_task-Test-2ndClass':                'places'},
+         'ses-D2_task-testA':                'faces',
+         'ses-D2_task-learnB':               'places',
+         'ses-D2_task-testB':                'places'},
 
     # start with places
     'start_with_class2':
-        {'ses-ExpD1_task-Learn-1stClass':               'places',
-         'ses-ExpD1_task-Test-1stClass':                'places',
+        {'ses-D1_task-learnA':               'places',
+         'ses-D1_task-testA':                'places',
 
-         'ses-ExpTest_task-Test-1stClass':              'places',
-         'ses-ExpTest_task-Recognition':                'places',
+         'ses-Test_task-testA':              'places',
+         'ses-Test_task-recognition':        'places',
 
-         'ses-ExpD2_task-Test-1stClass':                'places',
-         'ses-ExpD2_task-Learn-2ndClass':               'faces',
-         'ses-ExpD2_task-Test-2ndClass':                'faces'}
+         'ses-D2_task-testA':                'places',
+         'ses-D2_task-learnB':               'faces',
+         'ses-D2_task-testB':                'faces'}
 }
 
-sessions = ['ExpD1', 'ExpSleep', 'ExpTest', 'ExpD2', 'ExpMVPA']
+sessions = ['D1', 'ExpSleep', 'Test', 'D2', 'MVPA']
 
 experiment_session = {
-    'ses-ExpD1_task-choose-language':               'ExpD1',
-    'ses-ExpD1_task-choose-faces-places':           'ExpD1',
+    'ses-D1_task-choose-language':               'D1',
+    'ses-D1_task-choose-faces-places':           'D1',
 
-    'ses-ExpD1_task-Example':                       'ExpD1',
-    'ses-ExpD1_task-Learn-1stClass':                'ExpD1',
-    'ses-ExpD1_task-PVT':                           'ExpD1',
-    'ses-ExpD1_task-Test-1stClass':                 'ExpD1',
+    'ses-D1_task-Example':                       'D1',
+    'ses-D1_task-learnA':                        'D1',
+    'ses-D1_task-PVT':                           'D1',
+    'ses-D1_task-testA':                         'D1',
 
-    'ses-ExpTest_task-PVT':                         'ExpTest',
-    'ses-ExpTest_task-Test-1stClass':               'ExpTest',
-    'ses-ExpTest_task-Recognition':                 'ExpTest',
+    'ses-Test_task-PVT':                         'Test',
+    'ses-Test_task-testA':                       'Test',
+    'ses-Test_task-recognition':                 'Test',
 
-    'ses-ExpD2_task-PVT1':                          'ExpD2',
-    'ses-ExpD2_task-Test-1stClass':                 'ExpD2',
-    'ses-ExpD2_task-Learn-2ndClass':                'ExpD2',
-    'ses-ExpD2_task-PVT2':                          'ExpD2',
-    'ses-ExpD2_task-Test-2ndClass':                 'ExpD2',
+    'ses-D2_task-PVT1':                          'D2',
+    'ses-D2_task-testA':                         'D2',
+    'ses-D2_task-learnB':                        'D2',
+    'ses-D2_task-PVT2':                          'D2',
+    'ses-D2_task-testB':                         'D2',
 
-    'ses-ExpMVPA_NOT-A-TASK-generate-mvpa-trials':  'ExpMVPA',
-    'ses-ExpMVPA_task-Block-1':                'ExpMVPA',
-    'ses-ExpMVPA_task-Block-2':                'ExpMVPA',
-    'ses-ExpMVPA_task-Block-3':                'ExpMVPA',
-    'ses-ExpMVPA_task-Block-4':                'ExpMVPA',
-    'ses-ExpMVPA_task-Block-5':                'ExpMVPA'}
+    'ses-MVPA_NOT-A-TASK-generate-mvpa-trials':  'MVPA',
+    'ses-MVPA_task-block-1':                     'MVPA',
+    'ses-MVPA_task-block-2':                     'MVPA',
+    'ses-MVPA_task-block-3':                     'MVPA',
+    'ses-MVPA_task-block-4':                     'MVPA',
+    'ses-MVPA_task-block-5':                     'MVPA'}

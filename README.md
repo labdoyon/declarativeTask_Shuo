@@ -60,7 +60,7 @@ python tests\monitor_ttl_interval.py
 % code to calibrate a proper TTL interval
 
 python src\declarativeTask3\ld_show_matrix.py "show_matrix,BEPI_001" 
-% code to calibrate a proper TTL interval
+% code to show the image-location assignment result for a given subject
 
 python ld_runExperimentDayOne.py "SUBJ_ID"
 % code to initiate the navigation panel
