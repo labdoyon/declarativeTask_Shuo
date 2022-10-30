@@ -312,7 +312,7 @@ while currentCorrectAnswers < correctAnswersMax and nBlock < nbBlocksMax:
         start_of_response_period_timestamp = None
         while not valid_response and rt is not None:
             mouse.show_cursor(True, True)
-            start = get_time()
+            start = exp.clock.time
             if start_of_response_period_timestamp is None:
                 start_of_response_period_timestamp = start
             rt, position = readMouse(start, mouseButton, time_left)
